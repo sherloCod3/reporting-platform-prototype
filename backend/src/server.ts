@@ -1,17 +1,26 @@
-// server.ts (20 linhas)
 import express from 'express';
-import reportRoutes from './routes/index.js';
+import cors from 'cors';
+import routes from './routes/index.js';
 import { requestLogger } from './middlewares/requestLogger.js';
 import { errorHandler } from './middlewares/errorHandler.js';
-import router from './routes/report.routes.js';
 
 const app = express();
+
+app.use(cors({
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    credentials: true
+}));
+
+// parser JSON - transforma body em objeto
 app.use(express.json({ limit: '50mb' }));
-app.use('/api', reportRoutes);
+
 app.use((req, res, next) => requestLogger(req, res, next));
-app.use(router);
+app.use('/api', routes);
 app.use(errorHandler);
 
-app.listen(3000);
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`)
+});
 
 export default app;

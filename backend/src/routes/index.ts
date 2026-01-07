@@ -5,6 +5,6 @@ import { healthCheck } from '../controllers/health.controller.js';
 const router = Router();
 
 router.get('/health', healthCheck);
-router.use('/api/reports', reportRoutes);
+router.use('/reports', reportRoutes);
 
 export default router;
