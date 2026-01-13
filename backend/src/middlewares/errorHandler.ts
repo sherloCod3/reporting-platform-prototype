@@ -1,18 +1,36 @@
 import type { Request, Response, NextFunction } from 'express';
+import { AppError } from '../types/errors.types.js';
 
 export function errorHandler(
-    error: any,
+    error: Error | AppError,
     req: Request,
     res: Response,
     next: NextFunction
 ) {
-    // Mapear erros MySQL para mensagens amigáveis
-    const statusCode = error.statuscode || 500;
-    const message = error.userMessage || 'Erro interno';
+    // Se o erro já foi tratado passa adiante
+    if (res.headersSent) {
+        return next(error);
+    }
 
-    res.status(statusCode).json({
+    // Se é AppError (erro controlado)
+    if (error instanceof AppError) {
+        return res.status(error.statusCode).json({
+            success: false,
+            message: error.message,
+            hint: error.hint,
+            timestamp: new Date().toISOString()
+        });
+    }
+
+    // Para erros inesperados, log completo (somente em dev)
+    if (process.env.NODE_ENV !== 'production') {
+        console.error('⚠️ Erro não tratado:', error);
+    }
+
+    // Resposta genérica em produção
+    res.status(500).json({
         success: false,
-        message,
-        hint: error.hint
+        message: 'Erro interno do servidor',
+        timestamp: new Date().toISOString()
     });
 }
