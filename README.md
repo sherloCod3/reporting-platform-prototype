@@ -447,21 +447,20 @@ chore: maintenance tasks
 
 - [x] Core SQL execution
 - [x] PDF export
-- [ ] Performance optimization
-- [ ] Authentication (JWT)
-- [ ] Saved templates
+- [x] Performance optimization
+- [x] Authentication (JWT)
+- [x] Multi-tenant support
 
 ### **Q2 2025**
-
-- [ ] Excel export
+- [ ] Visual query builder
+- [ ] Advanced filters
+- [ ] Advanced tools
 - [ ] Interactive charts
-- [ ] Scheduled reports
-- [ ] Multi-tenant support
+- [ ] Saved templates
 
 ### **Q3 2025**
 
-- [ ] Visual query builder
-- [ ] Advanced filters
+- [ ] Excel export
 - [ ] Dashboard analytics
 - [ ] API documentation (Swagger)
 
@@ -496,7 +495,7 @@ Report bugs via [GitHub Issues](https://github.com/sherlocod3/qreports-tool/issu
 
 ### **Documentation**
 
-- 📖 [Wiki](https://github.com/YOUR-USERNAME/qreports/wiki)
+- 📖 [Wiki](https://github.com/YOUR-USERNAME/qreports/wiki) (planned)
 - 📚 [API Docs](https://api.notreadyyet.com/docs) (planned)
 
 ---
@@ -514,7 +513,7 @@ Report bugs via [GitHub Issues](https://github.com/sherlocod3/qreports-tool/issu
 
 ![GitHub last commit](https://img.shields.io/github/last-commit/sherlocod3/qreports-tool)
 ![GitHub issues](https://img.shields.io/github/issues/sherlocod3/qreports-tool)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/YOUR-USERNAME/qreports)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/sherlocod3/qreports-tool)
 
 ---
 
