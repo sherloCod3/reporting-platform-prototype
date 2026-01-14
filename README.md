@@ -512,8 +512,8 @@ Report bugs via [GitHub Issues](https://github.com/sherlocod3/qreports-tool/issu
 
 ## 📈 **Stats**
 
-![GitHub last commit](https://img.shields.io/github/last-commit/YOUR-USERNAME/qreports)
-![GitHub issues](https://img.shields.io/github/issues/YOUR-USERNAME/qreports)
+![GitHub last commit](https://img.shields.io/github/last-commit/sherlocod3/qreports-tool)
+![GitHub issues](https://img.shields.io/github/issues/sherlocod3/qreports-tool)
 ![GitHub pull requests](https://img.shields.io/github/issues-pr/YOUR-USERNAME/qreports)
 
 ---
