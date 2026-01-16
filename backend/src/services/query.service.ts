@@ -10,7 +10,7 @@ export async function execute(sql: string, pool: Pool): Promise<ReportExecutionR
     const startTime = Date.now();
 
     // Timeout geral de 30 segundos
-    const QUERY_TIMEOUT = 30_000; //30 segundos
+    const QUERY_TIMEOUT = 30_000;
 
     const queryPromise = pool.execute<RowDataPacket[]>(sql);
 
@@ -47,11 +47,11 @@ export async function execute(sql: string, pool: Pool): Promise<ReportExecutionR
         columns,
         rows,
         rowCount: Array.isArray(rows) ? rows.length : 0,
-        duration
+        duration,
     };
 
     return {
         success: true,
-        data: resultData,
+        data: resultData
     };
 }
