@@ -1,10 +1,10 @@
 import pool from '../config/database.config.js';
 import { validateSql } from './validation.service.js';
 import type { QueryResult, ReportExecutionResult } from '../types/report.types.js';
-import type { RowDataPacket } from 'mysql2';
+import type { Pool, RowDataPacket } from 'mysql2/promise';
 import { ErrorFactory } from '../types/errors.types.js';
 
-export async function execute(sql: string): Promise<ReportExecutionResult> {
+export async function execute(sql: string, pool: Pool): Promise<ReportExecutionResult> {
     validateSql(sql); //Throws se inválido
 
     const startTime = Date.now();

@@ -2,10 +2,10 @@ import mysql from 'mysql2/promise';
 import { env } from './env.config.js';
 
 export const dbPool = mysql.createPool({
-    host: env.DB_HOST,
-    user: env.DB_USER,
-    password: env.DB_PASSWORD,
-    database: env.DB_NAME,
+    host: env.AUTH_DB_HOST,
+    user: env.AUTH_DB_USER,
+    password: env.AUTH_DB_PASSWORD,
+    database: env.AUTH_DB_NAME,
 
     // pool config
     waitForConnections: true,
