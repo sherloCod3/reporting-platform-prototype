@@ -48,4 +48,44 @@ export const AuthService = {
             throw ErrorFactory.unauthorized('Token inválido ou expirado');
         }
     },
+
+    async getUsers() {
+        return AuthRepository.findAllUsers();
+    },
+
+    async createUser(data: { email: string; password: string; role: string; clientId: number }) {
+        const salt = await bcrypt.genSalt(10);
+        const hash = await bcrypt.hash(data.password, salt);
+
+        const id = await AuthRepository.createUser({
+            email: data.email,
+            password_hash: hash,
+            role: data.role,
+            client_id: data.clientId
+        });
+
+        return { id, ...data };
+    },
+
+    async updateUser(id: number, data: { email?: string; password?: string; role?: string; clientId?: number; active?: number }) {
+        let password_hash: string | undefined;
+
+        if (data.password) {
+            const salt = await bcrypt.genSalt(10);
+            password_hash = await bcrypt.hash(data.password, salt);
+        }
+
+        const updateData: any = {};
+        if (data.email) updateData.email = data.email;
+        if (password_hash) updateData.password_hash = password_hash;
+        if (data.role) updateData.role = data.role;
+        if (data.clientId) updateData.client_id = data.clientId;
+        if (data.active !== undefined) updateData.active = data.active;
+
+        await AuthRepository.updateUser(id, updateData);
+    },
+
+    async deleteUser(id: number) {
+        await AuthRepository.deleteUser(id);
+    }
 };
