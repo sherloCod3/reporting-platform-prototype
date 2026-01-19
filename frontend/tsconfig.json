@@ -5,6 +5,7 @@
     { "path": "./tsconfig.node.json" }
   ],
   "compilerOptions": {
+    "types": ["vite/client", "vite/types/importMeta.d.ts"],
     "target": "ES2020",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",

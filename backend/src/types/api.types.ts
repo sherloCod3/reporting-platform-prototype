@@ -13,3 +13,12 @@ export interface ApiError {
     message: string;
     code?: string;
 }
+
+export interface LoginResponse {
+    token: string;
+    user: {
+        id: number;
+        email: string;
+        role: string;
+    };
+}

@@ -9,10 +9,25 @@ const api = axios.create({
     },
 });
 
-// Interceptor - erros e log no console (desenvolvimento)
+// Request interceptor: Inject token
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem('@qreports:token');
+    if (token) {
+        config.headers = config.headers ?? {};
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
+
+// Response interceptor: Handle errors and 401 redirects
 api.interceptors.response.use(
     (response) => response,
     (error) => {
+        if (error.response?.status === 401) {
+            localStorage.removeItem('@qreports:token');
+            window.location.href = '/login';
+        }
+
         if (!axios.isCancel(error)) {
             console.error("API Error:", error.response?.data || error.message);
         }
