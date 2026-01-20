@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs'; // compara senha com hash
-const jwt = require('jsonwebtoken'); // gera/verifica token
+import jwt from 'jsonwebtoken'; // gera/verifica token
 import { env } from '../config/env.config.js';
 import { AuthRepository } from '../repositories/auth.repository.js';
 import type { JwtPayload, LoginRequest } from '../types/auth.types.js';
@@ -25,9 +25,9 @@ export const AuthService = {
             clientSlug: user.client_slug,
         };
 
-        const token = jwt.sign(payload, env.JWT_SECRET, { // assina o token
+        const token = jwt.sign(payload, env.JWT_SECRET, {
             expiresIn: env.JWT_EXPIRES_IN,
-        });
+        } as jwt.SignOptions);
 
         return {
             success: true,

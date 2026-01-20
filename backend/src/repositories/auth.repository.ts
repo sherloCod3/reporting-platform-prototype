@@ -2,7 +2,7 @@ import type { RowDataPacket } from 'mysql2';
 import { authPool } from '../config/authDb.config.js';
 
 // linha de usuário
-interface UserRow extends RowDataPacket {
+export interface UserRow extends RowDataPacket {
     id: number;
     client_id: number;
     email: string;
@@ -14,7 +14,7 @@ interface UserRow extends RowDataPacket {
 }
 
 // linha com conexão do cliente
-interface ClientConnRow extends RowDataPacket {
+export interface ClientConnRow extends RowDataPacket {
     id: number;
     slug: string;
     db_host: string; // host externo do banco

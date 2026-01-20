@@ -18,10 +18,11 @@ const CLIENT_CONN_TTL_MS = 60_000; // verificar com testes se é necessário alt
 
 // escolhe qual credencial usar baseado no role
 function pickDbCredential(role: 'admin' | 'user' | 'viewer') {
-    if (role === 'viewer') { // somente leitura
-        return { user: env.REPORT_DB_READ_USER, password: env.REPORT_DB_READ_PASSWORD };
+    if (role === 'admin') {
+        // Admin gets write access
+        return { user: env.REPORT_DB_WRITE_USER, password: env.REPORT_DB_WRITE_PASSWORD };
     }
-    // admin/user com possibilidade de write, se possível
+    // user and viewer only get read access
     return { user: env.REPORT_DB_READ_USER, password: env.REPORT_DB_READ_PASSWORD };
 }
 

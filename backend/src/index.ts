@@ -2,10 +2,8 @@ import app from './server.js';
 import { env } from './config/env.config.js';
 import { testConnection } from './config/database.config.js';
 
-// Apenas inicia o servidor se executado diretamente
-// Permite testes importarem 'app' sem iniciar servidor
-
-if (import.meta.url === `file://${process.argv[ 1 ]}`) {
+// Start server
+async function startServer() {
     try {
         await testConnection();
         app.listen(env.PORT, () => {
@@ -18,5 +16,7 @@ if (import.meta.url === `file://${process.argv[ 1 ]}`) {
         process.exit(1);
     }
 }
+
+startServer();
 
 export { default } from './server.js';
