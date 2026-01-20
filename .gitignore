@@ -4,3 +4,4 @@ commits.pdf
 node_modules
 package-lock.json
 prototypes
+.agent

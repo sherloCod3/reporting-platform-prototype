@@ -9,7 +9,7 @@ export interface ReportDefinition {
 
 export interface ReportDefinitionDetail extends ReportDefinition {
     sql_query: string;
-    layout_json: any;
+    layout_json: Record<string, unknown>;
     updated_at: string;
 }
 
@@ -24,7 +24,7 @@ export const reportsService = {
         return response.data;
     },
 
-    async create(data: { name: string; description?: string; sql_query?: string; layout_json?: any }): Promise<{ id: number; message: string }> {
+    async create(data: { name: string; description?: string; sql_query?: string; layout_json?: Record<string, unknown> }): Promise<{ id: number; message: string }> {
         const response = await api.post('/definitions', data);
         return response.data;
     },

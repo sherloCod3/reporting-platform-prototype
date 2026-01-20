@@ -29,5 +29,5 @@ export default function EditReportPage() {
         return <div>Erro ao carregar relatório.</div>;
     }
 
-    return <ReportEditor initialData={report} isEditing />;
+    return <ReportEditor initialData={report} />;
 }

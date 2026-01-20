@@ -30,6 +30,7 @@ export function UserForm({ user, onSuccess }: UserFormProps) {
     const [isLoading, setIsLoading] = useState(false);
 
     const form = useForm<UserFormData>({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         resolver: zodResolver(userSchema) as any,
         defaultValues: {
             email: user?.email || '',
@@ -58,9 +59,10 @@ export function UserForm({ user, onSuccess }: UserFormProps) {
             }
             onSuccess?.();
             form.reset();
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error(error);
-            toast.error(error.response?.data?.message || 'Erro ao salvar usuário');
+            const errorMessage = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Erro ao salvar usuário';
+            toast.error(errorMessage);
         } finally {
             setIsLoading(false);
         }

@@ -1,4 +1,6 @@
 @import "tailwindcss";
+
+/* QReports Global Styles */
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
@@ -115,6 +117,7 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -123,3 +126,105 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* QREPORTS — DESIGN SYSTEM (GLOBAL BASE) */
+:root {
+    /* Brand */
+    --brand-primary: #4f46e5;
+    --brand-primary-dark: #4338ca;
+    --data-accent: #0ea5e9;
+
+    /* Grid */
+    --grid-size: 20px;
+
+    /* UI */
+    --scrollbar-thumb: #94a3b8;
+    --scrollbar-thumb-dark: #475569;
+
+    /* Effects */
+    --page-shadow: 0 10px 40px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Brand gradient */
+.gradient-bg {
+    background: linear-gradient(135deg, var(--brand-primary) 0%, var(--data-accent) 100%);
+}
+
+/* UI Motion */
+.ui-motion {
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease,
+        opacity 0.2s ease,
+        box-shadow 0.2s ease;
+    will-change: transform;
+}
+
+/* Scrollbar (shared) */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb-dark);
+}
+
+/* Report Gradients */
+.gradient-report-1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.gradient-report-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+.gradient-report-3 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+
+/* UI Kit Components */
+.ui-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    font-weight: 500;
+    border: 1px solid transparent;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s, transform 0.2s, opacity 0.2s;
+}
+.ui-btn:disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
+.ui-btn-primary { background: var(--brand-primary); color: #fff; }
+
+/* Editor Specific Styles */
+.canvas-grid {
+    background-image: linear-gradient(rgba(148, 163, 184, 0.15) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(148, 163, 184, 0.15) 1px, transparent 1px);
+    background-size: var(--grid-size) var(--grid-size);
+    background-position: -1px -1px;
+}
+.dark .canvas-grid {
+    background-image: linear-gradient(rgba(71, 85, 105, 0.4) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(71, 85, 105, 0.4) 1px, transparent 1px);
+}
+
+.guide-line {
+    position: absolute;
+    background: var(--brand-primary);
+    opacity: 0.5;
+    z-index: 40;
+    pointer-events: none;
+}
+.guide-line-vertical { width: 2px; height: 100%; }
+.guide-line-horizontal { height: 2px; width: 100%; }
+.snapped { box-shadow: 0 0 0 2px var(--brand-primary); }
+
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+.modal-content { animation: modalFadeIn 0.2s ease-out; }
+
+

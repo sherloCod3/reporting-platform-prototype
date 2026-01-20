@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useEffect, useState, Suspense } from 'react';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/use-auth';
 import { LayoutDashboard, FileBarChart, Database, Settings, LogOut, Menu, User } from 'lucide-react';
@@ -9,26 +9,55 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
+import { DatasourcesModal } from '@/components/datasources/datasources-modal';
 
 const NAV_ITEMS = [
     { label: 'Dashboard', icon: LayoutDashboard, href: '/' },
-    { label: 'Users', icon: User, href: '/users' },
     { label: 'Relatórios', icon: FileBarChart, href: '/reports' },
-    { label: 'Fontes de Dados', icon: Database, href: '/datasources' },
+    { label: 'Fontes de Dados', icon: Database, href: '#', action: 'datasources' },
+    { label: 'Users', icon: User, href: '/users' },
     { label: 'Configurações', icon: Settings, href: '/settings' },
 ];
+
+function UrlModalManager() {
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const pathname = usePathname();
+    const isDatasourcesOpen = searchParams?.get('action') === 'datasources';
+    
+    const handleOpenChange = (open: boolean) => {
+        if (!open) {
+            router.push(pathname);
+        }
+    };
+
+    return <DatasourcesModal open={isDatasourcesOpen} onOpenChange={handleOpenChange} />;
+}
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     const { isAuthenticated, isLoading, logout, user, client } = useAuth();
     const router = useRouter();
     const pathname = usePathname();
+    // searchParams moved to UrlModalManager
     const [isMobileOpen, setIsMobileOpen] = useState(false);
-
+    
     useEffect(() => {
         if (!isLoading && !isAuthenticated) {
             router.push('/login');
         }
     }, [isLoading, isAuthenticated, router]);
+    
+    // handleOpenChange moved to UrlModalManager
+
+    const handleNavClick = (item: typeof NAV_ITEMS[0], e: React.MouseEvent) => {
+        if (item.action === 'datasources') {
+           e.preventDefault();
+           router.push('?action=datasources');
+           setIsMobileOpen(false);   
+        } else {
+            setIsMobileOpen(false);
+        }
+    };
 
     if (isLoading) {
         return <div className="min-h-screen flex items-center justify-center text-sm text-muted-foreground">Carregando...</div>;
@@ -38,6 +67,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
     return (
         <div className="min-h-screen bg-gray-50/40 flex">
+            <Suspense fallback={null}>
+                <UrlModalManager />
+            </Suspense>
+            
             {/* Desktop Sidebar */}
             <aside className="hidden md:flex w-64 flex-col border-r bg-white h-screen sticky top-0">
                 <div className="h-16 flex items-center px-6 border-b">
@@ -52,12 +85,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         const Icon = item.icon;
                         const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
                         return (
-                            <Link key={item.href} href={item.href}>
+                            <Link 
+                                key={item.label} 
+                                href={item.href}
+                                onClick={(e) => handleNavClick(item, e)}
+                            >
                                 <div className={cn(
                                     "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
-                                    isActive ? "bg-blue-50 text-blue-700" : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                                    isActive && !item.action ? "bg-blue-50 text-blue-700" : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                                 )}>
-                                    <Icon className={cn("mr-3 h-5 w-5", isActive ? "text-blue-700" : "text-gray-400")} />
+                                    <Icon className={cn("mr-3 h-5 w-5", isActive && !item.action ? "text-blue-700" : "text-gray-400")} />
                                     {item.label}
                                 </div>
                             </Link>
@@ -98,12 +135,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                {NAV_ITEMS.map((item) => {
                                    const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
                                    return (
-                                       <Link key={item.href} href={item.href} onClick={() => setIsMobileOpen(false)}>
+                                       <Link 
+                                           key={item.label} 
+                                           href={item.href} 
+                                           onClick={(e) => handleNavClick(item, e)}
+                                       >
                                            <div className={cn(
                                                "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
-                                               isActive ? "bg-blue-50 text-blue-700" : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                                               isActive && !item.action ? "bg-blue-50 text-blue-700" : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                                            )}>
-                                               <item.icon className={cn("mr-3 h-5 w-5", isActive ? "text-blue-700" : "text-gray-400")} />
+                                               <item.icon className={cn("mr-3 h-5 w-5", isActive && !item.action ? "text-blue-700" : "text-gray-400")} />
                                                {item.label}
                                            </div>
                                        </Link>

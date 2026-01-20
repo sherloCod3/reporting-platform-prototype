@@ -1,0 +1,27 @@
+
+> frontend@0.1.0 lint
+> eslint
+
+
+C:\Users\DoQR\Documents\qreports-tool\frontend\services\user.service.ts
+  19:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  24:38  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\DoQR\Documents\qreports-tool\frontend\src\app\(dashboard)\reports\[id]\run\page.tsx
+  32:26  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  91:39  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  91:58  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\DoQR\Documents\qreports-tool\frontend\src\components\auth-context.tsx
+  69:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\DoQR\Documents\qreports-tool\frontend\src\components\users\user-form.tsx
+  33:46  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  61:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\DoQR\Documents\qreports-tool\frontend\src\services\reports\reports.ts
+  12:18  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  27:96  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+Ô£û 10 problems (10 errors, 0 warnings)
+

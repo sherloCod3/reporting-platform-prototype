@@ -66,9 +66,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
             toast.success('Login realizado com sucesso!');
             router.push('/');
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error(error);
-            toast.error(error.response?.data?.message || 'Falha no login');
+            const errorMessage = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Falha no login';
+            toast.error(errorMessage);
             throw error;
         } finally {
             setIsLoading(false);

@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { UserService, User } from '@/services/users/users';
-import { UserForm } from '../../components/users/user-form';
+import { UserForm } from '@/components/users/user-form';
 
 export default function UsersPage() {
     const [users, setUsers] = useState<User[]>([]);

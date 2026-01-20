@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { DashboardCard } from '@/components/dashboard/dashboard-card';
 import { FileBarChart, Plus, Database } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 
@@ -11,71 +11,60 @@ export default function DashboardPage() {
 
     return (
         <div className="space-y-8">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight text-gray-900">Olá, {user?.email.split('@')[0]}</h1>
-                <p className="text-gray-500 mt-2">Bem-vindo ao QReports. O que você gostaria de fazer hoje?</p>
+            <div className="relative overflow-hidden rounded-2xl gradient-bg p-8 text-white shadow-xl">
+                <div className="relative z-10">
+                    <h1 className="text-3xl font-bold tracking-tight">Olá, {user?.email.split('@')[0]}!</h1>
+                    <p className="mt-2 text-blue-100 max-w-xl">
+                        Bem-vindo ao QReports. Crie insights poderosos e gerencie seus dados com facilidade usando nossa nova interface.
+                    </p>
+                </div>
+                {/* Background Decoration */}
+                <div className="absolute top-0 right-0 -mt-10 -mr-10 h-64 w-64 rounded-full bg-white/10 blur-3xl"></div>
+                <div className="absolute bottom-0 left-0 -mb-10 -ml-10 h-40 w-40 rounded-full bg-blue-500/20 blur-2xl"></div>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                <Card className="hover:shadow-md transition-shadow cursor-pointer border-l-4 border-l-blue-500">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Relatórios</CardTitle>
-                        <FileBarChart className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">Meus Relatórios</div>
-                        <CardDescription className="mt-1">
-                            Visualize e gerencie seus relatórios salvos.
-                        </CardDescription>
-                        <div className="mt-4">
-                            <Link href="/reports">
-                                <Button variant="outline" className="w-full">
-                                    Ver Todos
-                                </Button>
-                            </Link>
-                        </div>
-                    </CardContent>
-                </Card>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <DashboardCard
+                    title="Meus Relatórios"
+                    description="Visualize, edite e acompanhe seus relatórios salvos e dashboards."
+                    icon={FileBarChart}
+                    gradient="gradient-report-1"
+                    action={
+                        <Link href="/reports">
+                            <Button variant="outline" className="w-full hover:bg-slate-50 border-slate-200">
+                                Acessar Relatórios
+                            </Button>
+                        </Link>
+                    }
+                />
 
-                <Card className="hover:shadow-md transition-shadow cursor-pointer border-l-4 border-l-green-500">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Criar Novo</CardTitle>
-                        <Plus className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">Novo Relatório</div>
-                        <CardDescription className="mt-1">
-                            Crie um novo relatório do zero.
-                        </CardDescription>
-                        <div className="mt-4">
-                             <Link href="/reports/create">
-                                <Button className="w-full bg-green-600 hover:bg-green-700 text-white">
-                                    Criar Agora
-                                </Button>
-                            </Link>
-                        </div>
-                    </CardContent>
-                </Card>
+                <DashboardCard
+                    title="Criar Novo Relatório"
+                    description="Comece do zero e crie visualizações impactantes com seus dados."
+                    icon={Plus}
+                    gradient="gradient-report-2"
+                    action={
+                        <Link href="/reports/create">
+                            <Button className="w-full gradient-bg border-0 hover:opacity-90 transition-opacity">
+                                Criar Agora
+                            </Button>
+                        </Link>
+                    }
+                />
 
-                 <Card className="hover:shadow-md transition-shadow cursor-pointer border-l-4 border-l-indigo-500">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Fontes de Dados</CardTitle>
-                        <Database className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">Conexões</div>
-                        <CardDescription className="mt-1">
-                            Gerencie suas conexões de banco de dados.
-                        </CardDescription>
-                        <div className="mt-4">
-                            <Link href="/datasources">
-                                <Button variant="outline" className="w-full">
-                                    Gerenciar
-                                </Button>
-                            </Link>
-                        </div>
-                    </CardContent>
-                </Card>
+                <DashboardCard
+                    title="Fontes de Dados"
+                    description="Conecte e gerencie bancos de dados (PostgreSQL, MySQL, etc)."
+                    icon={Database}
+                    gradient="gradient-report-3"
+                    action={
+                        <Link href="?action=datasources" scroll={false}>
+                            <Button variant="outline" className="w-full hover:bg-slate-50 border-slate-200">
+                                Gerenciar Conexões
+                            </Button>
+                        </Link>
+                    }
+                />
             </div>
         </div>
     );

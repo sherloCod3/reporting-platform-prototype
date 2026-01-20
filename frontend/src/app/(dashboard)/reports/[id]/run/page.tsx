@@ -29,8 +29,9 @@ export default function RunReportPage() {
             const response = await api.post('/reports/execute', { query: sql });
             return response.data; // Array of results
         },
-        onError: (error: any) => {
-            toast.error(error.response?.data?.message || 'Erro na execução do relatório');
+        onError: (error: unknown) => {
+            const errorMessage = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Erro na execução do relatório';
+            toast.error(errorMessage);
         },
     });
 
@@ -88,7 +89,7 @@ export default function RunReportPage() {
                         <ResultsTable data={executionMutation.data} />
                     ) : (
                         <div className="text-center py-12 text-gray-400 bg-gray-50 rounded-lg border-2 border-dashed">
-                            Clique em "Executar Relatório" para ver os dados.
+                            Clique em &quot;Executar Relatório&quot; para ver os dados.
                         </div>
                     )}
                 </CardContent>

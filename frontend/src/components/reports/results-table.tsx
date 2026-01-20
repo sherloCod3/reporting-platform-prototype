@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 
 interface ResultsTableProps {
-  data: any[];
+    data: Record<string, unknown>[];
 }
 
 export function ResultsTable({ data }: ResultsTableProps) {
