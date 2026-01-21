@@ -6,13 +6,19 @@ import type { JwtPayload, LoginRequest } from '../types/auth.types.js';
 import { ErrorFactory } from '../types/errors.types.js';
 
 export const AuthService = {
-    // login do sistema
+    /**
+     * Authenticates a user and generates a JWT.
+     * Validates credentials against the database and creates a signed token containing user claims.
+     * @param request - Login credentials (email and password).
+     */
     async login({ email, password }: LoginRequest) {
         const user = await AuthRepository.findUserByEmail(email);
         if (!user) {
             throw ErrorFactory.unauthorized('Email ou senha incorretos');
         }
-        const ok = await bcrypt.compare(password, user.password_hash); // compara a senha
+
+        // Verify password hash
+        const ok = await bcrypt.compare(password, user.password_hash);
         if (!ok) {
             throw ErrorFactory.unauthorized('Email ou senha incorretos');
         }
@@ -40,7 +46,11 @@ export const AuthService = {
         };
     },
 
-    // valida token e retorna payload
+    /**
+     * Verifies a JWT and extracts the payload.
+     * Throws an error if the token is invalid or expired.
+     * @param token - The JWT string to verify.
+     */
     verifyToken(token: string): JwtPayload {
         try {
             return jwt.verify(token, env.JWT_SECRET) as JwtPayload;

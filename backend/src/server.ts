@@ -11,7 +11,7 @@ app.use(cors({
     credentials: true
 }));
 
-// parser JSON - transforma body em objeto - limite de até 50mb de arquivo HTML
+// Configure JSON body parser with increased limit for large payloads (e.g., HTML content)
 app.use(express.json({ limit: '50mb' }));
 
 app.use((req, res, next) => requestLogger(req, res, next));

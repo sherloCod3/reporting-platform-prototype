@@ -5,6 +5,10 @@ import { ErrorFactory } from '../types/errors.types.js';
 
 const router = Router();
 
+/**
+ * Authenticates a user and returns a token.
+ * POST /api/login
+ */
 router.post('/login', async (req, res, next) => {
     try {
         const { email, password } = req.body;
@@ -19,7 +23,9 @@ router.post('/login', async (req, res, next) => {
     }
 });
 
+// ------------------------------------------------------------------
 // User Management Routes (Protected)
+// ------------------------------------------------------------------
 router.get('/users', authenticate, async (req, res, next) => {
     try {
         if (req.user?.role !== 'admin') {

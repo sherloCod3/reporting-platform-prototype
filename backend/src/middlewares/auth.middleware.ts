@@ -5,18 +5,18 @@ import { AuthRepository } from '../repositories/auth.repository.js'; // client c
 import { env } from '../config/env.config.js';
 import { ErrorFactory } from '../types/errors.types.js';
 
-// cache de pool por destino + credencial (evita recriar conexões)
+// Connection pool cache by destination and credentials
 const poolCache = new Map<string, mysql.Pool>();
 
-// cache de conexão do cliente (evita bater sempre no auth db)
+// Client connection details cache
 const clientConnCache = new Map<number, {
     value: { host: string; port: number; db: string; slug: string }
     expiresAt: number;
 }>();
 
-const CLIENT_CONN_TTL_MS = 60_000; // verificar com testes se é necessário alterar
+const CLIENT_CONN_TTL_MS = 60_000;
 
-// escolhe qual credencial usar baseado no role
+// Selects database credentials based on user role
 function pickDbCredential(role: 'admin' | 'user' | 'viewer') {
     if (role === 'admin') {
         // Admin gets write access
@@ -30,33 +30,36 @@ function getOrCreatePool(
     clientConn: { host: string; port: number; db: string; slug: string },
     cred: { user: string; password: string }
 ): mysql.Pool {
-    const poolKey = `${clientConn.host}:${clientConn.port}:${clientConn.db}:${cred.user}`; // key única
+    const poolKey = `${clientConn.host}:${clientConn.port}:${clientConn.db}:${cred.user}`;
     let pool = poolCache.get(poolKey);
 
     if (!pool) {
         pool = mysql.createPool({
             host: clientConn.host,
             port: clientConn.port,
-            user: cred.user, // user fixo (powerbi)
-            password: cred.password, // password fixa
+            user: cred.user,
+            password: cred.password,
             database: clientConn.db,
             waitForConnections: true,
             connectionLimit: 10,
             connectTimeout: 10_000,
         });
 
-        poolCache.set(poolKey, pool); // guarda pool
-        console.log(`Pool externo criado: ${clientConn.slug} (${cred.user})`); // log para depuração
+        poolCache.set(poolKey, pool);
     }
 
     return pool;
 }
 
+/**
+ * Middleware to authenticate requests and inject database connection.
+ * Verifies the JWT token and establishes a connection to the client-specific database.
+ */
 export async function authenticate(req: Request, _res: Response, next: NextFunction) {
     try {
         const header = req.headers.authorization;
-        if (!header?.startsWith('Bearer ')) { // validação do formato
-            throw ErrorFactory.unauthorized('Token não fornecido'); // (401)
+        if (!header?.startsWith('Bearer ')) {
+            throw ErrorFactory.unauthorized('Token não fornecido');
         }
 
         const token = header.substring(7); // remove a palavra "Bearer"

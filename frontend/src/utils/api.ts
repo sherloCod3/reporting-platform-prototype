@@ -7,6 +7,11 @@ export const api = axios.create({
     },
 });
 
+/**
+ * Request interceptor
+ * Automatically attaches the authentication token to every outgoing request.
+ * This ensures that protected routes are accessible without manually adding headers.
+ */
 api.interceptors.request.use((config) => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('@qreports:token') : null;
     if (token) {
@@ -15,6 +20,11 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
+/**
+ * Response interceptor
+ * centralized error handling for authentication failures.
+ * If the API returns a 401 Unauthorized, we clear the session and redirect the user to the login page.
+ */
 api.interceptors.response.use(
     (response) => response,
     (error) => {
@@ -22,7 +32,8 @@ api.interceptors.response.use(
             if (typeof window !== 'undefined') {
                 localStorage.removeItem('@qreports:token');
                 localStorage.removeItem('@qreports:user');
-                // Only redirect if not already on login page to avoid loops
+
+                // Prevent infinite redirect loops if already on the login page
                 if (!window.location.pathname.includes('/login')) {
                     window.location.href = '/login';
                 }
