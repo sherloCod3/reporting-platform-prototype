@@ -93,10 +93,15 @@ export async function authenticate(req: Request, _res: Response, next: NextFunct
             });
         }
 
-        const cred = pickDbCredential(payload.role); // escolhe credencial
+        const cred = pickDbCredential(payload.role);
 
-        const pool = getOrCreatePool(clientConn, cred); // resolve pool sem undefined
-        req.db = pool; // injeta pool no request
+        const pool = getOrCreatePool(clientConn, cred);
+
+        // Inject connection info and credentials for database management
+        req.db = pool;
+        req.clientConn = clientConn;
+        req.dbCredentials = cred;
+
         next();
     } catch (err) {
         next(err); // manda para o error handler

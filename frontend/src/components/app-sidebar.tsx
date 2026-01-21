@@ -37,6 +37,8 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { useAuth } from "@/hooks/use-auth";
+import { ConnectionStatus } from "@/components/database/connection-status";
+import { DatabaseSelector } from "@/components/database/database-selector";
 // import { Button } from '@/components/ui/button';
 // import { Separator } from '@/components/ui/separator';
 
@@ -135,6 +137,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </div>
       </SidebarHeader>
       <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-xs text-muted-foreground px-2 mb-1">
+            Database Connection
+          </SidebarGroupLabel>
+          <div className="px-2 space-y-2">
+            <ConnectionStatus />
+            <DatabaseSelector />
+          </div>
+        </SidebarGroup>
         <SidebarGroup>
           <SidebarGroupLabel>Menu</SidebarGroupLabel>
           <SidebarGroupContent>
