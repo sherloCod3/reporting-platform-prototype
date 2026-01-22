@@ -37,9 +37,6 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
   const [databases, setDatabases] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  /**
-   * Fetches the current database connection status.
-   */
   const fetchStatus = useCallback(async () => {
     // Only fetch if user is authenticated
     if (!user) {
@@ -49,8 +46,9 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
     try {
       const response = await api.get("/db/status");
       setStatus(response.data.data);
-    } catch (error) {
-      console.error("Failed to fetch database status:", error);
+    } catch {
+      // Silently fail - connection status is optional
+      // Don't pollute console or show error toast
       setStatus(null);
     }
   }, [user]);
@@ -110,18 +108,20 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
 
   // Load status on mount and when user changes
   useEffect(() => {
-    // Only fetch if user is authenticated
+    // Only set status to null if user logs out
     if (!user) {
       setStatus(null);
       return;
     }
 
-    fetchStatus();
+    // Don't auto-fetch on mount - let it be manual
+    // This prevents blocking the app load on slow/failed connections
+    // fetchStatus();
 
-    // Refresh status every 30 seconds
-    const interval = setInterval(fetchStatus, 30000);
-    return () => clearInterval(interval);
-  }, [fetchStatus, user]);
+    // Remove auto-polling - status can be manually refreshed if needed
+    // const interval = setInterval(fetchStatus, 30000);
+    // return () => clearInterval(interval);
+  }, [user]);
 
   return (
     <DatabaseContext.Provider

@@ -22,6 +22,7 @@ export const env = {
     AUTH_DB_NAME: getEnv('DB_NAME'),
 
     // Credenciais fixas e isoladas para acesso aos DBs
+    REPORT_DB_HOST: getEnv('REPORT_DB_HOST'),
     REPORT_DB_READ_USER: getEnv('REPORT_DB_READ_USER'),
     REPORT_DB_READ_PASSWORD: getEnv('REPORT_DB_READ_PASSWORD'),
 

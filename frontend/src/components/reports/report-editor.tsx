@@ -11,6 +11,9 @@ import {
   Undo,
   Redo,
   Trash2,
+  Play,
+  AlertCircle,
+  Database,
 } from "lucide-react";
 import {
   Dialog,
@@ -18,12 +21,16 @@ import {
   DialogDescription,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { SqlEditor } from "@/components/sql/sql-editor";
+import { QueryResultsTable } from "@/components/sql/query-results-table";
+import { useSqlExecution } from "@/hooks/use-sql-execution";
+import { toast } from "sonner";
 
 interface SqlResult {
   columns: string[];
-  rows: (string | number | boolean | null)[][];
+  rows: unknown[][];
   rowCount: number;
-  duration: string;
+  duration: number; // milliseconds
 }
 
 interface Component {
@@ -74,7 +81,6 @@ export function ReportEditor({ initialData, onSave }: ReportEditorProps) {
   );
   const [sqlQuery, setSqlQuery] = useState("");
   const [sqlResult, setSqlResult] = useState<SqlResult | null>(null);
-  const [sqlExecuting, setSqlExecuting] = useState(false);
 
   // Undo/Redo history stack
 
@@ -206,30 +212,62 @@ export function ReportEditor({ initialData, onSave }: ReportEditorProps) {
     };
   }, [draggingId, commitHistory]);
 
-  const openSqlEditor = (id: number) => {
-    const comp = components.find((c) => c.id === id);
-    if (comp) {
-      setEditingComponentId(id);
-      setSqlQuery(comp.sqlQuery || "");
-      setSqlResult(comp.sqlResult || null);
+  /**
+   * Opens the SQL editor modal.
+   * If id is provided, loads the component's existing query.
+   * If no id, opens a blank editor (global SQL access).
+   */
+  const openSqlEditor = useCallback(
+    (id?: number) => {
+      if (id !== undefined) {
+        const comp = components.find((c) => c.id === id);
+        if (comp) {
+          setEditingComponentId(id);
+          setSqlQuery(comp.sqlQuery || "");
+          setSqlResult(comp.sqlResult || null);
+        }
+      } else {
+        // Global SQL editor access (no component selected)
+        setEditingComponentId(null);
+        setSqlQuery("");
+        setSqlResult(null);
+      }
       setSqlModalOpen(true);
-    }
-  };
+    },
+    [components],
+  );
+
+  // Keyboard shortcut for SQL editor (Ctrl+Shift+S)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.shiftKey && e.key === "S") {
+        e.preventDefault();
+        openSqlEditor();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [openSqlEditor]);
+
+  // SQL execution hook
+  const { executeQuery, isExecuting, error } = useSqlExecution();
 
   const executeSql = async () => {
-    setSqlExecuting(true);
-    setTimeout(() => {
-      setSqlResult({
-        columns: ["id", "name", "role"],
-        rows: [
-          [1, "Admin", "superuser"],
-          [2, "User", "editor"],
-        ],
-        rowCount: 2,
-        duration: "12ms",
-      });
-      setSqlExecuting(false);
-    }, 800);
+    try {
+      const queryResult = await executeQuery(sqlQuery);
+      if (queryResult) {
+        setSqlResult({
+          columns: queryResult.columns,
+          rows: queryResult.rows,
+          rowCount: queryResult.rowCount,
+          duration: queryResult.duration,
+        });
+        toast.success("Query executed successfully");
+      }
+    } catch (err) {
+      const error = err as { response?: { data?: { message?: string } } };
+      toast.error(error.response?.data?.message || "Failed to execute query");
+    }
   };
 
   const applySql = () => {
@@ -278,6 +316,16 @@ export function ReportEditor({ initialData, onSave }: ReportEditorProps) {
           </Button>
         </div>
         <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => openSqlEditor()}
+            className="flex items-center gap-1 text-xs"
+            title="Open SQL Editor (Ctrl+Shift+S)">
+            <Database className="w-4 h-4" />
+            SQL Editor
+          </Button>
+          <div className="h-4 w-px bg-slate-300 mx-1" />
           <Button variant="outline" className="text-xs">
             Preview
           </Button>
@@ -334,6 +382,7 @@ export function ReportEditor({ initialData, onSave }: ReportEditorProps) {
                       e.stopPropagation();
                       deleteComponent(comp.id);
                     }}
+                    title="Delete component"
                     className="px-2 py-0.5 hover:bg-red-500 rounded text-xs">
                     <Trash2 className="w-3 h-3" />
                   </button>
@@ -364,7 +413,7 @@ export function ReportEditor({ initialData, onSave }: ReportEditorProps) {
                         <div className="grid grid-cols-2 gap-1 opacity-60">
                           {comp.sqlResult.rows.map((r, i) => (
                             <div key={i} className="bg-slate-100 p-1 truncate">
-                              {r[1]}
+                              {String(r[1] ?? "")}
                             </div>
                           ))}
                         </div>
@@ -416,74 +465,90 @@ export function ReportEditor({ initialData, onSave }: ReportEditorProps) {
 
       {/* SQL Editor Modal */}
       <Dialog open={sqlModalOpen} onOpenChange={setSqlModalOpen}>
-        <DialogContent className="max-w-4xl h-[80vh] flex flex-col p-0 gap-0 overflow-hidden">
+        <DialogContent className="max-w-6xl h-[85vh] flex flex-col p-0 gap-0 overflow-hidden">
           <div className="p-4 border-b flex justify-between items-center gradient-bg text-white">
             <DialogTitle className="flex items-center gap-2">
-              <Table className="w-5 h-5" /> Editor SQL
+              <Table className="w-5 h-5" /> Professional SQL Editor
             </DialogTitle>
             <DialogDescription className="sr-only">
-              Editor SQL
+              Professional SQL Editor with syntax highlighting
             </DialogDescription>
           </div>
-          <div className="flex-1 flex">
-            <div className="flex-1 flex flex-col border-r p-4 bg-slate-50 dark:bg-slate-900">
-              <h3 className="text-sm font-semibold mb-2">Query</h3>
-              <textarea
-                className="flex-1 bg-slate-100 dark:bg-slate-800 p-4 border rounded-md font-mono text-sm resize-none focus:ring-2 focus:ring-indigo-500 outline-none"
-                value={sqlQuery}
-                onChange={(e) => setSqlQuery(e.target.value)}
-                placeholder="SELECT * FROM table..."
-              />
-              <Button
-                className="mt-4 gradient-bg border-0"
-                onClick={executeSql}
-                disabled={sqlExecuting}>
-                {sqlExecuting ? "Executando..." : "Executar Query"}
-              </Button>
-            </div>
-            <div className="flex-1 flex flex-col p-4 bg-white dark:bg-slate-800">
-              <h3 className="text-sm font-semibold mb-2">Resultados</h3>
-              {sqlResult ? (
-                <div className="border rounded-md overflow-hidden">
-                  <table className="w-full text-sm">
-                    <thead className="bg-slate-100">
-                      <tr>
-                        {sqlResult.columns.map((c: string) => (
-                          <th key={c} className="p-2 text-left">
-                            {c}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {sqlResult.rows.map((row, i) => (
-                        <tr key={i} className="border-t">
-                          {row.map((cell, j) => (
-                            <td key={j} className="p-2">
-                              {cell as React.ReactNode}
-                            </td>
-                          ))}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+          <div className="flex-1 flex overflow-hidden min-h-0">
+            {/* Editor Panel */}
+            <div className="flex-1 flex flex-col border-r p-4 bg-slate-50 dark:bg-slate-900 min-w-0">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-semibold">SQL Query</h3>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    className="gradient-bg border-0 flex items-center gap-1"
+                    onClick={executeSql}
+                    disabled={isExecuting}>
+                    {isExecuting ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        Executing...
+                      </>
+                    ) : (
+                      <>
+                        <Play className="w-4 h-4" />
+                        Execute (Ctrl+Enter)
+                      </>
+                    )}
+                  </Button>
                 </div>
+              </div>
+              <div className="flex-1 min-h-[300px]">
+                <SqlEditor
+                  value={sqlQuery}
+                  onChange={setSqlQuery}
+                  height="100%"
+                  onExecute={executeSql}
+                />
+              </div>
+              {error && (
+                <div className="mt-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md flex items-start gap-2 text-sm">
+                  <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400 mt-0.5 shrink-0" />
+                  <span className="text-red-700 dark:text-red-300">
+                    {error}
+                  </span>
+                </div>
+              )}
+            </div>
+            {/* Results Panel */}
+            <div className="flex-1 flex flex-col p-4 bg-white dark:bg-slate-800 overflow-hidden min-w-0 min-h-0">
+              <h3 className="text-sm font-semibold mb-3">Results</h3>
+              {sqlResult ? (
+                <QueryResultsTable result={sqlResult} />
               ) : (
-                <div className="flex-1 flex items-center justify-center text-slate-400 border border-dashed rounded-md">
-                  Nenhum resultado
+                <div className="flex-1 flex items-center justify-center border border-dashed rounded-md text-slate-400">
+                  <div className="text-center">
+                    <Table className="w-12 h-12 mx-auto mb-2 opacity-30" />
+                    <p className="text-sm">
+                      {isExecuting ? "Executing query..." : "No results yet"}
+                    </p>
+                    <p className="text-xs mt-1">
+                      Press{" "}
+                      <kbd className="px-1 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs">
+                        Ctrl+Enter
+                      </kbd>{" "}
+                      to execute
+                    </p>
+                  </div>
                 </div>
               )}
             </div>
           </div>
-          <div className="p-4 border-t bg-slate-50 flex justify-end gap-2">
+          <div className="p-4 border-t bg-slate-50 dark:bg-slate-900 flex justify-end gap-2">
             <Button variant="ghost" onClick={() => setSqlModalOpen(false)}>
-              Cancelar
+              Cancel
             </Button>
             <Button
               onClick={applySql}
               disabled={!sqlResult}
               className="gradient-bg border-0">
-              Aplicar
+              Apply to Component
             </Button>
           </div>
         </DialogContent>

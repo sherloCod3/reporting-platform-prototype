@@ -81,7 +81,8 @@ export async function authenticate(req: Request, _res: Response, next: NextFunct
             }
 
             clientConn = { // montagem do conn
-                host: row.db_host,
+                // FORÇADO: Usar host do jumpserver para todas as conexões externas
+                host: env.REPORT_DB_HOST,
                 port: row.db_port,
                 db: row.db_name,
                 slug: row.slug
@@ -93,7 +94,9 @@ export async function authenticate(req: Request, _res: Response, next: NextFunct
             });
         }
 
-        const cred = pickDbCredential(payload.role);
+        // FORÇADO: Sempre usar credenciais de LEITURA, ignorando role de admin
+        // const cred = pickDbCredential(payload.role);
+        const cred = { user: env.REPORT_DB_READ_USER, password: env.REPORT_DB_READ_PASSWORD };
 
         const pool = getOrCreatePool(clientConn, cred);
 
