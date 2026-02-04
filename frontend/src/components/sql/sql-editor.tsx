@@ -93,7 +93,7 @@ export function SqlEditor({
   };
 
   return (
-    <div className="border rounded-md overflow-hidden bg-white dark:bg-slate-900 h-full w-full">
+    <div className="border rounded-md overflow-hidden bg-background h-full w-full">
       <Editor
         height={height}
         defaultLanguage="mysql"

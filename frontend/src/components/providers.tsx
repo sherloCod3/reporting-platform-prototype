@@ -5,14 +5,17 @@ import { queryClient } from "@/lib/query-client";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/components/auth-context";
 import { DatabaseProvider } from "@/contexts/db-context";
+import { ThemeProvider } from "next-themes";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <DatabaseProvider>{children}</DatabaseProvider>
-      </AuthProvider>
-      <Toaster />
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <AuthProvider>
+          <DatabaseProvider>{children}</DatabaseProvider>
+        </AuthProvider>
+        <Toaster />
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }

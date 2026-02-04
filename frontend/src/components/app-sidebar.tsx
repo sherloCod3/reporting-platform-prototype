@@ -40,6 +40,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { ConnectionStatus } from "@/components/database/connection-status";
 import { DatabaseSelector } from "@/components/database/database-selector";
 import { useSidebar } from "@/components/ui/sidebar";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 // import { Button } from '@/components/ui/button';
 // import { Separator } from '@/components/ui/separator';
 
@@ -239,6 +240,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </span>
               </div>
             </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <ThemeToggle />
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton

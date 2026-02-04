@@ -93,37 +93,55 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.72 0.17 255);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.72 0.17 255);
-  --sidebar-primary-foreground: oklch(0.205 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* Material Dark Base */
+  --background: #121212; 
+  --foreground: rgba(255, 255, 255, 0.87); /* High-emphasis */
+
+  /* Elevated Surfaces (using #1e1e1e as requested/standard overlay for ~1dp) */
+  --card: #1e1e1e;
+  --card-foreground: rgba(255, 255, 255, 0.87);
+  
+  --popover: #1e1e1e;
+  --popover-foreground: rgba(255, 255, 255, 0.87);
+  
+  /* Primary - Keeping readable blue, but could be #90CAF9 for true Material */
+  --primary: #90CAF9; 
+  --primary-foreground: #121212;
+  
+  --secondary: #2d2d2d; /* Slightly lighter than card */
+  --secondary-foreground: rgba(255, 255, 255, 0.87);
+  
+  /* Muted - Medium emphasis area */
+  --muted: #2d2d2d;
+  --muted-foreground: rgba(255, 255, 255, 0.60); /* Medium-emphasis/Hint */
+  
+  --accent: #2d2d2d;
+  --accent-foreground: rgba(255, 255, 255, 0.87);
+  
+  /* Semantic Colors - Requested */
+  --destructive: #931f1f; /* Red */
+  --destructive-foreground: rgba(255, 255, 255, 0.87);
+  
+  /* Borders - 12% White */
+  --border: rgba(255, 255, 255, 0.12);
+  --input: rgba(255, 255, 255, 0.12);
+  --ring: #90CAF9;
+  
+  --chart-1: #3b82f6;
+  --chart-2: #367d39; /* Green (requested semantic) used in chart */
+  --chart-3: #a56705; /* Yellow (requested semantic) used in chart */
+  --chart-4: #c084fc;
+  --chart-5: #fb7185;
+  
+  /* Sidebar - Consistent with Card/Elevated */
+  --sidebar: #1e1e1e;
+  --sidebar-foreground: rgba(255, 255, 255, 0.87);
+  --sidebar-primary: #90CAF9;
+  --sidebar-primary-foreground: #121212;
+  --sidebar-accent: rgba(255, 255, 255, 0.08); /* White overlay for selection */
+  --sidebar-accent-foreground: rgba(255, 255, 255, 0.87);
+  --sidebar-border: rgba(255, 255, 255, 0.12); /* 12% White */
+  --sidebar-ring: #90CAF9;
 }
 
 @layer base {
@@ -183,14 +201,14 @@
 
 /* Editor Specific Styles */
 .canvas-grid {
-    background-image: linear-gradient(rgba(148, 163, 184, 0.03) 1px, transparent 1px),
-                      linear-gradient(90deg, rgba(148, 163, 184, 0.03) 1px, transparent 1px);
+    background-image: linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
     background-size: var(--grid-size) var(--grid-size);
     background-position: -1px -1px;
 }
 .dark .canvas-grid {
-    background-image: linear-gradient(rgba(71, 85, 105, 0.05) 1px, transparent 1px),
-                      linear-gradient(90deg, rgba(71, 85, 105, 0.05) 1px, transparent 1px);
+    background-image: linear-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(255, 255, 255, 0.12) 1px, transparent 1px);
 }
 
 .guide-line {
