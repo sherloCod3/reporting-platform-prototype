@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useReducer } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -25,24 +25,126 @@ import { SqlEditor } from "@/components/sql/sql-editor";
 import { QueryResultsTable } from "@/components/sql/query-results-table";
 import { useSqlExecution } from "@/hooks/use-sql-execution";
 import { toast } from "sonner";
+import type { Component, SqlResult, EditorState, EditorAction } from "./types";
 
-interface SqlResult {
-  columns: string[];
-  rows: unknown[][];
-  rowCount: number;
-  duration: number; // milliseconds
-}
+/**
+ * Reducer for managing editor state centrally.
+ * Optimized to avoid unnecessary clones and support batching.
+ */
+function editorReducer(state: EditorState, action: EditorAction): EditorState {
+  switch (action.type) {
+    case "ADD_COMPONENT": {
+      const newComp: Component = { ...action.payload, id: state.nextId };
+      const newComponents = [...state.components, newComp];
 
-interface Component {
-  id: number;
-  type: "text" | "table" | "chart" | "image";
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  content?: string;
-  sqlQuery?: string;
-  sqlResult?: SqlResult;
+      return {
+        ...state,
+        components: newComponents,
+        history: [
+          ...state.history.slice(0, state.historyIndex + 1),
+          newComponents,
+        ],
+        historyIndex: state.historyIndex + 1,
+        nextId: state.nextId + 1,
+      };
+    }
+
+    case "UPDATE_COMPONENT": {
+      const newComponents = state.components.map((c) =>
+        c.id === action.id ? { ...c, ...action.changes } : c,
+      );
+
+      return {
+        ...state,
+        components: newComponents,
+      };
+    }
+
+    case "DELETE_COMPONENT": {
+      const newComponents = state.components.filter((c) => c.id !== action.id);
+
+      return {
+        ...state,
+        components: newComponents,
+        history: [
+          ...state.history.slice(0, state.historyIndex + 1),
+          newComponents,
+        ],
+        historyIndex: state.historyIndex + 1,
+        selectedId: state.selectedId === action.id ? null : state.selectedId,
+      };
+    }
+
+    case "MOVE_COMPONENT": {
+      // Early return if position hasn't changed (performance optimization)
+      const existing = state.components.find((c) => c.id === action.id);
+      if (existing?.x === action.x && existing?.y === action.y) {
+        return state;
+      }
+
+      const newComponents = state.components.map((c) =>
+        c.id === action.id ? { ...c, x: action.x, y: action.y } : c,
+      );
+
+      return {
+        ...state,
+        components: newComponents,
+      };
+    }
+
+    case "SELECT_COMPONENT": {
+      return {
+        ...state,
+        selectedId: action.id,
+      };
+    }
+
+    case "SET_DRAGGING": {
+      return {
+        ...state,
+        draggingId: action.id,
+      };
+    }
+
+    case "COMMIT_HISTORY": {
+      return {
+        ...state,
+        history: [
+          ...state.history.slice(0, state.historyIndex + 1),
+          state.components,
+        ],
+        historyIndex: state.historyIndex + 1,
+      };
+    }
+
+    case "UNDO": {
+      if (state.historyIndex <= 0) return state;
+
+      return {
+        ...state,
+        components: state.history[state.historyIndex - 1],
+        historyIndex: state.historyIndex - 1,
+      };
+    }
+
+    case "REDO": {
+      if (state.historyIndex >= state.history.length - 1) return state;
+
+      return {
+        ...state,
+        components: state.history[state.historyIndex + 1],
+        historyIndex: state.historyIndex + 1,
+      };
+    }
+
+    case "BATCH": {
+      // Execute multiple actions without intermediate renders
+      return action.actions.reduce(editorReducer, state);
+    }
+
+    default:
+      return state;
+  }
 }
 
 interface ReportEditorProps {
@@ -57,24 +159,29 @@ interface ReportEditorProps {
 
 export function ReportEditor({ initialData, onSave }: ReportEditorProps) {
   // ------------------------------------------------------------------
-  // State Management
+  // State Management - Centralized with useReducer
   // ------------------------------------------------------------------
 
-  // Canvas configuration and component state
-  const [components, setComponents] = useState<Component[]>(
-    initialData?.components || [],
-  );
-  const [selectedId, setSelectedId] = useState<number | null>(null);
-  const [nextId, setNextId] = useState(1);
+  const [state, dispatch] = useReducer(editorReducer, {
+    components: initialData?.components || [],
+    history: [initialData?.components || []],
+    historyIndex: 0,
+    nextId: 1,
+    selectedId: null,
+    draggingId: null,
+  });
+
+  // Ref for accessing current state in closures (prevents stale closures)
+  const stateRef = useRef(state);
+  useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
+
+  // Other state not managed by reducer
   const gridSize = 20;
-
-  // Drag and drop interaction state
-
-  const [draggingId, setDraggingId] = useState<number | null>(null);
   const dragOffset = useRef({ x: 0, y: 0 });
 
-  // SQL Editor Modal state and execution results
-
+  // SQL Editor Modal state
   const [sqlModalOpen, setSqlModalOpen] = useState(false);
   const [editingComponentId, setEditingComponentId] = useState<number | null>(
     null,
@@ -82,42 +189,9 @@ export function ReportEditor({ initialData, onSave }: ReportEditorProps) {
   const [sqlQuery, setSqlQuery] = useState("");
   const [sqlResult, setSqlResult] = useState<SqlResult | null>(null);
 
-  // Undo/Redo history stack
-
-  const [history, setHistory] = useState<Component[][]>([]);
-  const [historyIndex, setHistoryIndex] = useState(-1);
-
-  // Refs for event handlers
-  const componentsRef = useRef(components);
-  useEffect(() => {
-    componentsRef.current = components;
-  }, [components]);
-
-  const commitHistory = useCallback(
-    (newState: Component[]) => {
-      setHistory((prev) => {
-        const newHistory = prev.slice(0, historyIndex + 1);
-        newHistory.push(JSON.parse(JSON.stringify(newState)));
-        return newHistory;
-      });
-      setHistoryIndex((prev) => prev + 1);
-    },
-    [historyIndex],
-  );
-
-  const undo = () => {
-    if (historyIndex > 0) {
-      setHistoryIndex((prev) => prev - 1);
-      setComponents(JSON.parse(JSON.stringify(history[historyIndex - 1])));
-    }
-  };
-
-  const redo = () => {
-    if (historyIndex < history.length - 1) {
-      setHistoryIndex((prev) => prev + 1);
-      setComponents(JSON.parse(JSON.stringify(history[historyIndex + 1])));
-    }
-  };
+  // ------------------------------------------------------------------
+  // Helper Functions
+  // ------------------------------------------------------------------
 
   const snapToGrid = (value: number) => {
     return Math.round(value / gridSize) * gridSize;
@@ -132,21 +206,18 @@ export function ReportEditor({ initialData, onSave }: ReportEditorProps) {
     };
     const size = sizes[type];
 
-    const newComp: Component = {
-      id: nextId,
-      type,
-      x: snapToGrid(50),
-      y: snapToGrid(50 + components.length * 50),
-      width: size.w,
-      height: size.h,
-      content: type === "text" ? "Novo Texto" : "",
-      sqlQuery: type === "table" ? "SELECT * FROM users LIMIT 5" : undefined,
-    };
-
-    const newComponents = [...components, newComp];
-    setComponents(newComponents);
-    setNextId(nextId + 1);
-    commitHistory(newComponents);
+    dispatch({
+      type: "ADD_COMPONENT",
+      payload: {
+        type,
+        x: snapToGrid(50),
+        y: snapToGrid(50 + state.components.length * 50),
+        width: size.w,
+        height: size.h,
+        content: type === "text" ? "Novo Texto" : "",
+        sqlQuery: type === "table" ? "SELECT * FROM users LIMIT 5" : undefined,
+      },
+    });
   };
 
   // ------------------------------------------------------------------
@@ -159,9 +230,9 @@ export function ReportEditor({ initialData, onSave }: ReportEditorProps) {
    */
   const startDrag = (e: React.MouseEvent, id: number) => {
     e.stopPropagation();
-    setDraggingId(id);
-    setSelectedId(id);
-    const comp = components.find((c) => c.id === id);
+    dispatch({ type: "SET_DRAGGING", id });
+    dispatch({ type: "SELECT_COMPONENT", id });
+    const comp = state.components.find((c) => c.id === id);
     if (comp) {
       const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
       dragOffset.current = {
@@ -173,7 +244,7 @@ export function ReportEditor({ initialData, onSave }: ReportEditorProps) {
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      if (draggingId !== null) {
+      if (state.draggingId !== null) {
         const canvasRect = document
           .getElementById("canvas-area")
           ?.getBoundingClientRect();
@@ -185,23 +256,28 @@ export function ReportEditor({ initialData, onSave }: ReportEditorProps) {
         const snappedX = Math.round(Math.max(0, rawX) / 20) * 20;
         const snappedY = Math.round(Math.max(0, rawY) / 20) * 20;
 
-        setComponents((prev) =>
-          prev.map((c) =>
-            c.id === draggingId ? { ...c, x: snappedX, y: snappedY } : c,
-          ),
-        );
+        dispatch({
+          type: "MOVE_COMPONENT",
+          id: state.draggingId,
+          x: snappedX,
+          y: snappedY,
+        });
       }
     };
 
     const handleMouseUp = () => {
-      if (draggingId !== null) {
-        setDraggingId(null);
-        // Commit using the ref to avoid stale closure state
-        commitHistory(componentsRef.current);
+      if (state.draggingId !== null) {
+        dispatch({
+          type: "BATCH",
+          actions: [
+            { type: "COMMIT_HISTORY" },
+            { type: "SET_DRAGGING", id: null },
+          ],
+        });
       }
     };
 
-    if (draggingId !== null) {
+    if (state.draggingId !== null) {
       window.addEventListener("mousemove", handleMouseMove);
       window.addEventListener("mouseup", handleMouseUp);
     }
@@ -210,7 +286,7 @@ export function ReportEditor({ initialData, onSave }: ReportEditorProps) {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [draggingId, commitHistory]);
+  }, [state.draggingId]);
 
   /**
    * Opens the SQL editor modal.
@@ -220,7 +296,7 @@ export function ReportEditor({ initialData, onSave }: ReportEditorProps) {
   const openSqlEditor = useCallback(
     (id?: number) => {
       if (id !== undefined) {
-        const comp = components.find((c) => c.id === id);
+        const comp = state.components.find((c) => c.id === id);
         if (comp) {
           setEditingComponentId(id);
           setSqlQuery(comp.sqlQuery || "");
@@ -234,7 +310,7 @@ export function ReportEditor({ initialData, onSave }: ReportEditorProps) {
       }
       setSqlModalOpen(true);
     },
-    [components],
+    [state.components],
   );
 
   // Keyboard shortcut for SQL editor (Ctrl+Shift+S)
@@ -272,21 +348,23 @@ export function ReportEditor({ initialData, onSave }: ReportEditorProps) {
 
   const applySql = () => {
     if (editingComponentId !== null) {
-      const updated = components.map((c) =>
-        c.id === editingComponentId
-          ? { ...c, sqlQuery, sqlResult: sqlResult || undefined }
-          : c,
-      );
-      setComponents(updated);
-      commitHistory(updated);
+      dispatch({
+        type: "BATCH",
+        actions: [
+          {
+            type: "UPDATE_COMPONENT",
+            id: editingComponentId,
+            changes: { sqlQuery, sqlResult: sqlResult || undefined },
+          },
+          { type: "COMMIT_HISTORY" },
+        ],
+      });
       setSqlModalOpen(false);
     }
   };
 
   const deleteComponent = (id: number) => {
-    const updated = components.filter((c) => c.id !== id);
-    setComponents(updated);
-    commitHistory(updated);
+    dispatch({ type: "DELETE_COMPONENT", id });
   };
 
   return (
@@ -301,16 +379,16 @@ export function ReportEditor({ initialData, onSave }: ReportEditorProps) {
           <Button
             variant="ghost"
             size="icon"
-            onClick={undo}
-            disabled={historyIndex <= 0}
+            onClick={() => dispatch({ type: "UNDO" })}
+            disabled={state.historyIndex <= 0}
             title="Undo">
             <Undo className="w-4 h-4" />
           </Button>
           <Button
             variant="ghost"
             size="icon"
-            onClick={redo}
-            disabled={historyIndex >= history.length - 1}
+            onClick={() => dispatch({ type: "REDO" })}
+            disabled={state.historyIndex >= state.history.length - 1}
             title="Redo">
             <Redo className="w-4 h-4" />
           </Button>
@@ -331,7 +409,7 @@ export function ReportEditor({ initialData, onSave }: ReportEditorProps) {
           </Button>
           <Button
             className="gradient-bg text-white border-0 text-xs"
-            onClick={() => onSave?.(components)}>
+            onClick={() => onSave?.(state.components)}>
             Salvar Relatório
           </Button>
         </div>
@@ -340,17 +418,17 @@ export function ReportEditor({ initialData, onSave }: ReportEditorProps) {
       {/* Main Canvas Area */}
       <div
         className="flex-1 overflow-auto bg-slate-100 dark:bg-slate-900 pt-16 p-8 relative"
-        onClick={() => setSelectedId(null)}>
+        onClick={() => dispatch({ type: "SELECT_COMPONENT", id: null })}>
         <div
           id="canvas-area"
           className="bg-white dark:bg-slate-800 shadow-xl w-[794px] h-[1123px] mx-auto relative canvas-grid ui-motion"
           onClick={(e) => e.stopPropagation()}>
-          {components.map((comp) => (
+          {state.components.map((comp) => (
             <div
               key={comp.id}
               className={cn(
                 "absolute border cursor-move group",
-                selectedId === comp.id
+                state.selectedId === comp.id
                   ? "border-indigo-500 ring-1 ring-indigo-500 z-10"
                   : "border-slate-300 dark:border-slate-600 border-dashed",
               )}
@@ -363,9 +441,9 @@ export function ReportEditor({ initialData, onSave }: ReportEditorProps) {
               onMouseDown={(e) => startDrag(e, comp.id)}
               onClick={(e) => {
                 e.stopPropagation();
-                setSelectedId(comp.id);
+                dispatch({ type: "SELECT_COMPONENT", id: comp.id });
               }}>
-              {selectedId === comp.id && (
+              {state.selectedId === comp.id && (
                 <div className="absolute -top-8 right-0 flex gap-1 bg-indigo-500 rounded p-1 shadow-lg text-white">
                   {comp.type === "table" && (
                     <button
@@ -465,7 +543,7 @@ export function ReportEditor({ initialData, onSave }: ReportEditorProps) {
 
       {/* SQL Editor Modal */}
       <Dialog open={sqlModalOpen} onOpenChange={setSqlModalOpen}>
-        <DialogContent className="max-w-6xl h-[85vh] flex flex-col p-0 gap-0 overflow-hidden">
+        <DialogContent className="w-[95vw] max-w-[95vw] h-[80vh] flex flex-col p-0 gap-0 overflow-hidden">
           <div className="p-4 border-b flex justify-between items-center gradient-bg text-white">
             <DialogTitle className="flex items-center gap-2">
               <Table className="w-5 h-5" /> Professional SQL Editor
@@ -474,9 +552,9 @@ export function ReportEditor({ initialData, onSave }: ReportEditorProps) {
               Professional SQL Editor with syntax highlighting
             </DialogDescription>
           </div>
-          <div className="flex-1 flex overflow-hidden min-h-0">
+          <div className="flex-1 flex flex-row overflow-hidden min-h-0">
             {/* Editor Panel */}
-            <div className="flex-1 flex flex-col border-r p-4 bg-slate-50 dark:bg-slate-900 min-w-0">
+            <div className="flex-1 w-1/2 flex flex-col border-r p-4 bg-slate-50 dark:bg-slate-900 min-w-0">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-semibold">SQL Query</h3>
                 <div className="flex gap-2">
@@ -517,7 +595,7 @@ export function ReportEditor({ initialData, onSave }: ReportEditorProps) {
               )}
             </div>
             {/* Results Panel */}
-            <div className="flex-1 flex flex-col p-4 bg-white dark:bg-slate-800 overflow-hidden min-w-0 min-h-0">
+            <div className="flex-1 w-1/2 flex flex-col p-4 bg-white dark:bg-slate-800 overflow-hidden min-w-0 min-h-0">
               <h3 className="text-sm font-semibold mb-3">Results</h3>
               {sqlResult ? (
                 <QueryResultsTable result={sqlResult} />
