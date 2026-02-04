@@ -52,9 +52,9 @@ export default function ReportsPage() {
             </div>
 
             {reports && reports.length === 0 ? (
-                <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed rounded-lg bg-gray-50">
-                    <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center mb-4">
-                        <FileText className="h-6 w-6 text-blue-600" />
+                <div className="flex flex-col items-center justify-center p-12 border border-border rounded-lg bg-muted/20">
+                    <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mb-4">
+                        <FileText className="h-6 w-6 text-primary" />
                     </div>
                     <h3 className="text-lg font-medium text-gray-900">Nenhum relatório encontrado</h3>
                     <p className="text-gray-500 mt-1 mb-4 text-center max-w-sm">

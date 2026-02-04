@@ -68,17 +68,27 @@ export function SqlEditor({
       },
     );
 
-    // Configure editor options
+    // Configure editor options for large queries (IDE-like)
     typedEditor.updateOptions({
-      fontSize: 14,
+      fontSize: 13,
       lineHeight: 20,
-      minimap: { enabled: true },
+      minimap: { enabled: true, side: "right", size: "fit" },
       scrollBeyondLastLine: false,
-      wordWrap: "on",
+      wordWrap: "off", // Better for large queries
       formatOnPaste: true,
       formatOnType: true,
       autoIndent: "full",
       tabSize: 2,
+      renderWhitespace: "selection",
+      renderLineHighlight: "all",
+      cursorBlinking: "smooth",
+      smoothScrolling: true,
+      cursorSmoothCaretAnimation: "on",
+      bracketPairColorization: { enabled: true },
+      guides: {
+        bracketPairs: true,
+        indentation: true,
+      },
     });
   };
 
@@ -93,13 +103,23 @@ export function SqlEditor({
         onMount={handleEditorMount}
         options={{
           readOnly,
-          minimap: { enabled: true },
-          fontSize: 14,
+          minimap: { enabled: true, side: "right", size: "fit" },
+          fontSize: 13,
           lineNumbers: "on",
           scrollBeyondLastLine: false,
           automaticLayout: true,
-          wordWrap: "on",
-          padding: { top: 10, bottom: 10 },
+          wordWrap: "off",
+          padding: { top: 12, bottom: 12 },
+          renderWhitespace: "selection",
+          renderLineHighlight: "all",
+          cursorBlinking: "smooth",
+          smoothScrolling: true,
+          cursorSmoothCaretAnimation: "on",
+          bracketPairColorization: { enabled: true },
+          guides: {
+            bracketPairs: true,
+            indentation: true,
+          },
         }}
         loading={
           <div className="flex items-center justify-center h-full">

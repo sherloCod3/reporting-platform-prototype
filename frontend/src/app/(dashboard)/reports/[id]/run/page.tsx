@@ -88,7 +88,7 @@ export default function RunReportPage() {
                     ) : executionMutation.data ? (
                         <ResultsTable data={executionMutation.data} />
                     ) : (
-                        <div className="text-center py-12 text-gray-400 bg-gray-50 rounded-lg border-2 border-dashed">
+                        <div className="text-center py-12 text-muted-foreground bg-muted/20 rounded-lg border border-border">
                             Clique em &quot;Executar Relatório&quot; para ver os dados.
                         </div>
                     )}

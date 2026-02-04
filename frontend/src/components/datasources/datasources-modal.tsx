@@ -62,14 +62,14 @@ export function DatasourcesModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700">
-        <div className="gradient-bg p-6 text-white">
+      <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden bg-background border-border">
+        <div className="px-6 py-4 border-b border-border">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-xl">
+            <DialogTitle className="flex items-center gap-2 text-base font-semibold">
               <Database className="h-6 w-6" />
               Fontes de Dados
             </DialogTitle>
-            <DialogDescription className="text-blue-100">
+            <DialogDescription className="text-xs text-muted-foreground">
               {view === "list"
                 ? "Gerencie suas conexões de banco de dados."
                 : "Configure os detalhes da sua conexão."}
@@ -84,16 +84,16 @@ export function DatasourcesModal({
                 {datasources.map((ds) => (
                   <div
                     key={ds.id}
-                    className="group flex items-center justify-between p-4 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-indigo-500 hover:shadow-md transition-all bg-white dark:bg-slate-800">
+                    className="group flex items-center justify-between p-4 rounded-lg border border-border hover:border-primary/50 hover:shadow-sm transition-all bg-background">
                     <div className="flex items-center gap-4">
-                      <div className="h-10 w-10 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-500 group-hover:text-indigo-600 transition-colors">
+                      <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground group-hover:text-primary transition-colors">
                         <Server className="h-5 w-5" />
                       </div>
                       <div>
-                        <h4 className="font-semibold text-slate-900 dark:text-white">
+                        <h4 className="font-semibold">
                           {ds.name}
                         </h4>
-                        <p className="text-xs text-slate-500">
+                        <p className="text-xs text-muted-foreground">
                           {ds.type} • {ds.host}:{ds.port}
                         </p>
                       </div>
@@ -102,7 +102,7 @@ export function DatasourcesModal({
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 hover:text-indigo-600">
+                        className="h-8 w-8 hover:text-primary">
                         <Edit2 className="h-4 w-4" />
                       </Button>
                       <Button
@@ -117,7 +117,7 @@ export function DatasourcesModal({
               </div>
               <Button
                 onClick={() => setView("form")}
-                className="w-full gradient-bg border-0">
+                className="w-full">
                 <Plus className="mr-2 h-4 w-4" /> Nova Conexão
               </Button>
             </div>
@@ -180,7 +180,7 @@ export function DatasourcesModal({
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="gradient-bg border-0">
+                  className="">
                   {isLoading ? "Salvando..." : "Salvar Conexão"}
                 </Button>
               </DialogFooter>

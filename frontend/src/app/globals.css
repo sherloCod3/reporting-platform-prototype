@@ -56,7 +56,8 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+  /* Accent (single brand color) */
+  --primary: oklch(0.55 0.215 255);
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
@@ -75,12 +76,20 @@
   --chart-5: oklch(0.769 0.188 70.08);
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary: oklch(0.55 0.215 255);
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.97 0 0);
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  /* QREPORTS — DESIGN SYSTEM (GLOBAL BASE) */
+  --brand-primary: #0066ff;
+  --brand-primary-dark: #0052cc;
+  --grid-size: 20px;
+  --scrollbar-thumb: #94a3b8;
+  --scrollbar-thumb-dark: #475569;
+  --page-shadow: 0 1px 2px rgba(0, 0, 0, 0.08), 0 1px 1px rgba(0, 0, 0, 0.04);
 }
 
 .dark {
@@ -90,7 +99,7 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
+  --primary: oklch(0.72 0.17 255);
   --primary-foreground: oklch(0.205 0 0);
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
@@ -109,8 +118,8 @@
   --chart-5: oklch(0.645 0.246 16.439);
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.72 0.17 255);
+  --sidebar-primary-foreground: oklch(0.205 0 0);
   --sidebar-accent: oklch(0.269 0 0);
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
@@ -124,29 +133,6 @@
   body {
     @apply bg-background text-foreground;
   }
-}
-
-/* QREPORTS — DESIGN SYSTEM (GLOBAL BASE) */
-:root {
-    /* Brand */
-    --brand-primary: #4f46e5;
-    --brand-primary-dark: #4338ca;
-    --data-accent: #0ea5e9;
-
-    /* Grid */
-    --grid-size: 20px;
-
-    /* UI */
-    --scrollbar-thumb: #94a3b8;
-    --scrollbar-thumb-dark: #475569;
-
-    /* Effects */
-    --page-shadow: 0 10px 40px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-/* Brand gradient */
-.gradient-bg {
-    background: linear-gradient(135deg, var(--brand-primary) 0%, var(--data-accent) 100%);
 }
 
 /* UI Motion */
@@ -177,9 +163,6 @@
 }
 
 /* Report Gradients */
-.gradient-report-1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-.gradient-report-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-.gradient-report-3 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
 
 /* UI Kit Components */
 .ui-btn {
@@ -191,6 +174,7 @@
     font-weight: 500;
     border: 1px solid transparent;
     cursor: pointer;
+    -webkit-user-select: none;
     user-select: none;
     transition: background-color 0.2s, color 0.2s, border-color 0.2s, transform 0.2s, opacity 0.2s;
 }
@@ -199,14 +183,14 @@
 
 /* Editor Specific Styles */
 .canvas-grid {
-    background-image: linear-gradient(rgba(148, 163, 184, 0.15) 1px, transparent 1px),
-                      linear-gradient(90deg, rgba(148, 163, 184, 0.15) 1px, transparent 1px);
+    background-image: linear-gradient(rgba(148, 163, 184, 0.03) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(148, 163, 184, 0.03) 1px, transparent 1px);
     background-size: var(--grid-size) var(--grid-size);
     background-position: -1px -1px;
 }
 .dark .canvas-grid {
-    background-image: linear-gradient(rgba(71, 85, 105, 0.4) 1px, transparent 1px),
-                      linear-gradient(90deg, rgba(71, 85, 105, 0.4) 1px, transparent 1px);
+    background-image: linear-gradient(rgba(71, 85, 105, 0.05) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(71, 85, 105, 0.05) 1px, transparent 1px);
 }
 
 .guide-line {

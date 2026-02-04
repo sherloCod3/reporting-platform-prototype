@@ -11,19 +11,15 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      <div className="relative overflow-hidden rounded-2xl gradient-bg p-8 text-white shadow-xl">
-        <div className="relative z-10">
-          <h1 className="text-3xl font-bold tracking-tight">
-            Olá, {user?.email.split("@")[0]}!
-          </h1>
-          <p className="mt-2 text-blue-100 max-w-xl">
-            Bem-vindo ao QReports. Crie insights poderosos e gerencie seus dados
-            com facilidade usando nossa nova interface.
-          </p>
-        </div>
-        {/* Background Decoration */}
-        <div className="absolute top-0 right-0 -mt-10 -mr-10 h-64 w-64 rounded-full bg-white/10 blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 -mb-10 -ml-10 h-40 w-40 rounded-full bg-blue-500/20 blur-2xl"></div>
+      <div className="rounded-2xl border border-border bg-background p-8">
+        <h1 className="text-[32px] font-bold tracking-[-0.02em]">
+          Olá, {user?.email.split("@")[0]}!
+        </h1>
+        <div className="mt-3 h-0.5 w-12 bg-primary/70" />
+        <p className="mt-4 max-w-xl text-sm text-muted-foreground">
+          Bem-vindo ao QReports. Crie insights poderosos e gerencie seus dados
+          com facilidade.
+        </p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -31,12 +27,11 @@ export default function DashboardPage() {
           title="Meus Relatórios"
           description="Visualize, edite e acompanhe seus relatórios salvos e dashboards."
           icon={FileBarChart}
-          gradient="gradient-report-1"
           action={
             <Link href="/reports">
               <Button
                 variant="outline"
-                className="w-full hover:bg-slate-50 border-slate-200">
+                className="w-full">
                 Acessar Relatórios
               </Button>
             </Link>
@@ -47,10 +42,9 @@ export default function DashboardPage() {
           title="Criar Novo Relatório"
           description="Comece do zero e crie visualizações impactantes com seus dados."
           icon={Plus}
-          gradient="gradient-report-2"
           action={
             <Link href="/reports/create">
-              <Button className="w-full gradient-bg border-0 hover:opacity-90 transition-opacity">
+              <Button className="w-full">
                 Criar Agora
               </Button>
             </Link>
@@ -61,12 +55,11 @@ export default function DashboardPage() {
           title="Fontes de Dados"
           description="Conecte e gerencie bancos de dados (PostgreSQL, MySQL, etc)."
           icon={Database}
-          gradient="gradient-report-3"
           action={
             <Link href="?action=datasources" scroll={false}>
               <Button
                 variant="outline"
-                className="w-full hover:bg-slate-50 border-slate-200">
+                className="w-full">
                 Gerenciar Conexões
               </Button>
             </Link>

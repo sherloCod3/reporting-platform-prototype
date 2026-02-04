@@ -61,14 +61,14 @@ export function QueryResultsTable({ result }: QueryResultsTableProps) {
   return (
     <div className="flex flex-col h-full">
       {/* Results Header */}
-      <div className="flex items-center justify-between p-3 border-b bg-slate-50 dark:bg-slate-900/50">
-        <div className="flex items-center gap-4 text-sm">
-          <div className="flex items-center gap-1 text-slate-600 dark:text-slate-400">
+      <div className="flex items-center justify-between px-3 py-2 border-b border-border bg-muted/20">
+        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+          <div className="flex items-center gap-1">
             <Table2 className="w-4 h-4" />
             <span className="font-medium">{result.rowCount}</span>
             <span>rows</span>
           </div>
-          <div className="flex items-center gap-1 text-slate-600 dark:text-slate-400">
+          <div className="flex items-center gap-1">
             <Clock className="w-4 h-4" />
             <span>{formattedDuration}</span>
           </div>
@@ -86,12 +86,12 @@ export function QueryResultsTable({ result }: QueryResultsTableProps) {
       {/* Results Table */}
       <div className="flex-1 overflow-auto">
         <table className="w-full text-sm">
-          <thead className="bg-slate-100 dark:bg-slate-800 sticky top-0">
+          <thead className="bg-muted/40 sticky top-0">
             <tr>
               {result.columns.map((column, index) => (
                 <th
                   key={index}
-                  className="p-2 text-left font-semibold border-b dark:border-slate-700 whitespace-nowrap">
+                  className="p-2 text-left font-semibold border-b border-border whitespace-nowrap text-xs text-muted-foreground">
                   {column}
                 </th>
               ))}
@@ -101,7 +101,7 @@ export function QueryResultsTable({ result }: QueryResultsTableProps) {
             {result.rows.map((row, rowIndex) => (
               <tr
                 key={rowIndex}
-                className="border-b dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                className="border-b border-border hover:bg-muted/30">
                 {row.map((cell, cellIndex) => (
                   <td
                     key={cellIndex}

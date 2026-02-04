@@ -14,6 +14,9 @@ import {
   Play,
   AlertCircle,
   Database,
+  Minus,
+  Plus,
+  Maximize2,
 } from "lucide-react";
 import {
   Dialog,
@@ -139,7 +142,7 @@ function editorReducer(state: EditorState, action: EditorAction): EditorState {
 
     case "BATCH": {
       // Execute multiple actions without intermediate renders
-      return action.actions.reduce(editorReducer, state);
+      return action.actions.reduce((s, a) => editorReducer(s, a), state);
     }
 
     default:
@@ -157,7 +160,14 @@ interface ReportEditorProps {
   onSave?: (components: Component[]) => void;
 }
 
-export function ReportEditor({ initialData, onSave }: ReportEditorProps) {
+const formatPreviewCell = (value: unknown) => {
+  if (value === null || value === undefined) return "";
+  if (typeof value === "string") return value;
+  if (typeof value === "number" || typeof value === "boolean") return String(value);
+  return "";
+};
+
+export function ReportEditor({ initialData, onSave }: Readonly<ReportEditorProps>) {
   // ------------------------------------------------------------------
   // State Management - Centralized with useReducer
   // ------------------------------------------------------------------
@@ -180,6 +190,11 @@ export function ReportEditor({ initialData, onSave }: ReportEditorProps) {
   // Other state not managed by reducer
   const gridSize = 20;
   const dragOffset = useRef({ x: 0, y: 0 });
+  const viewportRef = useRef<HTMLDivElement | null>(null);
+  const paperRef = useRef<HTMLDivElement | null>(null);
+
+  const PAPER_W = 794;
+  const PAPER_H = 1123;
 
   // SQL Editor Modal state
   const [sqlModalOpen, setSqlModalOpen] = useState(false);
@@ -189,6 +204,13 @@ export function ReportEditor({ initialData, onSave }: ReportEditorProps) {
   const [sqlQuery, setSqlQuery] = useState("");
   const [sqlResult, setSqlResult] = useState<SqlResult | null>(null);
 
+  // Canvas zoom (Figma-like)
+  const [zoom, setZoom] = useState(1);
+  
+  // SQL Editor panel resize
+  const [editorWidth, setEditorWidth] = useState(50); // percentage
+  const [isResizing, setIsResizing] = useState(false);
+
   // ------------------------------------------------------------------
   // Helper Functions
   // ------------------------------------------------------------------
@@ -196,6 +218,20 @@ export function ReportEditor({ initialData, onSave }: ReportEditorProps) {
   const snapToGrid = (value: number) => {
     return Math.round(value / gridSize) * gridSize;
   };
+
+  const clampZoom = (value: number) => Math.min(2, Math.max(0.25, value));
+
+  const fitToViewport = useCallback(() => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+
+    const rect = viewport.getBoundingClientRect();
+    // padding around page + room for zoom controls/status bar
+    const availableW = Math.max(320, rect.width - 64);
+    const availableH = Math.max(320, rect.height - 64);
+    const next = Math.min(availableW / PAPER_W, availableH / PAPER_H);
+    setZoom(clampZoom(next));
+  }, []);
 
   const addComponent = (type: Component["type"]) => {
     const sizes = {
@@ -278,15 +314,50 @@ export function ReportEditor({ initialData, onSave }: ReportEditorProps) {
     };
 
     if (state.draggingId !== null) {
-      window.addEventListener("mousemove", handleMouseMove);
-      window.addEventListener("mouseup", handleMouseUp);
+      globalThis.addEventListener("mousemove", handleMouseMove);
+      globalThis.addEventListener("mouseup", handleMouseUp);
     }
 
     return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
+      globalThis.removeEventListener("mousemove", handleMouseMove);
+      globalThis.removeEventListener("mouseup", handleMouseUp);
     };
   }, [state.draggingId]);
+
+  // Re-fit when viewport changes size
+  useEffect(() => {
+    const handleResize = () => {
+      // keep current zoom, but if it was previously "fit-like" this will still be usable.
+      // Users can always hit "fit" explicitly.
+    };
+    globalThis.addEventListener("resize", handleResize);
+    return () => globalThis.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Panel resize handler
+  useEffect(() => {
+    if (!isResizing) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const modal = document.querySelector('[role="dialog"]') as HTMLElement;
+      if (!modal) return;
+      const rect = modal.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const percentage = Math.max(30, Math.min(70, (x / rect.width) * 100));
+      setEditorWidth(percentage);
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+    };
+
+    globalThis.addEventListener("mousemove", handleMouseMove);
+    globalThis.addEventListener("mouseup", handleMouseUp);
+    return () => {
+      globalThis.removeEventListener("mousemove", handleMouseMove);
+      globalThis.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isResizing]);
 
   /**
    * Opens the SQL editor modal.
@@ -321,8 +392,8 @@ export function ReportEditor({ initialData, onSave }: ReportEditorProps) {
         openSqlEditor();
       }
     };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    globalThis.addEventListener("keydown", handleKeyDown);
+    return () => globalThis.removeEventListener("keydown", handleKeyDown);
   }, [openSqlEditor]);
 
   // SQL execution hook
@@ -368,216 +439,351 @@ export function ReportEditor({ initialData, onSave }: ReportEditorProps) {
   };
 
   return (
-    <div className="flex h-[800px] w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden relative">
-      {/* Top Navigation Bar */}
-      <div className="absolute top-0 left-0 right-0 h-14 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between px-4 z-20">
-        <div className="flex items-center gap-2">
-          <span className="font-bold text-slate-700 dark:text-white">
-            Editor Visual
-          </span>
-          <div className="h-4 w-px bg-slate-300 mx-2" />
+    <div className="flex h-[800px] w-full bg-background text-foreground border border-border rounded-xl overflow-hidden relative">
+      {/* Layout: Activity bar + content */}
+      <div className="flex w-full h-full">
+        {/* Activity Bar (VS Code style) */}
+        <div className="w-14 shrink-0 bg-muted/30 border-r border-border flex flex-col items-center py-2 gap-1">
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => dispatch({ type: "UNDO" })}
-            disabled={state.historyIndex <= 0}
-            title="Undo">
-            <Undo className="w-4 h-4" />
+            onClick={() => addComponent("text")}
+            title="Texto (T)"
+            className="h-9 w-9">
+            <Type className="w-5 h-5" />
           </Button>
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => dispatch({ type: "REDO" })}
-            disabled={state.historyIndex >= state.history.length - 1}
-            title="Redo">
-            <Redo className="w-4 h-4" />
-          </Button>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => openSqlEditor()}
-            className="flex items-center gap-1 text-xs"
-            title="Open SQL Editor (Ctrl+Shift+S)">
-            <Database className="w-4 h-4" />
-            SQL Editor
-          </Button>
-          <div className="h-4 w-px bg-slate-300 mx-1" />
-          <Button variant="outline" className="text-xs">
-            Preview
+            onClick={() => addComponent("table")}
+            title="Tabela (B)"
+            className="h-9 w-9">
+            <Table className="w-5 h-5" />
           </Button>
           <Button
-            className="gradient-bg text-white border-0 text-xs"
-            onClick={() => onSave?.(state.components)}>
-            Salvar Relatório
+            variant="ghost"
+            size="icon"
+            onClick={() => addComponent("chart")}
+            title="Gráfico (G)"
+            className="h-9 w-9">
+            <BarChart className="w-5 h-5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => addComponent("image")}
+            title="Imagem (I)"
+            className="h-9 w-9">
+            <ImageIcon className="w-5 h-5" />
           </Button>
         </div>
-      </div>
 
-      {/* Main Canvas Area */}
-      <div
-        className="flex-1 overflow-auto bg-slate-100 dark:bg-slate-900 pt-16 p-8 relative"
-        onClick={() => dispatch({ type: "SELECT_COMPONENT", id: null })}>
-        <div
-          id="canvas-area"
-          className="bg-white dark:bg-slate-800 shadow-xl w-[794px] h-[1123px] mx-auto relative canvas-grid ui-motion"
-          onClick={(e) => e.stopPropagation()}>
-          {state.components.map((comp) => (
-            <div
-              key={comp.id}
-              className={cn(
-                "absolute border cursor-move group",
-                state.selectedId === comp.id
-                  ? "border-indigo-500 ring-1 ring-indigo-500 z-10"
-                  : "border-slate-300 dark:border-slate-600 border-dashed",
-              )}
-              style={{
-                left: comp.x,
-                top: comp.y,
-                width: comp.width,
-                height: comp.height,
-              }}
-              onMouseDown={(e) => startDrag(e, comp.id)}
-              onClick={(e) => {
-                e.stopPropagation();
-                dispatch({ type: "SELECT_COMPONENT", id: comp.id });
-              }}>
-              {state.selectedId === comp.id && (
-                <div className="absolute -top-8 right-0 flex gap-1 bg-indigo-500 rounded p-1 shadow-lg text-white">
-                  {comp.type === "table" && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openSqlEditor(comp.id);
-                      }}
-                      className="px-2 py-0.5 hover:bg-indigo-600 rounded text-xs flex items-center gap-1">
-                      <Table className="w-3 h-3" /> SQL
-                    </button>
-                  )}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      deleteComponent(comp.id);
-                    }}
-                    title="Delete component"
-                    className="px-2 py-0.5 hover:bg-red-500 rounded text-xs">
-                    <Trash2 className="w-3 h-3" />
-                  </button>
-                </div>
-              )}
+        {/* Main */}
+        <div className="flex-1 min-w-0 flex flex-col relative">
+          {/* Top Bar (48px) */}
+          <div className="h-12 border-b border-border bg-background/80 backdrop-blur flex items-center px-4 gap-3 z-20">
+            {/* Breadcrumb */}
+            <div className="flex items-center gap-2 text-sm min-w-0">
+              <span className="text-muted-foreground truncate">Relatórios</span>
+              <span className="text-muted-foreground">/</span>
+              <span className="font-semibold truncate">
+                {initialData?.name || "Editor Visual"}
+              </span>
+            </div>
 
-              <div className="w-full h-full overflow-hidden p-2 pointer-events-none">
-                {comp.type === "text" && (
-                  <div className="text-lg font-medium">{comp.content}</div>
-                )}
-                {comp.type === "image" && (
-                  <div className="flex items-center justify-center h-full bg-slate-50 dark:bg-slate-700/50 text-4xl">
-                    🖼️
-                  </div>
-                )}
-                {comp.type === "chart" && (
-                  <div className="flex items-center justify-center h-full bg-indigo-50 text-indigo-400">
-                    <BarChart className="w-16 h-16" />
-                  </div>
-                )}
-                {comp.type === "table" && (
-                  <div className="text-xs w-full h-full overflow-hidden">
-                    {comp.sqlResult ? (
-                      <div className="space-y-1">
-                        <div className="font-semibold text-slate-500">
-                          Resultados ({comp.sqlResult.rowCount})
-                        </div>
-                        <div className="grid grid-cols-2 gap-1 opacity-60">
-                          {comp.sqlResult.rows.map((r, i) => (
-                            <div key={i} className="bg-slate-100 p-1 truncate">
-                              {String(r[1] ?? "")}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-center h-full text-slate-400">
-                        Sem dados SQL
-                      </div>
-                    )}
-                  </div>
-                )}
+            {/* Actions (center) */}
+            <div className="flex-1 flex items-center justify-center gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => dispatch({ type: "UNDO" })}
+                disabled={state.historyIndex <= 0}
+                title="Undo"
+                className="h-9 w-9">
+                <Undo className="w-4 h-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => dispatch({ type: "REDO" })}
+                disabled={state.historyIndex >= state.history.length - 1}
+                title="Redo"
+                className="h-9 w-9">
+                <Redo className="w-4 h-4" />
+              </Button>
+              <div className="w-px h-5 bg-border mx-2" />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => openSqlEditor()}
+                className="flex items-center gap-1 text-xs h-8"
+                title="Open SQL Editor (Ctrl+Shift+S)">
+                <Database className="w-4 h-4" />
+                SQL Editor
+              </Button>
+            </div>
+
+            {/* Save (right) */}
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" className="h-8 text-xs">
+                Preview
+              </Button>
+              <Button size="sm" className="h-8 text-xs" onClick={() => onSave?.(state.components)}>
+                Salvar
+              </Button>
+            </div>
+          </div>
+
+          {/* Canvas viewport */}
+          <div
+            ref={viewportRef}
+            className="flex-1 min-h-0 overflow-auto bg-muted/20 relative"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                dispatch({ type: "SELECT_COMPONENT", id: null });
+              }
+            }}
+            onClick={() => dispatch({ type: "SELECT_COMPONENT", id: null })}>
+            {/* Zoom controls */}
+            <div className="absolute top-3 right-3 z-20">
+              <div className="flex items-center gap-1 bg-background/95 backdrop-blur border border-border rounded-lg shadow-sm p-1">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  title="Zoom out"
+                  onClick={() => setZoom((z) => clampZoom(Number((z - 0.1).toFixed(2))))}>
+                  <Minus className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 px-2 text-xs tabular-nums"
+                  title="Reset zoom"
+                  onClick={() => setZoom(1)}>
+                  {Math.round(zoom * 100)}%
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  title="Zoom in"
+                  onClick={() => setZoom((z) => clampZoom(Number((z + 0.1).toFixed(2))))}>
+                  <Plus className="w-4 h-4" />
+                </Button>
+                <div className="w-px h-5 bg-border mx-1" />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  title="Fit"
+                  onClick={fitToViewport}>
+                  <Maximize2 className="w-4 h-4" />
+                </Button>
               </div>
             </div>
-          ))}
-        </div>
-      </div>
 
-      {/* Floating Toolbar (Right) */}
-      <div className="absolute right-4 top-20 flex flex-col gap-2 bg-white dark:bg-slate-800 p-2 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => addComponent("text")}
-          title="Texto">
-          <Type className="w-5 h-5" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => addComponent("table")}
-          title="Tabela">
-          <Table className="w-5 h-5" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => addComponent("chart")}
-          title="Gráfico">
-          <BarChart className="w-5 h-5" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => addComponent("image")}
-          title="Imagem">
-          <ImageIcon className="w-5 h-5" />
-        </Button>
+            <div className="p-8">
+              <div
+                id="canvas-area"
+                className="mx-auto w-fit"
+                role="presentation"
+                onClick={(e) => e.stopPropagation()}>
+                <div
+                  ref={paperRef}
+                  className="relative canvas-grid bg-background border border-border shadow-sm ui-motion w-[794px] h-[1123px]"
+                  style={{
+                    transform: `scale(${zoom})`,
+                    transformOrigin: "top left",
+                  }}>
+                  {/* Components */}
+                  {state.components.map((comp) => (
+                    <div
+                      key={comp.id}
+                      className={cn(
+                        "absolute border bg-background cursor-move group",
+                        "hover:border-primary/50 hover:shadow-sm",
+                        state.selectedId === comp.id
+                          ? "border-primary ring-1 ring-primary/20 z-10"
+                          : "border-border",
+                      )}
+                      style={{
+                        left: comp.x,
+                        top: comp.y,
+                        width: comp.width,
+                        height: comp.height,
+                      }}
+                      onMouseDown={(e) => startDrag(e, comp.id)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          dispatch({ type: "SELECT_COMPONENT", id: comp.id });
+                        }
+                        if (e.key === "Delete" || e.key === "Backspace") {
+                          e.preventDefault();
+                          deleteComponent(comp.id);
+                        }
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        dispatch({ type: "SELECT_COMPONENT", id: comp.id });
+                      }}>
+                      {/* Floating mini-toolbar */}
+                      <div
+                        className={cn(
+                          "absolute -top-9 right-0 flex gap-1 rounded-md border border-border bg-background/95 backdrop-blur shadow-sm p-1",
+                          "opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto",
+                          state.selectedId === comp.id && "opacity-100 pointer-events-auto",
+                        )}>
+                        {comp.type === "table" && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 px-2 text-xs"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openSqlEditor(comp.id);
+                            }}>
+                            <Table className="w-3.5 h-3.5 mr-1" />
+                            SQL
+                          </Button>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7"
+                          title="Delete component"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteComponent(comp.id);
+                          }}>
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
+
+                      {/* Resize handle (visual affordance) */}
+                      <div
+                        className={cn(
+                          "absolute -bottom-1.5 -right-1.5 h-3 w-3 rounded-sm bg-primary/20",
+                          state.selectedId === comp.id ? "opacity-100" : "opacity-0 group-hover:opacity-100",
+                        )}
+                      />
+
+                      <div className="w-full h-full overflow-hidden p-2 pointer-events-none text-sm">
+                        {comp.type === "text" && (
+                          <div className="text-sm font-medium">{comp.content}</div>
+                        )}
+                        {comp.type === "image" && (
+                          <div className="flex items-center justify-center h-full bg-muted/30 text-3xl text-muted-foreground">
+                            🖼️
+                          </div>
+                        )}
+                        {comp.type === "chart" && (
+                          <div className="flex items-center justify-center h-full bg-muted/30 text-primary/60">
+                            <BarChart className="w-14 h-14" />
+                          </div>
+                        )}
+                        {comp.type === "table" && (
+                          <div className="text-xs w-full h-full overflow-hidden">
+                            {comp.sqlResult ? (
+                              <div className="space-y-1">
+                                <div className="font-medium text-muted-foreground">
+                                  Resultados ({comp.sqlResult.rowCount})
+                                </div>
+                                <div className="grid grid-cols-2 gap-1 opacity-70">
+                                  {comp.sqlResult.rows.slice(0, 10).map((r, i) => (
+                                    <div
+                                      key={`${comp.id}-${i}`}
+                                      className="bg-muted/40 border border-border rounded-sm px-1.5 py-1 truncate">
+                                      {formatPreviewCell(r?.[1])}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="flex items-center justify-center h-full text-muted-foreground">
+                                Sem dados SQL
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Status bar (28px) */}
+          <div className="h-7 border-t border-border bg-background/80 backdrop-blur flex items-center px-3 text-xs text-muted-foreground">
+            <div className="flex items-center gap-3 min-w-0">
+              <span className="truncate">Conectado</span>
+              <span>•</span>
+              <span>{state.components.length} componentes</span>
+              <span>•</span>
+              <span>Zoom {Math.round(zoom * 100)}%</span>
+            </div>
+            <div className="ml-auto min-w-0 truncate">
+              {state.selectedId !== null
+                ? `Selecionado: #${state.selectedId}`
+                : "Nenhum componente selecionado"}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* SQL Editor Modal */}
       <Dialog open={sqlModalOpen} onOpenChange={setSqlModalOpen}>
         <DialogContent className="w-[95vw] max-w-[95vw] h-[80vh] flex flex-col p-0 gap-0 overflow-hidden">
-          <div className="p-4 border-b flex justify-between items-center gradient-bg text-white">
-            <DialogTitle className="flex items-center gap-2">
-              <Table className="w-5 h-5" /> Professional SQL Editor
+          <div className="px-6 py-4 border-b border-border">
+            <DialogTitle className="text-base font-semibold">
+              SQL Editor
             </DialogTitle>
             <DialogDescription className="sr-only">
               Professional SQL Editor with syntax highlighting
             </DialogDescription>
+            <p className="text-xs text-muted-foreground">
+              {editingComponentId !== null
+                ? `Componente #${editingComponentId}`
+                : "Editor global"}
+            </p>
           </div>
-          <div className="flex-1 flex flex-row overflow-hidden min-h-0">
+          <div className="flex-1 flex flex-row min-h-0 relative">
             {/* Editor Panel */}
-            <div className="flex-1 w-1/2 flex flex-col border-r p-4 bg-slate-50 dark:bg-slate-900 min-w-0">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-semibold">SQL Query</h3>
+            <div
+              className="flex flex-col min-w-0 border-r border-border bg-muted/20"
+              style={{ width: `${editorWidth}%` }}>
+              <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+                <h3 className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
+                  SQL Query
+                </h3>
                 <div className="flex gap-2">
                   <Button
                     size="sm"
-                    className="gradient-bg border-0 flex items-center gap-1"
+                    className="flex items-center gap-1.5 h-7 text-xs"
                     onClick={executeSql}
                     disabled={isExecuting}>
                     {isExecuting ? (
                       <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
                         Executing...
                       </>
                     ) : (
                       <>
-                        <Play className="w-4 h-4" />
-                        Execute (Ctrl+Enter)
+                        <Play className="w-3.5 h-3.5" />
+                        Execute
                       </>
                     )}
                   </Button>
                 </div>
               </div>
-              <div className="flex-1 min-h-[300px]">
+              <div className="flex-1 min-h-0 relative">
                 <SqlEditor
                   value={sqlQuery}
                   onChange={setSqlQuery}
@@ -586,46 +792,62 @@ export function ReportEditor({ initialData, onSave }: ReportEditorProps) {
                 />
               </div>
               {error && (
-                <div className="mt-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md flex items-start gap-2 text-sm">
-                  <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400 mt-0.5 shrink-0" />
-                  <span className="text-red-700 dark:text-red-300">
-                    {error}
-                  </span>
+                <div className="px-4 py-2 border-t border-destructive/30 bg-destructive/10 flex items-start gap-2 text-xs">
+                  <AlertCircle className="w-3.5 h-3.5 text-destructive mt-0.5 shrink-0" />
+                  <span className="text-destructive">{error}</span>
                 </div>
               )}
             </div>
+
+            {/* Resize Handle */}
+            <div
+              className="w-1 bg-border hover:bg-primary/50 transition-colors cursor-col-resize active:bg-primary"
+              onMouseDown={() => setIsResizing(true)}
+            />
+
             {/* Results Panel */}
-            <div className="flex-1 w-1/2 flex flex-col p-4 bg-white dark:bg-slate-800 overflow-hidden min-w-0 min-h-0">
-              <h3 className="text-sm font-semibold mb-3">Results</h3>
-              {sqlResult ? (
-                <QueryResultsTable result={sqlResult} />
-              ) : (
-                <div className="flex-1 flex items-center justify-center border border-dashed rounded-md text-slate-400">
-                  <div className="text-center">
-                    <Table className="w-12 h-12 mx-auto mb-2 opacity-30" />
-                    <p className="text-sm">
-                      {isExecuting ? "Executing query..." : "No results yet"}
-                    </p>
-                    <p className="text-xs mt-1">
-                      Press{" "}
-                      <kbd className="px-1 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs">
-                        Ctrl+Enter
-                      </kbd>{" "}
-                      to execute
-                    </p>
-                  </div>
+            <div
+              className="flex flex-col min-w-0 bg-background"
+              style={{ width: `${100 - editorWidth}%` }}>
+              <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+                <h3 className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
+                  Results
+                </h3>
+                <div className="text-xs text-muted-foreground tabular-nums">
+                  {sqlResult ? `${sqlResult.rowCount} rows • ${sqlResult.duration}ms` : "—"}
                 </div>
-              )}
+              </div>
+              <div className="flex-1 min-h-0 overflow-hidden">
+                {sqlResult ? (
+                  <QueryResultsTable result={sqlResult} />
+                ) : (
+                  <div className="flex-1 flex items-center justify-center border border-border rounded-md text-muted-foreground bg-muted/10 m-4">
+                    <div className="text-center">
+                      <Table className="w-10 h-10 mx-auto mb-2 opacity-30" />
+                      <p className="text-xs">
+                        {isExecuting ? "Executing query..." : "No results yet"}
+                      </p>
+                      <p className="text-xs mt-1 text-muted-foreground/70">
+                        Press{" "}
+                        <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded text-xs">
+                          Ctrl+Enter
+                        </kbd>{" "}
+                        to execute
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-          <div className="p-4 border-t bg-slate-50 dark:bg-slate-900 flex justify-end gap-2">
+          <div className="p-4 border-t border-border bg-muted/20 flex justify-end gap-2">
             <Button variant="ghost" onClick={() => setSqlModalOpen(false)}>
               Cancel
             </Button>
             <Button
               onClick={applySql}
               disabled={!sqlResult}
-              className="gradient-bg border-0">
+              >
               Apply to Component
             </Button>
           </div>

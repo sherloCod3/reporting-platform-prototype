@@ -39,6 +39,7 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { ConnectionStatus } from "@/components/database/connection-status";
 import { DatabaseSelector } from "@/components/database/database-selector";
+import { useSidebar } from "@/components/ui/sidebar";
 // import { Button } from '@/components/ui/button';
 // import { Separator } from '@/components/ui/separator';
 
@@ -106,6 +107,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, client, logout } = useAuth();
+  const { state } = useSidebar();
+  const isCollapsed = state === "collapsed";
 
   // Generate navigation items based on current context
   const items = getNavItems();
@@ -125,7 +128,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <GalleryVerticalEnd className="size-4" />
           </div>
           <div className="flex flex-col gap-0.5 leading-none group-data-[collapsible=icon]:hidden">
-            <span className="text-xl font-bold bg-linear-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent truncate">
+            <span className="text-xl font-bold tracking-[-0.02em] truncate">
               QReports
             </span>
             {client && (
@@ -138,12 +141,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-xs text-muted-foreground px-2 mb-1">
+          <SidebarGroupLabel className="text-xs text-muted-foreground px-2 mb-1 group-data-[collapsible=icon]:hidden">
             Database Connection
           </SidebarGroupLabel>
-          <div className="px-2 space-y-2">
-            <ConnectionStatus />
-            <DatabaseSelector />
+          <div className="px-2 space-y-2 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:space-y-1">
+            <ConnectionStatus compact={isCollapsed} />
+            {!isCollapsed && <DatabaseSelector />}
           </div>
         </SidebarGroup>
         <SidebarGroup>
