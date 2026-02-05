@@ -1,6 +1,14 @@
-# 📊 QReports - Modern Reporting System
+# 📊 Reporting Platform Prototype
 
-> 🚀 Full-stack reporting platform with SQL queries, PDF export, and React UI
+> 🚧 Technical prototype of a modern full-stack reporting system  
+> Built for experimentation, architecture validation, and portfolio demonstration.
+
+⚠️ **Disclaimer**  
+This repository represents a **technical prototype**.  
+Product name, branding, licensing, and commercial availability are subject to change.  
+This project may serve as the foundation for a future proprietary product.
+
+---
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue?logo=typescript)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)](https://reactjs.org/)
@@ -25,17 +33,18 @@
 
 ---
 
-## 🎯 **Overview**
+## 🎯 Overview
 
-QReports is a modern, self-hosted alternative to enterprise reporting tools like Bold Reports. Built with a focus on performance, security, and developer experience, it enables teams to create, execute, and export SQL-based reports with a beautiful UI.
+This project is a modern, self-hosted reporting platform prototype inspired by
+enterprise reporting tools. It focuses on performance, security, and developer
+experience, allowing teams to execute SQL-based reports and export them as
+professional documents.
 
-### **Key Goals**
-
-- ✅ Replace expensive SaaS reporting tools
-- ✅ Full control over data and infrastructure
-- ✅ Modern stack with TypeScript safety
-- ✅ Docker-ready for easy deployment
-- ✅ Professional PDF generation
+The main goal of this repository is to explore:
+- Reporting system architecture
+- Secure SQL execution
+- PDF generation pipelines
+- Modern full-stack development practices
 
 ---
 
@@ -102,8 +111,8 @@ QReports is a modern, self-hosted alternative to enterprise reporting tools like
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/YOUR-USERNAME/qreports.git
-cd qreports
+git clone https://github.com/YOUR-USERNAME/reporting-platform-prototype.git
+cd reporting-platform-prototype
 
 # 2. Setup environment variables
 cp .env.example .env
@@ -165,7 +174,7 @@ npm run dev
 ```bash
 # Start MySQL locally or use Docker
 docker run -d \
-  --name qreports-mysql \
+  --name reporting-platform-prototype-mysql \
   -e MYSQL_ROOT_PASSWORD=your_password \
   -e MYSQL_DATABASE=relatorios \
   -p 3306:3306 \
@@ -182,7 +191,7 @@ docker run -d \
 ## 📁 **Project Structure**
 
 ```
-qreports/
+reporting-platform-prototype/
 ├── backend/                 # Backend API (Express + TypeScript)
 │   ├── src/
 │   │   ├── config/         # Configuration files
@@ -227,7 +236,7 @@ Create a `.env` file in the project root:
 ```bash
 # Database
 MYSQL_ROOT_PASSWORD=your-super-secret-password
-DB_USER=qreports
+DB_USER=app
 DB_PASSWORD=your-app-password
 DB_HOST=mysql
 DB_NAME=relatorios
@@ -443,7 +452,7 @@ chore: maintenance tasks
 
 ## 📊 **Roadmap**
 
-### **Q1 2025**
+### **Q1 2025 (Prototype Phase)**
 
 - [x] Core SQL execution
 - [x] PDF export
@@ -466,13 +475,14 @@ chore: maintenance tasks
 
 ---
 
-## 📝 **License**
+## 📝 License
 
-This project is proprietary software owned by [DoQR].
+This repository contains proprietary source code and is shared publicly
+for demonstration and portfolio purposes only.
 
-**Unauthorized copying, distribution, or modification is prohibited.**
+Unauthorized copying, distribution, or modification is prohibited.
 
-For licensing inquiries, contact: comercial@doqr.com.br (planned)
+Future licensing terms may change upon product officialization.
 
 ---
 
@@ -487,7 +497,7 @@ For licensing inquiries, contact: comercial@doqr.com.br (planned)
 
 ### **Issues & Bugs**
 
-Report bugs via [GitHub Issues](https://github.com/sherlocod3/qreports-tool/issues)
+Report bugs via [GitHub Issues](https://github.com/sherlocod3/reporting-platform-prototype/issues)
 
 ### **Questions**
 
@@ -495,7 +505,7 @@ Report bugs via [GitHub Issues](https://github.com/sherlocod3/qreports-tool/issu
 
 ### **Documentation**
 
-- 📖 [Wiki](https://github.com/YOUR-USERNAME/qreports/wiki) (planned)
+- 📖 [Wiki](https://github.com/YOUR-USERNAME/reporting-platform-prototype/wiki) (planned)
 - 📚 [API Docs](https://api.notreadyyet.com/docs) (planned)
 
 ---
@@ -511,9 +521,9 @@ Report bugs via [GitHub Issues](https://github.com/sherlocod3/qreports-tool/issu
 
 ## 📈 **Stats**
 
-![GitHub last commit](https://img.shields.io/github/last-commit/sherlocod3/qreports-tool)
-![GitHub issues](https://img.shields.io/github/issues/sherlocod3/qreports-tool)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/sherlocod3/qreports-tool)
+![GitHub last commit](https://img.shields.io/github/last-commit/sherlocod3/reporting-platform-prototype)
+![GitHub issues](https://img.shields.io/github/issues/sherlocod3/reporting-platform-prototype)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/sherlocod3/reporting-platform-prototype)
 
 ---
 
