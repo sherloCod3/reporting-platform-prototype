@@ -17,7 +17,16 @@ import {
   Minus,
   Plus,
   Maximize2,
+  Settings,
+  Check,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Dialog,
   DialogContent,
@@ -27,6 +36,11 @@ import {
 import { SqlEditor } from "@/components/sql/sql-editor";
 import { QueryResultsTable } from "@/components/sql/query-results-table";
 import { useSqlExecution } from "@/hooks/use-sql-execution";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
 import { toast } from "sonner";
 import type { Component, SqlResult, EditorState, EditorAction } from "./types";
 
@@ -163,11 +177,15 @@ interface ReportEditorProps {
 const formatPreviewCell = (value: unknown) => {
   if (value === null || value === undefined) return "";
   if (typeof value === "string") return value;
-  if (typeof value === "number" || typeof value === "boolean") return String(value);
+  if (typeof value === "number" || typeof value === "boolean")
+    return String(value);
   return "";
 };
 
-export function ReportEditor({ initialData, onSave }: Readonly<ReportEditorProps>) {
+export function ReportEditor({
+  initialData,
+  onSave,
+}: Readonly<ReportEditorProps>) {
   // ------------------------------------------------------------------
   // State Management - Centralized with useReducer
   // ------------------------------------------------------------------
@@ -206,10 +224,20 @@ export function ReportEditor({ initialData, onSave }: Readonly<ReportEditorProps
 
   // Canvas zoom (Figma-like)
   const [zoom, setZoom] = useState(1);
-  
-  // SQL Editor panel resize
-  const [editorWidth, setEditorWidth] = useState(50); // percentage
-  const [isResizing, setIsResizing] = useState(false);
+
+  // Workspace background color
+  const [workspaceColor, setWorkspaceColor] = useState<string | null>(null);
+
+  const backgroundPresets = [
+    { name: "Padrão", value: null },
+    { name: "Cinza Claro", value: "#f4f4f5" },
+    { name: "Cinza Médio", value: "#e4e4e7" },
+    { name: "Cinza Escuro", value: "#27272a" },
+    { name: "Grafite", value: "#18181b" },
+    { name: "Azul Bebê", value: "#eff6ff" },
+    { name: "Slate", value: "#1e293b" },
+    { name: "Branco", value: "#ffffff" },
+  ];
 
   // ------------------------------------------------------------------
   // Helper Functions
@@ -333,31 +361,6 @@ export function ReportEditor({ initialData, onSave }: Readonly<ReportEditorProps
     globalThis.addEventListener("resize", handleResize);
     return () => globalThis.removeEventListener("resize", handleResize);
   }, []);
-
-  // Panel resize handler
-  useEffect(() => {
-    if (!isResizing) return;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      const modal = document.querySelector('[role="dialog"]') as HTMLElement;
-      if (!modal) return;
-      const rect = modal.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const percentage = Math.max(30, Math.min(70, (x / rect.width) * 100));
-      setEditorWidth(percentage);
-    };
-
-    const handleMouseUp = () => {
-      setIsResizing(false);
-    };
-
-    globalThis.addEventListener("mousemove", handleMouseMove);
-    globalThis.addEventListener("mouseup", handleMouseUp);
-    return () => {
-      globalThis.removeEventListener("mousemove", handleMouseMove);
-      globalThis.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, [isResizing]);
 
   /**
    * Opens the SQL editor modal.
@@ -521,6 +524,44 @@ export function ReportEditor({ initialData, onSave }: Readonly<ReportEditorProps
                 <Database className="w-4 h-4" />
                 SQL Editor
               </Button>
+              <div className="w-px h-5 bg-border mx-2" />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-9 w-9"
+                    title="Configurações do Workspace">
+                    <Settings className="w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>Cor de Fundo</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <div className="grid grid-cols-4 gap-2 p-2">
+                    {backgroundPresets.map((bg) => (
+                      <button
+                        key={bg.name}
+                        onClick={() => setWorkspaceColor(bg.value)}
+                        className={cn(
+                          "w-8 h-8 rounded-full border border-border shadow-sm flex items-center justify-center transition-all hover:scale-110",
+                          workspaceColor === bg.value &&
+                            "ring-2 ring-primary ring-offset-2",
+                        )}
+                        style={{
+                          background:
+                            bg.value ||
+                            "conic-gradient(at center, #ddd 0deg, #fff 180deg, #ddd 360deg)", // Visual representation for "default"
+                        }}
+                        title={bg.name}>
+                        {workspaceColor === bg.value && (
+                          <Check className="w-4 h-4 text-foreground drop-shadow-md" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
 
             {/* Save (right) */}
@@ -528,7 +569,10 @@ export function ReportEditor({ initialData, onSave }: Readonly<ReportEditorProps
               <Button variant="outline" size="sm" className="h-8 text-xs">
                 Preview
               </Button>
-              <Button size="sm" className="h-8 text-xs" onClick={() => onSave?.(state.components)}>
+              <Button
+                size="sm"
+                className="h-8 text-xs"
+                onClick={() => onSave?.(state.components)}>
                 Salvar
               </Button>
             </div>
@@ -537,7 +581,8 @@ export function ReportEditor({ initialData, onSave }: Readonly<ReportEditorProps
           {/* Canvas viewport */}
           <div
             ref={viewportRef}
-            className="flex-1 min-h-0 overflow-auto bg-muted/20 relative"
+            className="flex-1 min-h-0 overflow-auto bg-muted/20 relative transition-colors duration-200"
+            style={{ backgroundColor: workspaceColor ?? undefined }}
             role="button"
             tabIndex={0}
             onKeyDown={(e) => {
@@ -555,7 +600,9 @@ export function ReportEditor({ initialData, onSave }: Readonly<ReportEditorProps
                   size="icon"
                   className="h-8 w-8"
                   title="Zoom out"
-                  onClick={() => setZoom((z) => clampZoom(Number((z - 0.1).toFixed(2))))}>
+                  onClick={() =>
+                    setZoom((z) => clampZoom(Number((z - 0.1).toFixed(2))))
+                  }>
                   <Minus className="w-4 h-4" />
                 </Button>
                 <Button
@@ -571,7 +618,9 @@ export function ReportEditor({ initialData, onSave }: Readonly<ReportEditorProps
                   size="icon"
                   className="h-8 w-8"
                   title="Zoom in"
-                  onClick={() => setZoom((z) => clampZoom(Number((z + 0.1).toFixed(2))))}>
+                  onClick={() =>
+                    setZoom((z) => clampZoom(Number((z + 0.1).toFixed(2))))
+                  }>
                   <Plus className="w-4 h-4" />
                 </Button>
                 <div className="w-px h-5 bg-border mx-1" />
@@ -638,7 +687,8 @@ export function ReportEditor({ initialData, onSave }: Readonly<ReportEditorProps
                         className={cn(
                           "absolute -top-9 right-0 flex gap-1 rounded-md border border-border bg-background/95 backdrop-blur shadow-sm p-1",
                           "opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto",
-                          state.selectedId === comp.id && "opacity-100 pointer-events-auto",
+                          state.selectedId === comp.id &&
+                            "opacity-100 pointer-events-auto",
                         )}>
                         {comp.type === "table" && (
                           <Button
@@ -670,13 +720,17 @@ export function ReportEditor({ initialData, onSave }: Readonly<ReportEditorProps
                       <div
                         className={cn(
                           "absolute -bottom-1.5 -right-1.5 h-3 w-3 rounded-sm bg-primary/20",
-                          state.selectedId === comp.id ? "opacity-100" : "opacity-0 group-hover:opacity-100",
+                          state.selectedId === comp.id
+                            ? "opacity-100"
+                            : "opacity-0 group-hover:opacity-100",
                         )}
                       />
 
                       <div className="w-full h-full overflow-hidden p-2 pointer-events-none text-sm">
                         {comp.type === "text" && (
-                          <div className="text-sm font-medium">{comp.content}</div>
+                          <div className="text-sm font-medium">
+                            {comp.content}
+                          </div>
                         )}
                         {comp.type === "image" && (
                           <div className="flex items-center justify-center h-full bg-muted/30 text-3xl text-muted-foreground">
@@ -696,13 +750,15 @@ export function ReportEditor({ initialData, onSave }: Readonly<ReportEditorProps
                                   Resultados ({comp.sqlResult.rowCount})
                                 </div>
                                 <div className="grid grid-cols-2 gap-1 opacity-70">
-                                  {comp.sqlResult.rows.slice(0, 10).map((r, i) => (
-                                    <div
-                                      key={`${comp.id}-${i}`}
-                                      className="bg-muted/40 border border-border rounded-sm px-1.5 py-1 truncate">
-                                      {formatPreviewCell(r?.[1])}
-                                    </div>
-                                  ))}
+                                  {comp.sqlResult.rows
+                                    .slice(0, 10)
+                                    .map((r, i) => (
+                                      <div
+                                        key={`${comp.id}-${i}`}
+                                        className="bg-muted/40 border border-border rounded-sm px-1.5 py-1 truncate">
+                                        {formatPreviewCell(r?.[1])}
+                                      </div>
+                                    ))}
                                 </div>
                               </div>
                             ) : (
@@ -739,8 +795,22 @@ export function ReportEditor({ initialData, onSave }: Readonly<ReportEditorProps
       </div>
 
       {/* SQL Editor Modal */}
-      <Dialog open={sqlModalOpen} onOpenChange={setSqlModalOpen}>
-        <DialogContent className="w-[95vw] max-w-[95vw] h-[80vh] flex flex-col p-0 gap-0 overflow-hidden">
+      <Dialog
+        open={sqlModalOpen}
+        onOpenChange={(open) => {
+          if (!open) console.log("Dialog closing...");
+          setSqlModalOpen(open);
+        }}>
+        <DialogContent
+          className="w-[90vw] max-w-[1600px] h-[80vh] flex flex-col p-0 gap-0 overflow-hidden"
+          onInteractOutside={(e) => {
+            // Prevent closing when interacting with resizable handles or anything else outside
+            e.preventDefault();
+          }}
+          onPointerDownOutside={(e) => {
+            // Extra safety: prevent pointer down outside from closing
+            e.preventDefault();
+          }}>
           <div className="px-6 py-4 border-b border-border">
             <DialogTitle className="text-base font-semibold">
               SQL Editor
@@ -755,99 +825,129 @@ export function ReportEditor({ initialData, onSave }: Readonly<ReportEditorProps
             </p>
           </div>
           <div className="flex-1 flex flex-row min-h-0 relative">
-            {/* Editor Panel */}
-            <div
-              className="flex flex-col min-w-0 border-r border-border bg-muted/20"
-              style={{ width: `${editorWidth}%` }}>
-              <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-                <h3 className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
-                  SQL Query
-                </h3>
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    className="flex items-center gap-1.5 h-7 text-xs"
-                    onClick={executeSql}
-                    disabled={isExecuting}>
-                    {isExecuting ? (
-                      <>
-                        <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                        Executing...
-                      </>
-                    ) : (
-                      <>
-                        <Play className="w-3.5 h-3.5" />
-                        Execute
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </div>
-              <div className="flex-1 min-h-0 relative">
-                <SqlEditor
-                  value={sqlQuery}
-                  onChange={setSqlQuery}
-                  height="100%"
-                  onExecute={executeSql}
-                />
-              </div>
-              {error && (
-                <div className="px-4 py-2 border-t border-destructive/30 bg-destructive/10 flex items-start gap-2 text-xs">
-                  <AlertCircle className="w-3.5 h-3.5 text-destructive mt-0.5 shrink-0" />
-                  <span className="text-destructive">{error}</span>
-                </div>
-              )}
-            </div>
-
-            {/* Resize Handle */}
-            <div
-              className="w-1 bg-border hover:bg-primary/50 transition-colors cursor-col-resize active:bg-primary"
-              onMouseDown={() => setIsResizing(true)}
-            />
-
-            {/* Results Panel */}
-            <div
-              className="flex flex-col min-w-0 bg-background"
-              style={{ width: `${100 - editorWidth}%` }}>
-              <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-                <h3 className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
-                  Results
-                </h3>
-                <div className="text-xs text-muted-foreground tabular-nums">
-                  {sqlResult ? `${sqlResult.rowCount} rows • ${sqlResult.duration}ms` : "—"}
-                </div>
-              </div>
-              <div className="flex-1 min-h-0 overflow-hidden">
-                {sqlResult ? (
-                  <QueryResultsTable result={sqlResult} />
-                ) : (
-                  <div className="flex-1 flex items-center justify-center border border-border rounded-md text-muted-foreground bg-muted/10 m-4">
-                    <div className="text-center">
-                      <Table className="w-10 h-10 mx-auto mb-2 opacity-30" />
-                      <p className="text-xs">
-                        {isExecuting ? "Executing query..." : "No results yet"}
-                      </p>
-                      <p className="text-xs mt-1 text-muted-foreground/70">
-                        Press{" "}
-                        <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded text-xs">
-                          Ctrl+Enter
-                        </kbd>{" "}
-                        to execute
-                      </p>
+            <ResizablePanelGroup direction="horizontal">
+              {/* Left Sidebar: Schema/Files */}
+              <ResizablePanel defaultSize={20} minSize={10} maxSize={50}>
+                <div className="h-full border-r border-border bg-background flex flex-col">
+                  <div className="px-4 py-3 border-b border-border h-[53px] flex items-center">
+                    <h3 className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
+                      Explorer
+                    </h3>
+                  </div>
+                  <div className="flex-1 p-4 text-xs text-muted-foreground">
+                    <div className="flex items-center gap-2 mb-2 text-foreground font-medium">
+                      <Database className="w-3.5 h-3.5" />
+                      Database
+                    </div>
+                    {/* Placeholder for schema browser */}
+                    <div className="pl-5 space-y-1 opacity-70">
+                      <div>users</div>
+                      <div>reports</div>
+                      <div>sales_data</div>
+                      <div>logs</div>
                     </div>
                   </div>
-                )}
-              </div>
-            </div>
+                </div>
+              </ResizablePanel>
+
+              <ResizableHandle withHandle />
+
+              {/* Main Content: Editor & Results */}
+              <ResizablePanel defaultSize={80}>
+                <ResizablePanelGroup direction="vertical">
+                  {/* Editor Panel */}
+                  <ResizablePanel defaultSize={70} minSize={30}>
+                    <div className="flex flex-col h-full min-w-0 bg-background">
+                      <div className="flex items-center justify-between px-4 py-3 border-b border-border h-[53px]">
+                        <h3 className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
+                          SQL Query
+                        </h3>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            className="flex items-center gap-1.5 h-7 text-xs"
+                            onClick={executeSql}
+                            disabled={isExecuting}>
+                            {isExecuting ? (
+                              <>
+                                <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                Executing...
+                              </>
+                            ) : (
+                              <>
+                                <Play className="w-3.5 h-3.5" />
+                                Execute
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="flex-1 min-h-0 relative">
+                        <SqlEditor
+                          value={sqlQuery}
+                          onChange={setSqlQuery}
+                          height="100%"
+                          onExecute={executeSql}
+                        />
+                      </div>
+                      {error && (
+                        <div className="px-4 py-2 border-t border-destructive/30 bg-destructive/10 flex items-start gap-2 text-xs">
+                          <AlertCircle className="w-3.5 h-3.5 text-destructive mt-0.5 shrink-0" />
+                          <span className="text-destructive">{error}</span>
+                        </div>
+                      )}
+                    </div>
+                  </ResizablePanel>
+
+                  <ResizableHandle withHandle />
+
+                  {/* Results Panel */}
+                  <ResizablePanel defaultSize={30} minSize={20}>
+                    <div className="flex flex-col h-full min-w-0 bg-background">
+                      <div className="flex items-center justify-between px-4 py-3 border-b border-border h-[53px]">
+                        <h3 className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
+                          Results
+                        </h3>
+                        <div className="text-xs text-muted-foreground tabular-nums">
+                          {sqlResult
+                            ? `${sqlResult.rowCount} rows • ${sqlResult.duration}ms`
+                            : "—"}
+                        </div>
+                      </div>
+                      <div className="flex-1 min-h-0 overflow-hidden">
+                        {sqlResult ? (
+                          <QueryResultsTable result={sqlResult} />
+                        ) : (
+                          <div className="flex-1 flex items-center justify-center border border-border rounded-md text-muted-foreground bg-muted/10 m-4">
+                            <div className="text-center">
+                              <Table className="w-10 h-10 mx-auto mb-2 opacity-30" />
+                              <p className="text-xs">
+                                {isExecuting
+                                  ? "Executing query..."
+                                  : "No results yet"}
+                              </p>
+                              <p className="text-xs mt-1 text-muted-foreground/70">
+                                Press{" "}
+                                <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded text-xs">
+                                  Ctrl+Enter
+                                </kbd>{" "}
+                                to execute
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </ResizablePanel>
+                </ResizablePanelGroup>
+              </ResizablePanel>
+            </ResizablePanelGroup>
           </div>
           <div className="p-4 border-t border-border bg-muted/20 flex justify-end gap-2">
             <Button variant="ghost" onClick={() => setSqlModalOpen(false)}>
               Cancel
             </Button>
-            <Button
-              onClick={applySql}
-              disabled={!sqlResult}
-              >
+            <Button onClick={applySql} disabled={!sqlResult}>
               Apply to Component
             </Button>
           </div>

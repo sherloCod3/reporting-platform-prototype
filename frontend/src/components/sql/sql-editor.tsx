@@ -3,6 +3,7 @@
 import Editor from "@monaco-editor/react";
 import { useTheme } from "next-themes";
 import { Loader2 } from "lucide-react";
+import { useRef, useEffect } from "react";
 
 interface SqlEditorProps {
   value: string;
@@ -21,6 +22,14 @@ export function SqlEditor({
 }: SqlEditorProps) {
   const { theme } = useTheme();
 
+  // Store editor instance and container references
+  const editorRef = useRef<{
+    layout: () => void;
+    addCommand: (keybinding: number, handler: () => void) => void;
+    updateOptions: (options: Record<string, unknown>) => void;
+  } | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
   const handleEditorChange = (value: string | undefined) => {
     onChange(value || "");
   };
@@ -28,6 +37,7 @@ export function SqlEditor({
   const handleEditorMount = (editor: unknown, monaco: unknown) => {
     // Type assertion for Monaco editor instance
     const typedEditor = editor as {
+      layout: () => void;
       addCommand: (keybinding: number, handler: () => void) => void;
       updateOptions: (options: Record<string, unknown>) => void;
     };
@@ -41,6 +51,9 @@ export function SqlEditor({
         ) => void;
       };
     };
+
+    // Store editor reference
+    editorRef.current = typedEditor;
 
     // Configure SQL language features
     typedMonaco.languages.setLanguageConfiguration("mysql", {
@@ -90,10 +103,34 @@ export function SqlEditor({
         indentation: true,
       },
     });
+
+    // Initial layout call to ensure correct sizing
+    typedEditor.layout();
   };
 
+  // ResizeObserver to handle container size changes
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const resizeObserver = new ResizeObserver(() => {
+      // Call layout() when container size changes
+      if (editorRef.current) {
+        editorRef.current.layout();
+      }
+    });
+
+    resizeObserver.observe(container);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
+
   return (
-    <div className="border rounded-md overflow-hidden bg-background h-full w-full">
+    <div
+      ref={containerRef}
+      className="border rounded-md overflow-hidden bg-background h-full w-full">
       <Editor
         height={height}
         defaultLanguage="mysql"
@@ -107,7 +144,7 @@ export function SqlEditor({
           fontSize: 13,
           lineNumbers: "on",
           scrollBeyondLastLine: false,
-          automaticLayout: true,
+          automaticLayout: false, // We handle layout manually with ResizeObserver
           wordWrap: "off",
           padding: { top: 12, bottom: 12 },
           renderWhitespace: "selection",
