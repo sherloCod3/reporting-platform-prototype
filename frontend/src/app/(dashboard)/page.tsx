@@ -11,7 +11,7 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      <div className="rounded-2xl border border-border bg-background p-8">
+      <div className="rounded-2xl border border-border bg-card p-8">
         <h1 className="text-[32px] font-bold tracking-[-0.02em]">
           Olá, {user?.email.split("@")[0]}!
         </h1>
@@ -29,9 +29,7 @@ export default function DashboardPage() {
           icon={FileBarChart}
           action={
             <Link href="/reports">
-              <Button
-                variant="outline"
-                className="w-full">
+              <Button variant="outline" className="w-full">
                 Acessar Relatórios
               </Button>
             </Link>
@@ -44,9 +42,7 @@ export default function DashboardPage() {
           icon={Plus}
           action={
             <Link href="/reports/create">
-              <Button className="w-full">
-                Criar Agora
-              </Button>
+              <Button className="w-full">Criar Agora</Button>
             </Link>
           }
         />
@@ -57,9 +53,7 @@ export default function DashboardPage() {
           icon={Database}
           action={
             <Link href="?action=datasources" scroll={false}>
-              <Button
-                variant="outline"
-                className="w-full">
+              <Button variant="outline" className="w-full">
                 Gerenciar Conexões
               </Button>
             </Link>

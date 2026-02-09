@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "QReports",
+  title: "Reporting Platform Prototype",
   description: "Modern Report Builder",
 };
 

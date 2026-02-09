@@ -129,8 +129,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <GalleryVerticalEnd className="size-4" />
           </div>
           <div className="flex flex-col gap-0.5 leading-none group-data-[collapsible=icon]:hidden">
-            <span className="text-xl font-bold tracking-[-0.02em] truncate">
-              QReports
+            <span className="text-sm font-semibold tracking-[-0.02em] truncate">
+              Reporting Platform Prototype
             </span>
             {client && (
               <span className="text-xs text-gray-500 truncate max-w-[120px]">

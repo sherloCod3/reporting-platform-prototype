@@ -7,22 +7,16 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: qreports_auth
+      MYSQL_ROOT_HOST: "%"
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - ./docker/mysql/init.sh:/docker-entrypoint-initdb.d/init.sh
     networks:
       - qreports-network
-    healthcheck: # Garante MySQL pronto
-      test:
-        [
-          "CMD",
-          "mysqladmin",
-          "ping",
-          "-h",
-          "localhost",
-          "-p${MYSQL_ROOT_PASSWORD}",
-        ]
+    healthcheck:
+      # Garante MySQL pronto
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD}" ]
       interval: 5s
       timeout: 3s
       retries: 10
@@ -72,6 +66,7 @@ services:
 
 volumes:
   mysql-data:
+
 
 networks:
   qreports-network:
