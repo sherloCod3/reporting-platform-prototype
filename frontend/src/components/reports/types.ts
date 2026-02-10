@@ -9,6 +9,8 @@ export interface SqlResult {
     duration: number; // milliseconds
 }
 
+export type ResizeHandle = "nw" | "n" | "ne" | "e" | "se" | "s" | "sw" | "w";
+
 export interface Component {
     id: number;
     type: "text" | "table" | "chart" | "image";
@@ -21,6 +23,14 @@ export interface Component {
     sqlResult?: SqlResult;
 }
 
+export interface AlignmentLine {
+    type: "vertical" | "horizontal";
+    x?: number;
+    y?: number;
+    start: number;
+    end: number;
+}
+
 /**
  * Editor state managed by useReducer
  */
@@ -31,6 +41,16 @@ export interface EditorState {
     nextId: number;
     selectedId: number | null;
     draggingId: number | null;
+
+    resizing: {
+        id: number;
+        handle: ResizeHandle;
+        startX: number;
+        startY: number;
+        initialBounds: { x: number; y: number; width: number; height: number };
+    } | null;
+
+    alignmentLines: AlignmentLine[];
 }
 
 /**
@@ -41,9 +61,23 @@ export type EditorAction =
     | { type: "UPDATE_COMPONENT"; id: number; changes: Partial<Component> }
     | { type: "DELETE_COMPONENT"; id: number }
     | { type: "MOVE_COMPONENT"; id: number; x: number; y: number }
+    | { type: "DELETE_COMPONENT"; id: number }
+    | { type: "MOVE_COMPONENT"; id: number; x: number; y: number }
     | { type: "SELECT_COMPONENT"; id: number | null }
     | { type: "SET_DRAGGING"; id: number | null }
+    | {
+        type: "SET_RESIZING";
+        payload: {
+            id: number;
+            handle: ResizeHandle;
+            startX: number;
+            startY: number;
+            initialBounds: { x: number; y: number; width: number; height: number };
+        } | null;
+    }
+    | { type: "RESIZE_COMPONENT"; id: number; x: number; y: number; width: number; height: number }
     | { type: "COMMIT_HISTORY" }
     | { type: "UNDO" }
+    | { type: "SET_ALIGNMENT_LINES"; lines: AlignmentLine[] }
     | { type: "REDO" }
     | { type: "BATCH"; actions: EditorAction[] };

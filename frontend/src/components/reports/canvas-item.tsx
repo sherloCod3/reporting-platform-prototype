@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import type { Component } from "./types";
 import { TableRenderer } from "./renderers/table-renderer";
 import { TextRenderer } from "./renderers/text-renderer";
+import type { ResizeHandle } from "./types";
 
 interface CanvasItemProps {
   component: Component;
@@ -13,6 +14,11 @@ interface CanvasItemProps {
   onDelete: (id: number) => void;
   onEditSql?: (id: number) => void;
   onDragStart: (e: React.MouseEvent, id: number) => void;
+  onResizeStart?: (
+    e: React.MouseEvent,
+    id: number,
+    handle: ResizeHandle,
+  ) => void;
   readOnly?: boolean;
 }
 
@@ -23,6 +29,7 @@ export const CanvasItem = memo(function CanvasItem({
   onDelete,
   onEditSql,
   onDragStart,
+  onResizeStart,
   readOnly = false,
 }: CanvasItemProps) {
   // Render different content based on type
@@ -147,13 +154,46 @@ export const CanvasItem = memo(function CanvasItem({
       )}
 
       {/* Resize Handle Hints (Only when selected and not read-only) */}
-      {!readOnly && (
-        <div
-          className={cn(
-            "absolute -bottom-1 -right-1 h-2.5 w-2.5 bg-primary rounded-sm cursor-se-resize",
-            isSelected ? "opacity-100" : "opacity-0",
+      {/* Resize Handles (Only when selected and not read-only) */}
+      {!readOnly && isSelected && (
+        <>
+          {(["nw", "n", "ne", "e", "se", "s", "sw", "w"] as ResizeHandle[]).map(
+            (handle) => (
+              <div
+                key={handle}
+                className={cn(
+                  "absolute w-3 h-3 bg-white border border-primary rounded-full z-20",
+                  "hover:bg-primary hover:scale-125 transition-transform",
+                  // Position logic
+                  handle.includes("n") ? "-top-1.5" : "",
+                  handle.includes("s") ? "-bottom-1.5" : "",
+                  handle.includes("w") ? "-left-1.5" : "",
+                  handle.includes("e") ? "-right-1.5" : "",
+                  // Center logic
+                  handle === "n" || handle === "s"
+                    ? "left-1/2 -translate-x-1/2"
+                    : "",
+                  handle === "w" || handle === "e"
+                    ? "top-1/2 -translate-y-1/2"
+                    : "",
+                  // Cursor logic
+                  handle === "nw" || handle === "se"
+                    ? "cursor-nwse-resize"
+                    : "",
+                  handle === "ne" || handle === "sw"
+                    ? "cursor-nesw-resize"
+                    : "",
+                  handle === "n" || handle === "s" ? "cursor-ns-resize" : "",
+                  handle === "w" || handle === "e" ? "cursor-ew-resize" : "",
+                )}
+                onMouseDown={(e) => {
+                  e.stopPropagation(); // CRITICAL: Prevent drag start
+                  onResizeStart?.(e, comp.id, handle);
+                }}
+              />
+            ),
           )}
-        />
+        </>
       )}
 
       {/* Render Component Content */}

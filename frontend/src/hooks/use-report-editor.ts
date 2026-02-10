@@ -1,18 +1,5 @@
 import { useReducer, useCallback } from "react";
-import type { Component, EditorState } from "@/components/reports/types";
-
-// Actions
-export type EditorAction =
-    | { type: "ADD_COMPONENT"; payload: Omit<Component, "id"> }
-    | { type: "UPDATE_COMPONENT"; id: number; changes: Partial<Component> }
-    | { type: "DELETE_COMPONENT"; id: number }
-    | { type: "MOVE_COMPONENT"; id: number; x: number; y: number }
-    | { type: "SELECT_COMPONENT"; id: number | null }
-    | { type: "SET_DRAGGING"; id: number | null }
-    | { type: "COMMIT_HISTORY" }
-    | { type: "UNDO" }
-    | { type: "REDO" }
-    | { type: "BATCH"; actions: EditorAction[] };
+import type { Component, EditorState, EditorAction } from "@/components/reports/types";
 
 // Reducer
 function editorReducer(state: EditorState, action: EditorAction): EditorState {
@@ -60,6 +47,37 @@ function editorReducer(state: EditorState, action: EditorAction): EditorState {
             };
         }
 
+        case "RESIZE_COMPONENT": {
+            const existing = state.components.find((c) => c.id === action.id);
+            // Optimization: Skip if no change
+            if (
+                existing &&
+                existing.width === action.width &&
+                existing.height === action.height &&
+                existing.x === action.x &&
+                existing.y === action.y
+            ) {
+                return state;
+            }
+
+            const newComponents = state.components.map((c) =>
+                c.id === action.id
+                    ? {
+                        ...c,
+                        x: action.x,
+                        y: action.y,
+                        width: action.width,
+                        height: action.height,
+                    }
+                    : c
+            );
+
+            return {
+                ...state,
+                components: newComponents,
+            };
+        }
+
         case "MOVE_COMPONENT": {
             // Early return if position hasn't changed (performance optimization)
             const existing = state.components.find((c) => c.id === action.id);
@@ -88,6 +106,13 @@ function editorReducer(state: EditorState, action: EditorAction): EditorState {
             return {
                 ...state,
                 draggingId: action.id,
+            };
+        }
+
+        case "SET_RESIZING": {
+            return {
+                ...state,
+                resizing: action.payload,
             };
         }
 
@@ -126,6 +151,13 @@ function editorReducer(state: EditorState, action: EditorAction): EditorState {
             return action.actions.reduce((s, a) => editorReducer(s, a), state);
         }
 
+        case "SET_ALIGNMENT_LINES": {
+            return {
+                ...state,
+                alignmentLines: action.lines,
+            };
+        }
+
         default:
             return state;
     }
@@ -140,6 +172,8 @@ export function useReportEditor(initialData?: { components?: Component[] }) {
         nextId: (initialData?.components?.length || 0) + 1,
         selectedId: null,
         draggingId: null,
+        resizing: null,
+        alignmentLines: [],
     });
 
     const snapToGrid = useCallback((value: number, gridSize = 20) => {

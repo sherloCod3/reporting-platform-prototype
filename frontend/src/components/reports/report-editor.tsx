@@ -24,9 +24,15 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { SqlEditor } from "@/components/sql/sql-editor";
 import { useSqlExecution } from "@/hooks/use-sql-execution";
 import { toast } from "sonner";
-import type { Component, SqlResult } from "./types";
+import type {
+  Component,
+  SqlResult,
+  ResizeHandle,
+  AlignmentLine,
+} from "./types";
 import { useReportEditor } from "@/hooks/use-report-editor";
 import { CanvasItem } from "./canvas-item";
+import { AlignmentGuides } from "./alignment-guides";
 import { AxiosError } from "axios";
 
 interface ReportEditorProps {
@@ -101,6 +107,91 @@ export function ReportEditor({
   // Interaction Handlers
   // ------------------------------------------------------------------
 
+  const calculateAlignment = useCallback(
+    (
+      id: number,
+      x: number,
+      y: number,
+      w: number,
+      h: number,
+      components: Component[],
+    ) => {
+      const SNAP_THRESHOLD = 5;
+      const lines: AlignmentLine[] = [];
+      let snappedX = x;
+      let snappedY = y;
+
+      // Edges to check: [value, type, isCenter]
+      const horizontalCandidates = [
+        { val: y, type: "start" }, // Top
+        { val: y + h / 2, type: "center" }, // Middle
+        { val: y + h, type: "end" }, // Bottom
+      ];
+
+      const verticalCandidates = [
+        { val: x, type: "start" }, // Left
+        { val: x + w / 2, type: "center" }, // Center
+        { val: x + w, type: "end" }, // Right
+      ];
+
+      components.forEach((other) => {
+        if (other.id === id) return;
+
+        const otherCenters = {
+          x: other.x + other.width / 2,
+          y: other.y + other.height / 2,
+        };
+
+        const otherH = [
+          other.y, // Top
+          otherCenters.y, // Middle
+          other.y + other.height, // Bottom
+        ];
+
+        const otherV = [
+          other.x, // Left
+          otherCenters.x, // Center
+          other.x + other.width, // Right
+        ];
+
+        // Check Horizontal Alignment (Y-axis)
+        horizontalCandidates.forEach((cand) => {
+          otherH.forEach((target) => {
+            if (Math.abs(cand.val - target) < SNAP_THRESHOLD) {
+              const diff = target - cand.val;
+              snappedY += diff;
+              lines.push({
+                type: "horizontal",
+                y: target,
+                start: Math.min(x, other.x),
+                end: Math.max(x + w, other.x + other.width),
+              });
+            }
+          });
+        });
+
+        // Check Vertical Alignment (X-axis)
+        verticalCandidates.forEach((cand) => {
+          otherV.forEach((target) => {
+            if (Math.abs(cand.val - target) < SNAP_THRESHOLD) {
+              const diff = target - cand.val;
+              snappedX += diff;
+              lines.push({
+                type: "vertical",
+                x: target,
+                start: Math.min(y, other.y),
+                end: Math.max(y + h, other.y + other.height),
+              });
+            }
+          });
+        });
+      });
+
+      return { x: snappedX, y: snappedY, lines };
+    },
+    [],
+  );
+
   const startDrag = useCallback(
     (e: React.MouseEvent, id: number) => {
       e.stopPropagation();
@@ -127,11 +218,71 @@ export function ReportEditor({
     [activeTool, state.components, zoom, dispatch],
   );
 
+  const startResize = useCallback(
+    (e: React.MouseEvent, id: number, handle: ResizeHandle) => {
+      e.stopPropagation();
+      e.preventDefault(); // Prevent native drag/select interactions
+
+      const comp = state.components.find((c) => c.id === id);
+      if (!comp) return;
+
+      dispatch({
+        type: "SET_RESIZING",
+        payload: {
+          id,
+          handle,
+          startX: e.clientX,
+          startY: e.clientY,
+          initialBounds: {
+            x: comp.x,
+            y: comp.y,
+            width: comp.width,
+            height: comp.height,
+          },
+        },
+      });
+    },
+    [state.components, dispatch],
+  );
+
   // Global Drag listeners
   useEffect(() => {
+    // Define handleMouseUp first so it can be called by handleMouseMove
+    const handleMouseUp = () => {
+      // Clear alignment lines on drop
+      if (state.alignmentLines.length > 0) {
+        dispatch({ type: "SET_ALIGNMENT_LINES", lines: [] });
+      }
+
+      if (state.draggingId !== null) {
+        dispatch({
+          type: "BATCH",
+          actions: [
+            { type: "COMMIT_HISTORY" },
+            { type: "SET_DRAGGING", id: null },
+          ],
+        });
+      } else if (state.resizing) {
+        dispatch({
+          type: "BATCH",
+          actions: [
+            { type: "COMMIT_HISTORY" },
+            { type: "SET_RESIZING", payload: null },
+            { type: "SELECT_COMPONENT", id: state.resizing.id }, // Re-select after resize
+          ],
+        });
+      }
+    };
+
     const handleMouseMove = (e: MouseEvent) => {
       // Disable global drag in preview mode (safety check)
       if (mode === "preview") return;
+
+      // Robustness: If buttons are 0, mouse is not pressed. Cancel operation.
+      if (e.buttons === 0) {
+        handleMouseUp();
+        return;
+      }
 
       if (state.draggingId !== null && paperRef.current) {
         const paperRect = paperRef.current.getBoundingClientRect();
@@ -141,31 +292,90 @@ export function ReportEditor({
         const rawX = (e.clientX - paperRect.left) / zoom - dragOffset.current.x;
         const rawY = (e.clientY - paperRect.top) / zoom - dragOffset.current.y;
 
-        const snappedX = snapToGrid(Math.max(0, rawX));
-        const snappedY = snapToGrid(Math.max(0, rawY));
+        //const snappedX = snapToGrid(Math.max(0, rawX));
+        //const snappedY = snapToGrid(Math.max(0, rawY));
+
+        // Use Alignment instead of just grid snapping for drag
+        const currentComp = state.components.find(
+          (c) => c.id === state.draggingId,
+        );
+        if (currentComp) {
+          const { x, y, lines } = calculateAlignment(
+            state.draggingId,
+            rawX,
+            rawY,
+            currentComp.width,
+            currentComp.height,
+            state.components,
+          );
+
+          dispatch({
+            type: "BATCH",
+            actions: [
+              { type: "MOVE_COMPONENT", id: state.draggingId, x, y },
+              { type: "SET_ALIGNMENT_LINES", lines },
+            ],
+          });
+        }
+      } else if (state.resizing) {
+        // RESIZE LOGIC
+        const { handle, startX, startY, initialBounds } = state.resizing;
+
+        // Calculate delta in CSS pixels (accounting for zoom)
+        const deltaX = (e.clientX - startX) / zoom;
+        const deltaY = (e.clientY - startY) / zoom;
+
+        let newX = initialBounds.x;
+        let newY = initialBounds.y;
+        let newW = initialBounds.width;
+        let newH = initialBounds.height;
+
+        // Apply delta based on handle
+        if (handle.includes("e")) newW = initialBounds.width + deltaX;
+        if (handle.includes("w")) {
+          newW = initialBounds.width - deltaX;
+          newX = initialBounds.x + deltaX;
+        }
+        if (handle.includes("s")) newH = initialBounds.height + deltaY;
+        if (handle.includes("n")) {
+          newH = initialBounds.height - deltaY;
+          newY = initialBounds.y + deltaY;
+        }
+
+        // Enforce Minimums & Corrections
+        const MIN_SIZE = 20;
+
+        if (newW < MIN_SIZE) {
+          newW = MIN_SIZE;
+          if (handle.includes("w")) {
+            newX = initialBounds.x + initialBounds.width - MIN_SIZE;
+          }
+        }
+        if (newH < MIN_SIZE) {
+          newH = MIN_SIZE;
+          if (handle.includes("n")) {
+            newY = initialBounds.y + initialBounds.height - MIN_SIZE;
+          }
+        }
+
+        // Apply Snap to Grid
+        const snappedX = snapToGrid(newX);
+        const snappedY = snapToGrid(newY);
+        const snappedW = snapToGrid(newW);
+        const snappedH = snapToGrid(newH);
 
         dispatch({
-          type: "MOVE_COMPONENT",
-          id: state.draggingId,
+          type: "RESIZE_COMPONENT",
+          id: state.resizing.id,
           x: snappedX,
           y: snappedY,
+          width: snappedW,
+          height: snappedH,
         });
       }
     };
 
-    const handleMouseUp = () => {
-      if (state.draggingId !== null) {
-        dispatch({
-          type: "BATCH",
-          actions: [
-            { type: "COMMIT_HISTORY" },
-            { type: "SET_DRAGGING", id: null },
-          ],
-        });
-      }
-    };
-
-    if (state.draggingId !== null) {
+    if (state.draggingId !== null || state.resizing !== null) {
       globalThis.addEventListener("mousemove", handleMouseMove);
       globalThis.addEventListener("mouseup", handleMouseUp);
     }
@@ -174,7 +384,65 @@ export function ReportEditor({
       globalThis.removeEventListener("mousemove", handleMouseMove);
       globalThis.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [state.draggingId, zoom, snapToGrid, dispatch, mode]);
+  }, [
+    state.draggingId,
+    state.resizing,
+    zoom,
+    snapToGrid,
+    dispatch,
+    mode,
+    calculateAlignment,
+    state.components,
+  ]);
+
+  // Keyboard Shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (mode === "preview") return;
+
+      // Delete
+      if (e.key === "Delete" || e.key === "Backspace") {
+        if (state.selectedId !== null) {
+          dispatch({ type: "DELETE_COMPONENT", id: state.selectedId });
+        }
+      }
+
+      // Arrows (Nudge)
+      if (state.selectedId !== null) {
+        const comp = state.components.find((c) => c.id === state.selectedId);
+        if (comp) {
+          const step = e.shiftKey ? 10 : 1;
+          let { x, y } = comp;
+          let handled = false;
+
+          if (e.key === "ArrowLeft") {
+            x -= step;
+            handled = true;
+          }
+          if (e.key === "ArrowRight") {
+            x += step;
+            handled = true;
+          }
+          if (e.key === "ArrowUp") {
+            y -= step;
+            handled = true;
+          }
+          if (e.key === "ArrowDown") {
+            y += step;
+            handled = true;
+          }
+
+          if (handled) {
+            e.preventDefault();
+            dispatch({ type: "MOVE_COMPONENT", id: comp.id, x, y });
+          }
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [state.selectedId, state.components, dispatch, mode]);
 
   const openSqlEditor = useCallback(
     (id?: number) => {
@@ -389,6 +657,7 @@ export function ReportEditor({
               transform: `scale(${zoom})`,
             }}
             onClick={(e) => e.stopPropagation()}>
+            <AlignmentGuides lines={state.alignmentLines} zoom={zoom} />
             {state.components.map((comp) => (
               <CanvasItem
                 key={comp.id}
@@ -398,6 +667,7 @@ export function ReportEditor({
                 onDelete={deleteComponent}
                 onEditSql={openSqlEditor}
                 onDragStart={startDrag}
+                onResizeStart={startResize}
                 readOnly={mode === "preview"}
               />
             ))}
