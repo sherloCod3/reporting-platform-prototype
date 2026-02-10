@@ -47,14 +47,14 @@ async function main() {
                 `UPDATE users SET password_hash = ?, role = ?, active = 1, client_id = ? WHERE email = ?`,
                 [ hash, targetRole, clientId, targetEmail ]
             );
-            console.log(`✅ User ${targetEmail} updated successfully!`);
+            console.log(`User ${targetEmail} updated successfully!`);
         } else {
             console.log(`User ${targetEmail} does not exist. Creating...`);
             await pool.execute(
                 `INSERT INTO users (client_id, email, password_hash, role, active) VALUES (?, ?, ?, ?, ?)`,
                 [ clientId, targetEmail, hash, targetRole, 1 ]
             );
-            console.log(`✅ User ${targetEmail} created successfully!`);
+            console.log(`User ${targetEmail} created successfully!`);
         }
 
     } catch (err: any) {

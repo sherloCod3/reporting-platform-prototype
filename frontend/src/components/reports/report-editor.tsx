@@ -17,6 +17,8 @@ import {
   Settings,
   Layout,
   MousePointer2,
+  Eye,
+  Edit2,
 } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { SqlEditor } from "@/components/sql/sql-editor";
@@ -68,6 +70,7 @@ export function ReportEditor({
   // UI State
   const [zoom, setZoom] = useState(1);
   const [activeTool, setActiveTool] = useState<"select" | "hand">("select");
+  const [mode, setMode] = useState<"edit" | "preview">("edit");
 
   // SQL Modal State
   const [sqlModalOpen, setSqlModalOpen] = useState(false);
@@ -127,6 +130,9 @@ export function ReportEditor({
   // Global Drag listeners
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
+      // Disable global drag in preview mode (safety check)
+      if (mode === "preview") return;
+
       if (state.draggingId !== null && paperRef.current) {
         const paperRect = paperRef.current.getBoundingClientRect();
 
@@ -168,7 +174,7 @@ export function ReportEditor({
       globalThis.removeEventListener("mousemove", handleMouseMove);
       globalThis.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [state.draggingId, zoom, snapToGrid, dispatch]);
+  }, [state.draggingId, zoom, snapToGrid, dispatch, mode]);
 
   const openSqlEditor = useCallback(
     (id?: number) => {
@@ -233,62 +239,91 @@ export function ReportEditor({
       <div className="h-14 border-b border-border bg-surface/80 backdrop-blur-sm flex items-center justify-between px-4 z-20">
         {/* Left: Tools */}
         <div className="flex items-center gap-1">
-          <div className="bg-muted/50 p-1 rounded-md flex gap-1 border border-border/50">
+          {/* Mode Toggle */}
+          <div className="bg-muted/50 p-1 rounded-md flex gap-1 border border-border/50 mr-2">
             <Button
-              variant={activeTool === "select" ? "secondary" : "ghost"}
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => setActiveTool("select")}
-              title="Select Tool (V)">
-              <MousePointer2 className="w-4 h-4" />
+              variant={mode === "edit" ? "secondary" : "ghost"}
+              size="sm"
+              className="h-8 px-3 text-xs"
+              onClick={() => setMode("edit")}
+              title="Edit Mode">
+              <Edit2 className="w-3.5 h-3.5 mr-1.5" />
+              Edit
             </Button>
             <Button
-              variant={activeTool === "hand" ? "secondary" : "ghost"}
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => setActiveTool("hand")}
-              title="Hand Tool (H)">
-              <Layout className="w-4 h-4 rotate-45" />
+              variant={mode === "preview" ? "secondary" : "ghost"}
+              size="sm"
+              className="h-8 px-3 text-xs"
+              onClick={() => {
+                setMode("preview");
+                dispatch({ type: "SELECT_COMPONENT", id: null });
+              }}
+              title="Preview Mode">
+              <Eye className="w-3.5 h-3.5 mr-1.5" />
+              Preview
             </Button>
           </div>
 
-          <div className="w-px h-6 bg-border mx-2" />
+          {mode === "edit" && (
+            <>
+              <div className="bg-muted/50 p-1 rounded-md flex gap-1 border border-border/50">
+                <Button
+                  variant={activeTool === "select" ? "secondary" : "ghost"}
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={() => setActiveTool("select")}
+                  title="Select Tool (V)">
+                  <MousePointer2 className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant={activeTool === "hand" ? "secondary" : "ghost"}
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={() => setActiveTool("hand")}
+                  title="Hand Tool (H)">
+                  <Layout className="w-4 h-4 rotate-45" />
+                </Button>
+              </div>
 
-          {/* Insert Tools */}
-          <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 px-2 text-xs font-medium text-muted-foreground hover:text-foreground"
-              onClick={() => addComponent("text")}>
-              <Type className="w-4 h-4 mr-1.5" />
-              Text
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 px-2 text-xs font-medium text-muted-foreground hover:text-foreground"
-              onClick={() => addComponent("table")}>
-              <Table className="w-4 h-4 mr-1.5" />
-              Table
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 px-2 text-xs font-medium text-muted-foreground hover:text-foreground"
-              onClick={() => addComponent("chart")}>
-              <BarChart className="w-4 h-4 mr-1.5" />
-              Chart
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 px-2 text-xs font-medium text-muted-foreground hover:text-foreground"
-              onClick={() => addComponent("image")}>
-              <ImageIcon className="w-4 h-4 mr-1.5" />
-              Image
-            </Button>
-          </div>
+              <div className="w-px h-6 bg-border mx-2" />
+
+              {/* Insert Tools */}
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 px-2 text-xs font-medium text-muted-foreground hover:text-foreground"
+                  onClick={() => addComponent("text")}>
+                  <Type className="w-4 h-4 mr-1.5" />
+                  Text
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 px-2 text-xs font-medium text-muted-foreground hover:text-foreground"
+                  onClick={() => addComponent("table")}>
+                  <Table className="w-4 h-4 mr-1.5" />
+                  Table
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 px-2 text-xs font-medium text-muted-foreground hover:text-foreground"
+                  onClick={() => addComponent("chart")}>
+                  <BarChart className="w-4 h-4 mr-1.5" />
+                  Chart
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 px-2 text-xs font-medium text-muted-foreground hover:text-foreground"
+                  onClick={() => addComponent("image")}>
+                  <ImageIcon className="w-4 h-4 mr-1.5" />
+                  Image
+                </Button>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Center: Title (Optional) or Info */}
@@ -345,7 +380,9 @@ export function ReportEditor({
           <div
             ref={paperRef}
             id="canvas-area"
-            className="bg-canvas shadow-lg border border-border/50 relative transition-transform duration-200 ease-out origin-top canvas-grid-pattern"
+            className={`bg-canvas shadow-lg border border-border/50 relative transition-transform duration-200 ease-out origin-top ${
+              mode === "edit" ? "canvas-grid-pattern" : ""
+            }`}
             style={{
               width: PAPER_W,
               height: PAPER_H,
@@ -361,6 +398,7 @@ export function ReportEditor({
                 onDelete={deleteComponent}
                 onEditSql={openSqlEditor}
                 onDragStart={startDrag}
+                readOnly={mode === "preview"}
               />
             ))}
           </div>

@@ -244,3 +244,50 @@
 .dark .canvas-grid-pattern {
     background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
 }
+
+/* ============================================================
+   Report Composer — Preview Mode (A4 Faithful Rendering)
+   ============================================================ */
+
+/* Paper container — simulates a printed A4 page */
+.preview-paper {
+    box-sizing: border-box;
+    background: var(--bg-canvas, #fff);
+}
+
+/* Consistent vertical spacing between sections */
+.preview-section {
+    margin-bottom: 16px;
+}
+.preview-section:last-child {
+    margin-bottom: 0;
+}
+
+/* Header section — larger type scale for PDF fidelity */
+.preview-header h1 {
+    font-size: 1.25rem;
+    line-height: 1.3;
+}
+
+/* Table section — crisp grid lines for print */
+.preview-table table {
+    border-spacing: 0;
+}
+.preview-table th,
+.preview-table td {
+    font-size: 0.7rem;
+}
+
+/* Page break — dashed visual separator */
+.preview-page-break {
+    margin-top: 24px;
+    margin-bottom: 24px;
+}
+
+/* Composer sections — subtle selection animation */
+.composer-section {
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background-color 0.2s ease;
+}

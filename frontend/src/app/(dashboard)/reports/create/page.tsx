@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { ReportEditor } from '@/components/reports/report-editor';
+import { ReportEditor } from "@/components/reports/report-editor";
 
 export default function CreateReportPage() {
-    return <ReportEditor />;
+  return <ReportEditor />;
 }
