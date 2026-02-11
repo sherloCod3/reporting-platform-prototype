@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import * as queryService from '../services/query.service.js';
 import { htmlToPdf } from '../services/pdf.service.js';
+import { ErrorFactory } from '../types/errors.types.js';
 
 export async function executeQuery(
     req: Request,
@@ -9,7 +10,10 @@ export async function executeQuery(
 ) {
     try {
         const { query } = req.body;
-        const result = await queryService.execute(query);
+        if (!req.db) {
+            throw ErrorFactory.unauthorized('Conexão do cliente não disponível');
+        }
+        const result = await queryService.execute(query, req.db);
         res.json(result);
     } catch (error) {
         next(error);
@@ -25,12 +29,8 @@ export async function exportPdf(
         const { htmlContent } = req.body;
 
         if (!htmlContent) {
-            return res.status(400).json({
-                success: false,
-                message: '❌ HTML é obrigatório'
-            });
+            throw ErrorFactory.badRequest('❌ HTML é obrigatório'); // 400
         }
-
         const pdf = await htmlToPdf(htmlContent);
 
         res.setHeader('Content-Type', 'application/pdf');

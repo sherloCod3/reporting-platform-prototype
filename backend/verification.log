@@ -1,0 +1,22 @@
+START_VERIFICATION
+{
+  "step": "connecting",
+  "config": {
+    "host": "bdjumpserver.qforms.com.br",
+    "user": "admin",
+    "password": "H0S***",
+    "database": "relatorios",
+    "port": 3306,
+    "connectTimeout": 20000
+  },
+  "original_client_data": {
+    "db_name": "relatorios",
+    "db_port": 3306,
+    "slug": "default"
+  }
+}
+{
+  "error": "Unknown database 'relatorios'",
+  "code": "ER_BAD_DB_ERROR",
+  "fatal": true
+}
