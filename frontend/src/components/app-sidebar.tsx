@@ -125,7 +125,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <div className="flex items-center gap-2 px-1 py-1">
-          <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-blue-600 text-white shrink-0">
+          <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground shrink-0">
             <GalleryVerticalEnd className="size-4" />
           </div>
           <div className="flex flex-col gap-0.5 leading-none group-data-[collapsible=icon]:hidden">
@@ -133,7 +133,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               Reporting Platform Prototype
             </span>
             {client && (
-              <span className="text-xs text-gray-500 truncate max-w-[120px]">
+              <span className="text-xs text-muted-foreground truncate max-w-[120px]">
                 {client.slug}
               </span>
             )}
@@ -230,12 +230,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarMenuButton
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-blue-100 text-blue-700 font-semibold text-xs shrink-0">
+              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-accent text-sidebar-foreground font-semibold text-xs shrink-0">
                 {user?.email?.[0]?.toUpperCase()}
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">{user?.email}</span>
-                <span className="truncate text-xs text-gray-500 capitalize">
+                <span className="truncate text-xs text-muted-foreground capitalize">
                   {user?.role}
                 </span>
               </div>

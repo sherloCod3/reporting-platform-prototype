@@ -21,7 +21,8 @@
     "jsonwebtoken": "^9.0.3",
     "mysql2": "^3.6.5",
     "puppeteer": "^21.6.1",
-    "sql-formatter": "^15.7.0"
+    "sql-formatter": "^15.7.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

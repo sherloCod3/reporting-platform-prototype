@@ -98,58 +98,62 @@
 }
 
 .dark {
-  /* Material Dark Base - Calibrated for Low Fatigue (IDE Style) */
-  --bg-app: #020617;     /* Slate 950 - Deepest Layer (Desk) */
-  --bg-panel: #0f172a;   /* Slate 900 - Sidebar/Panels */
-  --bg-surface: #1e293b; /* Slate 800 - Cards/Elevated */
-  --bg-canvas: #192230;  /* Custom - Report Paper (Slightly darker than surface) */
+  /* VS Code GitHub Dark Theme - Soft & Standardized */
+  --bg-app: #0d1117;     /* Main Background (Darker Workspace) */
+  --bg-panel: #1f2428;   /* Sidebar / Panels */
+  --bg-surface: #282e34; /* Cards / Elevated */
+  --bg-canvas: #24292e;  /* Report Canvas (Paper) */
 
   --background: var(--bg-app);
-  --foreground: #f1f5f9; /* Slate 100 */
+  --foreground: #D1DEDF; /* Soft White */
 
   /* Surface Hierarchy */
   --card: var(--bg-surface);
-  --card-foreground: #f1f5f9;
+  --card-foreground: #D1DEDF;
   
   --popover: var(--bg-surface);
-  --popover-foreground: #f1f5f9;
+  --popover-foreground: #D1DEDF;
   
-  /* Primary - Desaturated Blue for Dark Mode */
-  --primary: #3b82f6; /* Blue 500 */
-  --primary-foreground: #0f172a;
+  /* Primary - Muted Blue */
+  --primary: #4C8BD4;
+  --primary-foreground: #24292e;
   
-  --secondary: #334155; /* Slate 700 */
-  --secondary-foreground: #f1f5f9;
+  --secondary: #35393d; /* Input/Border Gray */
+  --secondary-foreground: #D1DEDF;
   
-  --muted: #1e293b; /* Slate 800 */
-  --muted-foreground: #94a3b8; /* Slate 400 */
+  --muted: #1f2428; /* Panel Background */
+  --muted-foreground: #818b98; /* Disabled/Muted Gray */
   
-  --accent: #334155; /* Slate 700 */
-  --accent-foreground: #f1f5f9;
+  --accent: #282e34; /* Surface Gray */
+  --accent-foreground: #D1DEDF;
   
-  --destructive: #ef4444; /* Red 500 */
-  --destructive-foreground: #f1f5f9;
+  --destructive: #d1242f; /* Red from user (or standard GitHub #da3633) */
+  --destructive-foreground: #f0f6fc;
   
-  /* Borders - Subtle Slate */
-  --border: #334155; /* Slate 700 */
-  --input: #334155;
-  --ring: #3b82f6;
+  /* Borders - Subtle Gray */
+  --border: #35393d;
+  --input: #35393d;
+  --ring: #58a6ff; /* Bright Blue focus ring */
   
-  --chart-1: #3b82f6;
-  --chart-2: #10b981;
-  --chart-3: #f59e0b;
-  --chart-4: #8b5cf6;
-  --chart-5: #f43f5e;
+  --chart-1: #4C8BD4; /* Primary Blue */
+  --chart-2: #30B44E; /* Green */
+  --chart-3: #d1242f; /* Red */
+  --chart-4: #e3b341; /* Yellow/Gold (standard GitHub) */
+  --chart-5: #6f42c1; /* Purple (standard GitHub) */
   
-  /* Sidebar - Consistent Slate surface */
+  /* Brand Overrides for Dark Mode */
+  --brand-primary: var(--primary);       /* #4C8BD4 */
+  --brand-primary-dark: #376b9f;         /* Darker shade of #4C8BD4 */
+  
+  /* Sidebar - Darker Panel */
   --sidebar: var(--bg-panel);
-  --sidebar-foreground: #f1f5f9;
-  --sidebar-primary: #3b82f6;
-  --sidebar-primary-foreground: #0f172a;
-  --sidebar-accent: #1e293b; /* Slate 800 */
-  --sidebar-accent-foreground: #f1f5f9;
-  --sidebar-border: #1e293b; /* Slate 800 */
-  --sidebar-ring: #3b82f6;
+  --sidebar-foreground: #D1DEDF;
+  --sidebar-primary: #4C8BD4;
+  --sidebar-primary-foreground: #24292e;
+  --sidebar-accent: #2e363d; /* Slightly lighter than panel for hover */
+  --sidebar-accent-foreground: #D1DEDF;
+  --sidebar-border: #35393d;
+  --sidebar-ring: #58a6ff;
 }
 
 @layer base {

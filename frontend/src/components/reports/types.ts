@@ -48,6 +48,8 @@ export interface AlignmentLine {
  * Editor state managed by useReducer
  */
 export interface EditorState {
+    title: string;
+    description: string;
     components: Component[];
     history: Component[][];
     historyIndex: number;
@@ -72,8 +74,7 @@ export interface EditorState {
 export type EditorAction =
     | { type: "ADD_COMPONENT"; payload: Omit<Component, "id"> }
     | { type: "UPDATE_COMPONENT"; id: number; changes: Partial<Component> }
-    | { type: "DELETE_COMPONENT"; id: number }
-    | { type: "MOVE_COMPONENT"; id: number; x: number; y: number }
+    | { type: "UPDATE_METADATA"; changes: Partial<{ title: string; description: string }> }
     | { type: "DELETE_COMPONENT"; id: number }
     | { type: "MOVE_COMPONENT"; id: number; x: number; y: number }
     | { type: "SELECT_COMPONENT"; id: number | null }
@@ -93,4 +94,12 @@ export type EditorAction =
     | { type: "UNDO" }
     | { type: "SET_ALIGNMENT_LINES"; lines: AlignmentLine[] }
     | { type: "REDO" }
+    | { type: "LOAD_REPORT"; payload: { title: string; description: string; components: Component[] } }
     | { type: "BATCH"; actions: EditorAction[] };
+
+export interface ReportData {
+    id?: number;
+    title: string;
+    description: string;
+    components: Component[];
+}

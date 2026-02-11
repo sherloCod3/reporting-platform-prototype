@@ -19,6 +19,8 @@ import {
   MousePointer2,
   Eye,
   Edit2,
+  PanelRightClose,
+  PanelRightOpen,
 } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { SqlEditor } from "@/components/sql/sql-editor";
@@ -29,6 +31,7 @@ import type {
   SqlResult,
   ResizeHandle,
   AlignmentLine,
+  ReportData,
 } from "./types";
 import { useReportEditor } from "@/hooks/use-report-editor";
 import { CanvasItem } from "./canvas-item";
@@ -37,13 +40,8 @@ import { PropertiesPanel } from "./properties-panel";
 import { AxiosError } from "axios";
 
 interface ReportEditorProps {
-  initialData?: {
-    name?: string;
-    description?: string;
-    components?: Component[];
-    [key: string]: unknown;
-  };
-  onSave?: (components: Component[]) => void;
+  initialData?: Partial<ReportData>;
+  onSave?: (data: ReportData) => void;
 }
 
 export function ReportEditor({
@@ -62,7 +60,11 @@ export function ReportEditor({
     undo,
     redo,
     snapToGrid,
-  } = useReportEditor(initialData);
+  } = useReportEditor({
+    title: initialData?.title,
+    description: initialData?.description,
+    components: initialData?.components,
+  });
 
   // Dragging State (Local to avoid hook thrashing)
   const dragOffset = useRef({ x: 0, y: 0 });
@@ -78,6 +80,7 @@ export function ReportEditor({
   const [zoom, setZoom] = useState(1);
   const [activeTool, setActiveTool] = useState<"select" | "hand">("select");
   const [mode, setMode] = useState<"edit" | "preview">("edit");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   // SQL Modal State
   const [sqlModalOpen, setSqlModalOpen] = useState(false);
@@ -104,6 +107,13 @@ export function ReportEditor({
     setZoom(clampZoom(next));
   }, []);
 
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch({
+      type: "UPDATE_METADATA",
+      changes: { title: e.target.value },
+    });
+  };
+
   // ------------------------------------------------------------------
   // Interaction Handlers
   // ------------------------------------------------------------------
@@ -116,11 +126,18 @@ export function ReportEditor({
       w: number,
       h: number,
       components: Component[],
+      gridSnapper: (val: number) => number,
     ) => {
-      const SNAP_THRESHOLD = 5;
+      const SNAP_THRESHOLD = 10; // Increased from 5 to 8-10 for stickier alignment
       const lines: AlignmentLine[] = [];
-      let snappedX = x;
-      let snappedY = y;
+
+      // 1. Start with Raw Position
+      let finalX = x;
+      let finalY = y;
+
+      // Flags to track if we found an alignment snap
+      let snappedX = false;
+      let snappedY = false;
 
       // Edges to check: [value, type, isCenter]
       const horizontalCandidates = [
@@ -135,6 +152,7 @@ export function ReportEditor({
         { val: x + w, type: "end" }, // Right
       ];
 
+      // 2. Check Alignments (Highest Priority)
       components.forEach((other) => {
         if (other.id === id) return;
 
@@ -156,39 +174,55 @@ export function ReportEditor({
         ];
 
         // Check Horizontal Alignment (Y-axis)
-        horizontalCandidates.forEach((cand) => {
-          otherH.forEach((target) => {
-            if (Math.abs(cand.val - target) < SNAP_THRESHOLD) {
-              const diff = target - cand.val;
-              snappedY += diff;
-              lines.push({
-                type: "horizontal",
-                y: target,
-                start: Math.min(x, other.x),
-                end: Math.max(x + w, other.x + other.width),
-              });
-            }
+        // Only snap if we haven't already hard-snapped to a line (or prioritize closest?)
+        // For simplicity, we accumulate small diffs, but let's strictly set if matched
+        if (!snappedY) {
+          horizontalCandidates.forEach((cand) => {
+            otherH.forEach((target) => {
+              if (Math.abs(cand.val - target) < SNAP_THRESHOLD) {
+                const diff = target - cand.val;
+                finalY += diff;
+                snappedY = true; // Mark as snapped to alignment
+                lines.push({
+                  type: "horizontal",
+                  y: target,
+                  start: Math.min(x, other.x), // Visuals use current pos
+                  end: Math.max(x + w, other.x + other.width),
+                });
+              }
+            });
           });
-        });
+        }
 
         // Check Vertical Alignment (X-axis)
-        verticalCandidates.forEach((cand) => {
-          otherV.forEach((target) => {
-            if (Math.abs(cand.val - target) < SNAP_THRESHOLD) {
-              const diff = target - cand.val;
-              snappedX += diff;
-              lines.push({
-                type: "vertical",
-                x: target,
-                start: Math.min(y, other.y),
-                end: Math.max(y + h, other.y + other.height),
-              });
-            }
+        if (!snappedX) {
+          verticalCandidates.forEach((cand) => {
+            otherV.forEach((target) => {
+              if (Math.abs(cand.val - target) < SNAP_THRESHOLD) {
+                const diff = target - cand.val;
+                finalX += diff;
+                snappedX = true; // Mark as snapped to alignment
+                lines.push({
+                  type: "vertical",
+                  x: target,
+                  start: Math.min(y, other.y),
+                  end: Math.max(y + h, other.y + other.height),
+                });
+              }
+            });
           });
-        });
+        }
       });
 
-      return { x: snappedX, y: snappedY, lines };
+      // 3. Fallback to Grid Snap if NO alignment found
+      if (!snappedX) {
+        finalX = gridSnapper(x);
+      }
+      if (!snappedY) {
+        finalY = gridSnapper(y);
+      }
+
+      return { x: finalX, y: finalY, lines };
     },
     [],
   );
@@ -293,9 +327,6 @@ export function ReportEditor({
         const rawX = (e.clientX - paperRect.left) / zoom - dragOffset.current.x;
         const rawY = (e.clientY - paperRect.top) / zoom - dragOffset.current.y;
 
-        //const snappedX = snapToGrid(Math.max(0, rawX));
-        //const snappedY = snapToGrid(Math.max(0, rawY));
-
         // Use Alignment instead of just grid snapping for drag
         const currentComp = state.components.find(
           (c) => c.id === state.draggingId,
@@ -308,6 +339,7 @@ export function ReportEditor({
             currentComp.width,
             currentComp.height,
             state.components,
+            snapToGrid,
           );
 
           dispatch({
@@ -604,9 +636,16 @@ export function ReportEditor({
           )}
         </div>
 
-        {/* Center: Title (Optional) or Info */}
-        <div className="absolute left-1/2 transform -translate-x-1/2 text-sm font-semibold text-muted-foreground opacity-50 select-none">
-          {initialData?.name || "Untitled Report"}
+        {/* Center: Title (Editable) */}
+        <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center">
+          <input
+            type="text"
+            value={state.title}
+            onChange={handleTitleChange}
+            disabled={mode === "preview"}
+            className="text-sm font-semibold text-center bg-transparent border-none outline-none focus:ring-1 focus:ring-primary rounded px-2 w-64 text-foreground placeholder:text-muted-foreground/50 transition-colors"
+            placeholder="Untitled Report"
+          />
         </div>
 
         {/* Right: Actions */}
@@ -634,6 +673,21 @@ export function ReportEditor({
 
           <Button
             variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            title={isSidebarOpen ? "Close Sidebar" : "Open Sidebar"}>
+            {isSidebarOpen ? (
+              <PanelRightClose className="w-4 h-4 text-muted-foreground" />
+            ) : (
+              <PanelRightOpen className="w-4 h-4 text-muted-foreground" />
+            )}
+          </Button>
+
+          <div className="w-px h-6 bg-border mx-1" />
+
+          <Button
+            variant="ghost"
             size="sm"
             className="h-8 w-8 p-0"
             title="Page Settings">
@@ -643,7 +697,13 @@ export function ReportEditor({
           <Button
             size="sm"
             className="h-8 px-4 text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
-            onClick={() => onSave?.(state.components)}>
+            onClick={() =>
+              onSave?.({
+                title: state.title,
+                description: state.description,
+                components: state.components,
+              })
+            }>
             Save Report
           </Button>
         </div>
@@ -668,7 +728,11 @@ export function ReportEditor({
                 height: PAPER_H,
                 transform: `scale(${zoom})`,
               }}
-              onClick={(e) => e.stopPropagation()}>
+              onClick={(e) => {
+                e.stopPropagation();
+                // User Request: Click inside canvas also deselects
+                dispatch({ type: "SELECT_COMPONENT", id: null });
+              }}>
               <AlignmentGuides lines={state.alignmentLines} zoom={zoom} />
               {state.components.map((comp) => (
                 <CanvasItem
@@ -719,7 +783,7 @@ export function ReportEditor({
         </div>
 
         {/* 3. Properties Panel (Right Sidebar) */}
-        {mode === "edit" && state.selectedId !== null && (
+        {mode === "edit" && isSidebarOpen && (
           <PropertiesPanel
             component={selectedComponent}
             onUpdate={updateComponent}

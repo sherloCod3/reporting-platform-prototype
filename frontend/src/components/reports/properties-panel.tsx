@@ -21,7 +21,7 @@ interface PropertiesPanelProps {
 export function PropertiesPanel({ component, onUpdate }: PropertiesPanelProps) {
   if (!component) {
     return (
-      <div className="w-[300px] border-l border-border bg-card p-4 text-muted-foreground text-sm flex items-center justify-center">
+      <div className="w-[300px] border-l border-border bg-card p-4 text-muted-foreground text-sm flex items-center justify-center h-full text-center">
         Select a component to edit properties
       </div>
     );

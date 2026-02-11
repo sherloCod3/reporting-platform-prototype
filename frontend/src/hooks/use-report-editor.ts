@@ -151,10 +151,32 @@ function editorReducer(state: EditorState, action: EditorAction): EditorState {
             return action.actions.reduce((s, a) => editorReducer(s, a), state);
         }
 
+        case "UPDATE_METADATA": {
+            return {
+                ...state,
+                ...action.changes,
+            };
+        }
+
         case "SET_ALIGNMENT_LINES": {
             return {
                 ...state,
                 alignmentLines: action.lines,
+            };
+        }
+
+        case "LOAD_REPORT": {
+            return {
+                ...state,
+                title: action.payload.title,
+                description: action.payload.description,
+                components: action.payload.components,
+                history: [ action.payload.components ], // Reset history to loaded state
+                historyIndex: 0,
+                nextId: (action.payload.components.length > 0
+                    ? Math.max(...action.payload.components.map(c => c.id))
+                    : 0) + 1,
+                selectedId: null,
             };
         }
 
@@ -164,12 +186,17 @@ function editorReducer(state: EditorState, action: EditorAction): EditorState {
 }
 
 // Hook
-export function useReportEditor(initialData?: { components?: Component[] }) {
+export function useReportEditor(initialData?: { title?: string; description?: string; components?: Component[] }) {
     const [ state, dispatch ] = useReducer(editorReducer, {
+        title: initialData?.title || "Untitled Report", // Default title
+        description: initialData?.description || "",
         components: initialData?.components || [],
         history: [ initialData?.components || [] ],
         historyIndex: 0,
-        nextId: (initialData?.components?.length || 0) + 1,
+        // CORRECTION: Use Max ID + 1 to avoid collisions with existing IDs (e.g. if we have id 5, 20)
+        nextId: (initialData?.components && initialData.components.length > 0)
+            ? Math.max(...initialData.components.map(c => c.id)) + 1
+            : 1,
         selectedId: null,
         draggingId: null,
         resizing: null,
@@ -210,6 +237,10 @@ export function useReportEditor(initialData?: { components?: Component[] }) {
     const undo = useCallback(() => dispatch({ type: "UNDO" }), []);
     const redo = useCallback(() => dispatch({ type: "REDO" }), []);
 
+    const loadReport = useCallback((data: { title: string; description: string; components: Component[] }) => {
+        dispatch({ type: "LOAD_REPORT", payload: data });
+    }, []);
+
     return {
         state,
         dispatch,
@@ -217,6 +248,7 @@ export function useReportEditor(initialData?: { components?: Component[] }) {
         deleteComponent,
         undo,
         redo,
-        snapToGrid
+        snapToGrid,
+        loadReport
     };
 }

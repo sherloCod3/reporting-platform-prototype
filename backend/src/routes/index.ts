@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import reportRoutes from './report.routes.js';
+import reportRoutes from './reportRoutes.js';
 import authRoutes from './auth.routes.js';
 import reportDefRoutes from './report-def.routes.js';
 import dbRoutes from './db.routes.js';
