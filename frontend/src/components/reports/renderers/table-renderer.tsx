@@ -3,13 +3,16 @@
 import React, { memo } from "react";
 import { cn } from "@/lib/utils";
 
+import type { ComponentStyle } from "../types";
+
 export interface TableRendererProps {
   columns: string[];
-  rows: unknown[][];
+  rows: any[][];
   showRowNumbers?: boolean;
-  striped?: boolean;
   className?: string;
   emptyMessage?: string;
+  striped?: boolean;
+  style?: ComponentStyle;
 }
 
 function formatCell(value: unknown): string {
@@ -27,7 +30,20 @@ export const TableRenderer = memo(function TableRenderer({
   striped = false,
   className,
   emptyMessage = "(Tabela sem dados)",
+  style,
 }: TableRendererProps) {
+  const containerStyle = {
+    opacity: style?.opacity ?? 1,
+    backgroundColor: style?.backgroundColor,
+    borderWidth: style?.borderWidth ? `${style.borderWidth}px` : undefined,
+    borderColor: style?.borderColor,
+    borderStyle: style?.borderWidth ? "solid" : undefined,
+    borderRadius: style?.borderRadius ? `${style.borderRadius}px` : undefined,
+    fontFamily: style?.fontFamily,
+    fontSize: style?.fontSize ? `${style.fontSize}px` : undefined,
+    color: style?.color,
+  } as React.CSSProperties;
+
   if (!rows.length && !columns.length) {
     return (
       <div className="text-center py-6 text-muted-foreground/30 text-xs italic select-none">
@@ -37,7 +53,7 @@ export const TableRenderer = memo(function TableRenderer({
   }
 
   return (
-    <div className={cn("overflow-x-auto", className)}>
+    <div className={cn("overflow-x-auto", className)} style={containerStyle}>
       <table className="w-full text-xs border-collapse">
         <thead>
           <tr>

@@ -37,11 +37,12 @@ export const CanvasItem = memo(function CanvasItem({
     switch (comp.type) {
       case "text":
         return (
-          <div className="p-2 h-full">
+          <div className="h-full">
             <TextRenderer
-              content={comp.content}
-              fontSize={14} // Default for now
-              className="h-full"
+              content={comp.content || ""}
+              width={comp.width}
+              height={comp.height}
+              style={comp.style}
             />
           </div>
         );
@@ -62,7 +63,7 @@ export const CanvasItem = memo(function CanvasItem({
 
       case "table":
         return (
-          <div className="w-full h-full overflow-hidden p-2 select-none">
+          <div className="w-full h-full overflow-hidden select-none">
             {comp.sqlResult ? (
               <div className="space-y-1 h-full flex flex-col">
                 <div className="font-medium text-muted-foreground flex items-center justify-between shrink-0">
@@ -76,6 +77,7 @@ export const CanvasItem = memo(function CanvasItem({
                   className="flex-1 border rounded-sm border-border/50 bg-background/50"
                   emptyMessage="Sem dados"
                   striped
+                  style={comp.style}
                 />
               </div>
             ) : (

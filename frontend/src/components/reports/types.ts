@@ -11,6 +11,18 @@ export interface SqlResult {
 
 export type ResizeHandle = "nw" | "n" | "ne" | "e" | "se" | "s" | "sw" | "w";
 
+export interface ComponentStyle {
+    fontFamily?: string;
+    fontSize?: number;
+    textAlign?: "left" | "center" | "right" | "justify";
+    color?: string; // Text color
+    backgroundColor?: string;
+    borderWidth?: number;
+    borderColor?: string;
+    borderRadius?: number;
+    opacity?: number;
+}
+
 export interface Component {
     id: number;
     type: "text" | "table" | "chart" | "image";
@@ -21,6 +33,7 @@ export interface Component {
     content?: string;
     sqlQuery?: string;
     sqlResult?: SqlResult;
+    style?: ComponentStyle;
 }
 
 export interface AlignmentLine {

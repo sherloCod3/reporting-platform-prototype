@@ -33,6 +33,7 @@ import type {
 import { useReportEditor } from "@/hooks/use-report-editor";
 import { CanvasItem } from "./canvas-item";
 import { AlignmentGuides } from "./alignment-guides";
+import { PropertiesPanel } from "./properties-panel";
 import { AxiosError } from "axios";
 
 interface ReportEditorProps {
@@ -393,6 +394,7 @@ export function ReportEditor({
     mode,
     calculateAlignment,
     state.components,
+    state.alignmentLines.length,
   ]);
 
   // Keyboard Shortcuts
@@ -500,6 +502,14 @@ export function ReportEditor({
       toast.success("SQL query saved to component");
     }
   };
+
+  const updateComponent = (id: number, changes: Partial<Component>) => {
+    dispatch({ type: "UPDATE_COMPONENT", id, changes });
+  };
+
+  const selectedComponent = state.selectedId
+    ? state.components.find((c) => c.id === state.selectedId) || null
+    : null;
 
   return (
     <div className="flex flex-col h-[calc(100vh-6rem)] w-full bg-app text-foreground border border-border rounded-lg overflow-hidden relative shadow-sm">
@@ -639,71 +649,82 @@ export function ReportEditor({
         </div>
       </div>
 
-      {/* 2. Workspace Area */}
-      <div
-        ref={viewportRef}
-        className="flex-1 bg-app overflow-auto relative cursor-grab active:cursor-grabbing"
-        onClick={() => dispatch({ type: "SELECT_COMPONENT", id: null })}>
-        <div className="min-w-full min-h-full p-16 flex justify-center items-start">
-          <div
-            ref={paperRef}
-            id="canvas-area"
-            className={`bg-canvas shadow-lg border border-border/50 relative transition-transform duration-200 ease-out origin-top ${
-              mode === "edit" ? "canvas-grid-pattern" : ""
-            }`}
-            style={{
-              width: PAPER_W,
-              height: PAPER_H,
-              transform: `scale(${zoom})`,
-            }}
-            onClick={(e) => e.stopPropagation()}>
-            <AlignmentGuides lines={state.alignmentLines} zoom={zoom} />
-            {state.components.map((comp) => (
-              <CanvasItem
-                key={comp.id}
-                component={comp}
-                isSelected={state.selectedId === comp.id}
-                onSelect={(id) => dispatch({ type: "SELECT_COMPONENT", id })}
-                onDelete={deleteComponent}
-                onEditSql={openSqlEditor}
-                onDragStart={startDrag}
-                onResizeStart={startResize}
-                readOnly={mode === "preview"}
-              />
-            ))}
+      {/* Main Content Area (Workspace + Sidebar) */}
+      <div className="flex-1 flex overflow-hidden relative">
+        {/* 2. Workspace Area */}
+        <div
+          ref={viewportRef}
+          className="flex-1 bg-app overflow-auto relative cursor-grab active:cursor-grabbing"
+          onClick={() => dispatch({ type: "SELECT_COMPONENT", id: null })}>
+          <div className="min-w-full min-h-full p-16 flex justify-center items-start">
+            <div
+              ref={paperRef}
+              id="canvas-area"
+              className={`bg-canvas shadow-lg border border-border/50 relative transition-transform duration-200 ease-out origin-top ${
+                mode === "edit" ? "canvas-grid-pattern" : ""
+              }`}
+              style={{
+                width: PAPER_W,
+                height: PAPER_H,
+                transform: `scale(${zoom})`,
+              }}
+              onClick={(e) => e.stopPropagation()}>
+              <AlignmentGuides lines={state.alignmentLines} zoom={zoom} />
+              {state.components.map((comp) => (
+                <CanvasItem
+                  key={comp.id}
+                  component={comp}
+                  isSelected={state.selectedId === comp.id}
+                  onSelect={(id) => dispatch({ type: "SELECT_COMPONENT", id })}
+                  onDelete={deleteComponent}
+                  onEditSql={openSqlEditor}
+                  onDragStart={startDrag}
+                  onResizeStart={startResize}
+                  readOnly={mode === "preview"}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Floating Zoom Controls (Bottom Right) */}
+          <div className="absolute bottom-6 right-6 flex items-center gap-1 bg-background/95 backdrop-blur border border-border rounded-lg shadow-md p-1 pl-3 z-30">
+            <span className="text-xs font-mono text-muted-foreground w-12 text-center">
+              {Math.round(zoom * 100)}%
+            </span>
+            <div className="w-px h-4 bg-border mx-1" />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={() => setZoom((z) => clampZoom(z - 0.1))}>
+              <Minus className="w-3.5 h-3.5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={() => setZoom((z) => clampZoom(z + 0.1))}>
+              <Plus className="w-3.5 h-3.5" />
+            </Button>
+            <div className="w-px h-4 bg-border mx-1" />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={fitToViewport}
+              title="Fit to screen">
+              <Maximize2 className="w-3.5 h-3.5" />
+            </Button>
           </div>
         </div>
 
-        {/* Floating Zoom Controls (Bottom Right) */}
-        <div className="absolute bottom-6 right-6 flex items-center gap-1 bg-background/95 backdrop-blur border border-border rounded-lg shadow-md p-1 pl-3 z-30">
-          <span className="text-xs font-mono text-muted-foreground w-12 text-center">
-            {Math.round(zoom * 100)}%
-          </span>
-          <div className="w-px h-4 bg-border mx-1" />
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7"
-            onClick={() => setZoom((z) => clampZoom(z - 0.1))}>
-            <Minus className="w-3.5 h-3.5" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7"
-            onClick={() => setZoom((z) => clampZoom(z + 0.1))}>
-            <Plus className="w-3.5 h-3.5" />
-          </Button>
-          <div className="w-px h-4 bg-border mx-1" />
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7"
-            onClick={fitToViewport}
-            title="Fit to screen">
-            <Maximize2 className="w-3.5 h-3.5" />
-          </Button>
-        </div>
+        {/* 3. Properties Panel (Right Sidebar) */}
+        {mode === "edit" && state.selectedId !== null && (
+          <PropertiesPanel
+            component={selectedComponent}
+            onUpdate={updateComponent}
+          />
+        )}
       </div>
 
       {/* SQL Editor Modal */}
