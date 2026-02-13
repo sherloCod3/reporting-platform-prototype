@@ -5,15 +5,15 @@ import { ErrorFactory } from "../types/errors.types.js";
 export function validateSql(query: string): void {
     const normalized = query.trim().toUpperCase();
 
-    // Regra 1: Apenas SELECT
-    if (!normalized.startsWith('SELECT') || !normalized.startsWith('WITH')) {
+    // Regra 1: Apenas SELECT ou CTE (WITH)
+    if (!normalized.startsWith('SELECT') && !normalized.startsWith('WITH')) {
         throw ErrorFactory.badRequest(
             'Apenas consultas SELECT e/ou CTE (WITH) são permitidas'
         );
     }
 
     // Regra 2: Comandos perigosos
-    const forbidden = [ 'DROP', 'DELETE', 'UPDATE', 'ALTER', 'TRUNCATE', 'INSERT' ];
+    const forbidden = ['DROP', 'DELETE', 'UPDATE', 'ALTER', 'TRUNCATE', 'INSERT'];
     const found = forbidden.find(word => normalized.includes(word));
 
     if (found) {
