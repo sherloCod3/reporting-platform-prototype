@@ -99,7 +99,7 @@
 
 .dark {
   /* VS Code GitHub Dark Theme - Soft & Standardized */
-  --bg-app: #0d1117;     /* Main Background (Darker Workspace) */
+  --bg-app: #14181e;     /* Main Background (Darker Workspace) */
   --bg-panel: #1f2428;   /* Sidebar / Panels */
   --bg-surface: #282e34; /* Cards / Elevated */
   --bg-canvas: #24292e;  /* Report Canvas (Paper) */
@@ -134,6 +134,9 @@
   --border: #35393d;
   --input: #35393d;
   --ring: #58a6ff; /* Bright Blue focus ring */
+
+  /* Border dark */
+  --border-dark: #1b1f23;
   
   --chart-1: #4C8BD4; /* Primary Blue */
   --chart-2: #30B44E; /* Green */

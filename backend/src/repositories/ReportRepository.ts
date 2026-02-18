@@ -1,5 +1,5 @@
 import mysql from "mysql2/promise";
-import { unifiedConfig } from "../config/unifiedConfig.js";
+import { authPool } from "../config/authDb.config.js";
 import type { CreateReportDto, UpdateReportDto } from "../validators/report.schema.js";
 
 export interface Report {
@@ -16,34 +16,7 @@ export class ReportRepository {
     private pool: mysql.Pool;
 
     constructor() {
-        this.pool = mysql.createPool({
-            host: unifiedConfig.authDb.host,
-            user: unifiedConfig.authDb.user,
-            password: unifiedConfig.authDb.password,
-            database: unifiedConfig.authDb.database,
-            port: unifiedConfig.authDb.port,
-            waitForConnections: true,
-            connectionLimit: 10,
-            queueLimit: 0,
-        });
-        this.ensureTableExists().catch(err => {
-            console.error("Failed to ensure table exists for reports:", err);
-        });
-    }
-
-    // Ensure table exists to match legacy schema
-    private async ensureTableExists() {
-        await this.pool.execute(`
-        CREATE TABLE IF NOT EXISTS reports (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            name VARCHAR(255) NOT NULL,
-            description TEXT,
-            sql_query TEXT,
-            layout_json JSON,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-        )
-    `);
+        this.pool = authPool;
     }
 
     async create(data: CreateReportDto): Promise<Report> {

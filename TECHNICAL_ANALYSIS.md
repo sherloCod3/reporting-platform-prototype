@@ -1,7 +1,7 @@
 # Technical System Analysis
 
-> Version: v0.1.0
-> Last updated: 2025-02-13
+> Version: v0.1.5
+> Last updated: 2026-02-18
 > Scope: Full-stack reporting platform prototype
 
 ---
@@ -55,12 +55,12 @@
 - **ARCH-01-ITEM-14:** Dual configuration systems coexist: `env.config.ts` (strict, throws on missing vars) and `unifiedConfig.ts` (lenient, uses defaults) -- potential source of inconsistency
   - Impact Level: Medium
   - Risk Category: Maintainability
-  - Status: Open
+  - Status: Done
 
 - **ARCH-01-ITEM-15:** Duplicate route registration: `reportRoutes.ts` re-registers `/execute` and `/export-pdf` alongside the new CRUD routes, overlapping with `report.routes.ts`
   - Impact Level: Medium
   - Risk Category: Maintainability
-  - Status: Open
+  - Status: Done
 
 - **ARCH-01-ITEM-16:** No shared type package between frontend and backend; types are duplicated (e.g., `QueryResult`, `LoginResponse`)
   - Impact Level: Low
@@ -135,7 +135,7 @@
 - **BE-02-ITEM-15:** `report-def.controller.ts` calls `ensureTableExists()` on every `list` and `create` request -- DDL on every read
   - Impact Level: Medium
   - Risk Category: Performance
-  - Status: Open
+  - Status: Done
 
 - **BE-02-ITEM-16:** No request body size validation beyond Express's 50MB JSON limit
   - Impact Level: Medium
@@ -155,7 +155,7 @@
 - **BE-02-ITEM-19:** `unifiedConfig.ts` defaults to `"default_secret_dont_use_in_prod"` for JWT secret -- risk if env var is missing
   - Impact Level: High
   - Risk Category: Security
-  - Status: Open
+  - Status: Done
 
 ---
 
@@ -211,7 +211,7 @@
 - **FE-03-ITEM-16:** `AuthContext` parses stored JSON on mount without try/catch -- corrupted localStorage will crash the app
   - Impact Level: Medium
   - Risk Category: Maintainability
-  - Status: Open
+  - Status: Done
 
 - **FE-03-ITEM-17:** `constants.ts` defines `API_URL` with port `3001` while `api.ts` defaults to port `3000` -- inconsistency
   - Impact Level: Low
@@ -296,7 +296,7 @@
 - **INFRA-04-ITEM-13:** `mysql-data` volume declared but not mounted -- database data is not persisted across container restarts
   - Impact Level: High
   - Risk Category: Scalability
-  - Status: Open
+  - Status: Done
 
 - **INFRA-04-ITEM-14:** Backend Dockerfile runs `npm run build` but compose overrides with bind mount, negating the build step in dev
   - Impact Level: Low
@@ -387,7 +387,7 @@
 - **SEC-05-ITEM-07:** `unifiedConfig.ts` falls back to `"default_secret_dont_use_in_prod"` for JWT secret if env var is missing -- tokens signed with a known secret
   - Impact Level: High
   - Risk Category: Security
-  - Status: Open
+  - Status: Done
 
 - **SEC-05-ITEM-08:** No CSRF protection on state-changing endpoints
   - Impact Level: Medium
@@ -507,7 +507,7 @@
 - **SCALE-06-ITEM-07:** `ensureTableExists()` DDL executed on every list/create request to `report-def.controller.ts`
   - Impact Level: Medium
   - Risk Category: Performance
-  - Status: Open
+  - Status: Done
 
 - **SCALE-06-ITEM-08:** No query result caching; identical queries re-execute against the database
   - Impact Level: Medium
@@ -603,7 +603,7 @@
 - **DEBT-07-ITEM-01:** Unify configuration -- Consolidate `env.config.ts` and `unifiedConfig.ts` into a single validated config module
   - Impact Level: Medium
   - Risk Category: Maintainability
-  - Status: Open
+  - Status: Done
 
 - **DEBT-07-ITEM-02:** Unify controller patterns -- Migrate functional controllers to class-based (`BaseController`) or vice versa; eliminate mixed patterns
   - Impact Level: Low
@@ -613,7 +613,7 @@
 - **DEBT-07-ITEM-03:** Resolve route duplication -- `reportRoutes.ts` and `report.routes.ts` both register `/execute` and `/export-pdf`; consolidate into one
   - Impact Level: Medium
   - Risk Category: Maintainability
-  - Status: Open
+  - Status: Done
 
 - **DEBT-07-ITEM-04:** Extract auth checks -- Inline `req.user?.role !== 'admin'` checks in route handlers should be extracted to a role-guard middleware
   - Impact Level: Low
@@ -623,12 +623,12 @@
 - **DEBT-07-ITEM-05:** Fix `ErrorFactory.notFound` -- Status code 500 and malformed message string
   - Impact Level: Medium
   - Risk Category: Maintainability
-  - Status: Open
+  - Status: Done
 
 - **DEBT-07-ITEM-06:** Remove `ensureTableExists` from request path -- Run DDL in migration scripts, not on every API call
   - Impact Level: Medium
   - Risk Category: Performance
-  - Status: Open
+  - Status: Done
 
 - **DEBT-07-ITEM-07:** Standardize API response envelope -- Some endpoints return `{ success, data }`, others return raw arrays
   - Impact Level: Medium
@@ -645,7 +645,7 @@
 - **DEBT-07-ITEM-09:** Zero test files in both backend and frontend
   - Impact Level: High
   - Risk Category: Maintainability
-  - Status: Open
+  - Status: Done
 
 - **DEBT-07-ITEM-10:** No unit tests for services, repositories, or validators
   - Impact Level: High
@@ -762,27 +762,27 @@
 - **ROADMAP-08-ITEM-02:** Fix `ErrorFactory.notFound` status code and message formatting
   - Impact Level: Medium
   - Risk Category: Maintainability
-  - Status: Open
+  - Status: Done
 
 - **ROADMAP-08-ITEM-03:** Consolidate `env.config.ts` and `unifiedConfig.ts` into single config module
   - Impact Level: Medium
   - Risk Category: Maintainability
-  - Status: Open
+  - Status: Done
 
 - **ROADMAP-08-ITEM-04:** Remove `ensureTableExists()` from request handlers; move to startup migration
   - Impact Level: Medium
   - Risk Category: Performance
-  - Status: Open
+  - Status: Done
 
 - **ROADMAP-08-ITEM-05:** Add try/catch around `localStorage` JSON parsing in `AuthContext`
   - Impact Level: Medium
   - Risk Category: Maintainability
-  - Status: Open
+  - Status: Done
 
 - **ROADMAP-08-ITEM-06:** Mount `mysql-data` volume in `docker-compose.yml` to persist database data
   - Impact Level: High
   - Risk Category: Scalability
-  - Status: Open
+  - Status: Done
 
 - **ROADMAP-08-ITEM-07:** Add unit tests for `validation.service.ts`, `auth.service.ts`, and `query.service.ts`
   - Impact Level: High

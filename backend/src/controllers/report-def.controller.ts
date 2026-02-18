@@ -17,8 +17,7 @@ export const ReportDefinitionController = {
     // List all reports
     async list(req: Request, res: Response, next: NextFunction) {
         try {
-            // Ensure table exists in auth database (where we have write permissions)
-            await ensureTableExists();
+            // Ensure table exists logic moved to startup
 
             const [ rows ] = await authPool.execute<ReportRow[]>('SELECT id, name, description, created_at FROM reports ORDER BY created_at DESC');
             res.json(rows);
@@ -55,7 +54,7 @@ export const ReportDefinitionController = {
 
             if (!name) throw ErrorFactory.badRequest('Nome é obrigatório');
 
-            await ensureTableExists();
+
 
             const [ result ] = await authPool.execute<ResultSetHeader>(
                 'INSERT INTO reports (name, description, sql_query, layout_json, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW())',
@@ -100,17 +99,4 @@ export const ReportDefinitionController = {
     }
 };
 
-// Helper to ensure table exists in auth database (central storage)
-async function ensureTableExists() {
-    await authPool.execute(`
-        CREATE TABLE IF NOT EXISTS reports (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            name VARCHAR(255) NOT NULL,
-            description TEXT,
-            sql_query TEXT,
-            layout_json JSON,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-        )
-    `);
-}
+

@@ -29,7 +29,7 @@ export class ErrorFactory {
     }
 
     static notFound(resource: string): AppError {
-        return new AppError(`${resource}, 500, undefined, false`);
+        return new AppError(`${resource} não encontrado`, 404);
     }
 
     static internal(message: string = 'Erro interno'): AppError {

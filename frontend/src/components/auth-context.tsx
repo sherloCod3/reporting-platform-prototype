@@ -44,16 +44,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const storedToken = localStorage.getItem("@qreports:token");
-    const storedUser = localStorage.getItem("@qreports:user");
-    const storedClient = localStorage.getItem("@qreports:client");
+    try {
+      const storedToken = localStorage.getItem("@qreports:token");
+      const storedUser = localStorage.getItem("@qreports:user");
+      const storedClient = localStorage.getItem("@qreports:client");
 
-    if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUser(JSON.parse(storedUser));
-      if (storedClient) setClient(JSON.parse(storedClient));
+      if (storedToken && storedUser) {
+        setToken(storedToken);
+        setUser(JSON.parse(storedUser));
+        if (storedClient) {
+          setClient(JSON.parse(storedClient));
+        }
+      }
+    } catch (error) {
+      console.error("Failed to parse auth storage:", error);
+      localStorage.removeItem("@qreports:token");
+      localStorage.removeItem("@qreports:user");
+      localStorage.removeItem("@qreports:client");
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   }, []);
 
   /**

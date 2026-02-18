@@ -2,10 +2,13 @@ import app from './server.js';
 import { env } from './config/env.config.js';
 import { testConnection } from './config/database.config.js';
 
+import { initAuthSchema } from './db/init-schema.js';
+
 // Start server
 async function startServer() {
     try {
         await testConnection();
+        await initAuthSchema();
         app.listen(env.PORT, () => {
             console.log(`Backend rodando na porta ${env.PORT}`);
             console.log(`Ambiente: ${process.env.NODE_ENV || 'development'}`);

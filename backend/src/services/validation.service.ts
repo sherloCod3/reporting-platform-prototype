@@ -1,35 +1,53 @@
 import { ErrorFactory } from "../types/errors.types.js";
 
-// Valida se o SQL é seguro para execução (@throws {AppError} se a query for invalidada)
+interface ValidationResult {
+    isValid: boolean;
+    reason?: string;
+}
 
+export const validationService = {
+    async validateQuery(query: string): Promise<ValidationResult> {
+        const normalized = query.trim().toUpperCase();
+
+        // Regra 1: Apenas SELECT ou CTE (WITH)
+        if (!normalized.startsWith('SELECT') && !normalized.startsWith('WITH')) {
+            return { isValid: false, reason: 'Apenas consultas SELECT e/ou CTE (WITH) são permitidas' };
+        }
+
+        // Regra 2: Comandos perigosos
+        // Remove literais de string (ex: 'DROP TABLE') para evitar falsos positivos
+        const sqlWithoutStrings = normalized.replace(/'[^']*'/g, '');
+
+        const forbidden = [ 'DROP', 'DELETE', 'UPDATE', 'ALTER', 'TRUNCATE', 'INSERT' ];
+        const found = forbidden.find(word => {
+            const regex = new RegExp(`\\b${word}\\b`, 'i');
+            return regex.test(sqlWithoutStrings);
+        });
+
+        if (found) {
+            return { isValid: false, reason: `Comando ${found} não é permitido` };
+        }
+
+        // Regra 3: limite de tamanho da query de acordo com a rotina
+        const MAX_QUERY_LENGTH = 35_000;
+
+        if (query.length > MAX_QUERY_LENGTH) {
+            return { isValid: false, reason: `Query muito longa. Limite: ${MAX_QUERY_LENGTH.toLocaleString('pt-BR')} caracteres` };
+        }
+
+        if (query.length === 0) {
+            return { isValid: false, reason: 'Query vazia' };
+        }
+
+        return { isValid: true };
+    }
+};
+
+// Legacy support (to be removed after refactor)
 export function validateSql(query: string): void {
-    const normalized = query.trim().toUpperCase();
-
-    // Regra 1: Apenas SELECT ou CTE (WITH)
-    if (!normalized.startsWith('SELECT') && !normalized.startsWith('WITH')) {
-        throw ErrorFactory.badRequest(
-            'Apenas consultas SELECT e/ou CTE (WITH) são permitidas'
-        );
-    }
-
-    // Regra 2: Comandos perigosos
-    const forbidden = ['DROP', 'DELETE', 'UPDATE', 'ALTER', 'TRUNCATE', 'INSERT'];
-    const found = forbidden.find(word => normalized.includes(word));
-
-    if (found) {
-        throw ErrorFactory.badRequest(
-            `Comando ${found} não é permitido`,
-            'Use apenas SELECT para consultas'
-        );
-    }
-
-    // Regra 3: limite de tamanho da query de acordo com a rotina
-    const MAX_QUERY_LENGTH = 35_000;
-
-    if (query.length > MAX_QUERY_LENGTH) {
-        throw ErrorFactory.badRequest(
-            'Query muito longa',
-            `Limite: ${MAX_QUERY_LENGTH.toLocaleString('pt-BR')} caracteres`
-        );
-    }
+    validationService.validateQuery(query).then(result => {
+        if (!result.isValid) {
+            throw ErrorFactory.badRequest(result.reason || 'Query inválida');
+        }
+    });
 }

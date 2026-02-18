@@ -39,4 +39,5 @@ export const ReportSchema = z.object({
 });
 
 export type CreateReportDto = z.infer<typeof ReportSchema>;
-export type UpdateReportDto = Partial<CreateReportDto>;
+const ReportUpdateSchema = ReportSchema.partial();
+export type UpdateReportDto = z.infer<typeof ReportUpdateSchema>;
