@@ -196,11 +196,12 @@ export const SectionTable: React.FC<Readonly<SectionTableProps>> = memo(
                             {i + 1}
                           </td>
                         )}
-                        {row.map((cell, j) => (
+                        {previewColumns.map((col, j) => (
                           <td
                             key={j}
                             className="px-2 py-1 border-b border-border/10 truncate max-w-[120px]">
-                            {formatCell(cell)}
+                            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                            {formatCell((row as any)[col])}
                           </td>
                         ))}
                       </tr>
@@ -355,11 +356,12 @@ export const SectionTable: React.FC<Readonly<SectionTableProps>> = memo(
                     <tbody>
                       {localResult.rows.map((row, i) => (
                         <tr key={i} className="hover:bg-muted/50">
-                          {row.map((cell, j) => (
+                          {localResult.columns.map((col, j) => (
                             <td
                               key={j}
                               className="p-1 border-b border-border/50 truncate max-w-[150px]">
-                              {String(cell)}
+                              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                              {String((row as any)[col] ?? "")}
                             </td>
                           ))}
                         </tr>

@@ -4,7 +4,11 @@ commits.pdf
 node_modules
 package-lock.json
 prototypes
-.agent
-.claude
 .cursor
 .cursorrules
+.claude/
+dist/
+backend/dist/
+frontend/.next/
+frontend/out/
+frontend/build/

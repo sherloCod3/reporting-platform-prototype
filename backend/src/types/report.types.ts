@@ -1,4 +1,10 @@
-import type { RowDataPacket } from "mysql2";
+import type { QueryResult } from "@shared/types/report.types.js";
+
+// Re-export specific types used internally if needed, or deprecate this file in favor of direct imports.
+// For now, we keep it but point to shared types to avoid breaking changes in imports if possible, 
+// though direct imports are preferred.
+
+export type { QueryResult };
 
 // Frontend envia para executar
 export interface ExecuteQueryRequest {
@@ -11,14 +17,6 @@ export interface GeneratePdfRequest {
     htmlContent: string;
     title?: string;
     orientation?: 'portrait' | 'landscape';
-}
-
-// O resultado de uma query
-export interface QueryResult {
-    columns: string[];
-    rows: RowDataPacket[] | RowDataPacket[][] | any[];
-    rowCount: number;
-    duration: number; // em ms
 }
 
 export interface ReportExecutionResult {

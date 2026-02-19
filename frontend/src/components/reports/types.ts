@@ -2,12 +2,9 @@
  * Type definitions for the Report Editor
  */
 
-export interface SqlResult {
-    columns: string[];
-    rows: unknown[][];
-    rowCount: number;
-    duration: number; // milliseconds
-}
+import type { QueryResult } from "@shared/types/report.types";
+
+export type SqlResult = QueryResult;
 
 export type ResizeHandle = "nw" | "n" | "ne" | "e" | "se" | "s" | "sw" | "w";
 

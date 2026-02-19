@@ -6,10 +6,14 @@ import type { ComponentStyle } from "../types";
 
 interface TextRendererProps {
   content: string;
-  width: number;
-  height: number;
+  width?: number;
+  height?: number;
   style?: ComponentStyle;
   placeholder?: string;
+  fontSize?: number;
+  bold?: boolean;
+  italic?: boolean;
+  alignment?: "left" | "center" | "right" | "justify";
 }
 
 export const TextRenderer = memo(function TextRenderer({
@@ -18,14 +22,24 @@ export const TextRenderer = memo(function TextRenderer({
   height,
   style,
   placeholder = "(Double click to edit text)",
+  fontSize,
+  bold,
+  italic,
+  alignment,
 }: TextRendererProps) {
   const containerStyle = useMemo(() => {
     return {
       width: "100%",
       height: "100%",
       fontFamily: style?.fontFamily ?? "Inter",
-      fontSize: style?.fontSize ? `${style.fontSize}px` : "14px",
-      textAlign: style?.textAlign ?? "left",
+      fontSize: fontSize
+        ? `${fontSize}px`
+        : style?.fontSize
+          ? `${style.fontSize}px`
+          : "14px",
+      textAlign: alignment ?? style?.textAlign ?? "left",
+      fontWeight: bold ? "bold" : "normal",
+      fontStyle: italic ? "italic" : "normal",
       color: style?.color ?? "inherit",
       backgroundColor: style?.backgroundColor ?? "transparent",
       borderWidth: style?.borderWidth ? `${style.borderWidth}px` : "0px",

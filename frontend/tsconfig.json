@@ -27,7 +27,8 @@
       "@/actions/*": ["./src/actions/*"],
       "@/hooks/*": ["./src/hooks/*"],
       "@/lib/*": ["./src/lib/*"],
-      "@/features/*": ["./src/features/*"]
+      "@/features/*": ["./src/features/*"],
+      "@shared/*": ["../shared/*"]
     }
   },
   "include": [
@@ -36,7 +37,8 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
-    "**/*.mts"
+    "**/*.mts",
+    "../shared/**/*"
   ],
   "exclude": ["node_modules"]
 }

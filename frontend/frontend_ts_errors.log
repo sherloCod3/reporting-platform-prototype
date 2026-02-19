@@ -1,0 +1,5 @@
+src/components/reports/report-editor.tsx(853,35): error TS7006: Parameter 'cell' implicitly has an 'any' type.
+src/components/reports/report-editor.tsx(853,41): error TS7006: Parameter 'j' implicitly has an 'any' type.
+src/components/sql/query-results-table.tsx(33,17): error TS7006: Parameter 'cell' implicitly has an 'any' type.
+src/features/report-composer/components/preview-section-renderer.tsx(86,9): error TS2322: Type '{ content: string; fontSize: number; bold: boolean; italic: boolean; alignment: "center" | "left" | "right"; }' is not assignable to type 'IntrinsicAttributes & TextRendererProps'.
+  Property 'fontSize' does not exist on type 'IntrinsicAttributes & TextRendererProps'.

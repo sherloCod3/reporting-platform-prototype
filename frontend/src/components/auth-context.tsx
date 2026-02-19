@@ -4,6 +4,7 @@ import { createContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/utils/api";
 import { toast } from "sonner";
+import { jwtDecode } from "jwt-decode";
 
 interface User {
   id: number;
@@ -41,6 +42,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
+  const isTokenValid = (token: string) => {
+    try {
+      const decoded: { exp?: number } = jwtDecode(token);
+      if (!decoded.exp) return true;
+      // Date.now() is in milliseconds, exp is in seconds
+      return decoded.exp * 1000 > Date.now();
+    } catch {
+      return false;
+    }
+  };
+
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -50,10 +62,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const storedClient = localStorage.getItem("@qreports:client");
 
       if (storedToken && storedUser) {
-        setToken(storedToken);
-        setUser(JSON.parse(storedUser));
-        if (storedClient) {
-          setClient(JSON.parse(storedClient));
+        if (isTokenValid(storedToken)) {
+          setToken(storedToken);
+          setUser(JSON.parse(storedUser));
+          if (storedClient) {
+            setClient(JSON.parse(storedClient));
+          }
+        } else {
+          console.warn("Stored token is expired or invalid. Clearing session.");
+          localStorage.removeItem("@qreports:token");
+          localStorage.removeItem("@qreports:user");
+          localStorage.removeItem("@qreports:client");
         }
       }
     } catch (error) {

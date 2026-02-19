@@ -65,7 +65,7 @@
 - **ARCH-01-ITEM-16:** No shared type package between frontend and backend; types are duplicated (e.g., `QueryResult`, `LoginResponse`)
   - Impact Level: Low
   - Risk Category: Maintainability
-  - Status: Open
+  - Status: Done
 
 - **ARCH-01-ITEM-17:** No API contract enforcement (no OpenAPI/Swagger spec)
   - Impact Level: Medium
@@ -206,7 +206,7 @@
 - **FE-03-ITEM-15:** Auth state stored in `localStorage` without token expiry validation on the client side; relies solely on server-side JWT verification
   - Impact Level: Medium
   - Risk Category: Security
-  - Status: Open
+  - Status: Done
 
 - **FE-03-ITEM-16:** `AuthContext` parses stored JSON on mount without try/catch -- corrupted localStorage will crash the app
   - Impact Level: Medium
@@ -216,7 +216,7 @@
 - **FE-03-ITEM-17:** `constants.ts` defines `API_URL` with port `3001` while `api.ts` defaults to port `3000` -- inconsistency
   - Impact Level: Low
   - Risk Category: Maintainability
-  - Status: Open
+  - Status: Done
 
 - **FE-03-ITEM-18:** No error boundary components for graceful failure handling
   - Impact Level: Medium

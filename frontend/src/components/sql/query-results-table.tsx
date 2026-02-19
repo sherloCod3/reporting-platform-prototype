@@ -3,13 +3,7 @@
 import { useMemo } from "react";
 import { Clock, Download, Table2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-interface QueryResult {
-  columns: string[];
-  rows: unknown[][];
-  rowCount: number;
-  duration: number;
-}
+import type { QueryResult } from "@shared/types/report.types";
 
 interface QueryResultsTableProps {
   result: QueryResult;
@@ -35,8 +29,10 @@ export function QueryResultsTable({ result }: QueryResultsTableProps) {
     const headers = result.columns.join(",");
     const rows = result.rows
       .map((row) =>
-        row
-          .map((cell) => {
+        result.columns
+          .map((col) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const cell = (row as any)[col];
             const value = formatCellValue(cell);
             // Escape quotes and wrap in quotes if contains comma
             if (value.includes(",") || value.includes('"')) {
@@ -102,18 +98,22 @@ export function QueryResultsTable({ result }: QueryResultsTableProps) {
               <tr
                 key={rowIndex}
                 className="border-b border-border hover:bg-muted/30">
-                {row.map((cell, cellIndex) => (
-                  <td
-                    key={cellIndex}
-                    className="p-2 max-w-md truncate"
-                    title={formatCellValue(cell)}>
-                    {cell === null ? (
-                      <span className="text-slate-400 italic">NULL</span>
-                    ) : (
-                      formatCellValue(cell)
-                    )}
-                  </td>
-                ))}
+                {result.columns.map((column, cellIndex) => {
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  const cell = (row as any)[column];
+                  return (
+                    <td
+                      key={cellIndex}
+                      className="p-2 max-w-md truncate"
+                      title={formatCellValue(cell)}>
+                      {cell === null ? (
+                        <span className="text-slate-400 italic">NULL</span>
+                      ) : (
+                        formatCellValue(cell)
+                      )}
+                    </td>
+                  );
+                })}
               </tr>
             ))}
           </tbody>

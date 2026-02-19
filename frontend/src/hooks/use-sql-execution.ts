@@ -2,13 +2,7 @@
 
 import { useState } from "react";
 import { api } from "@/utils/api";
-
-interface QueryResult {
-    columns: string[];
-    rows: unknown[][];
-    rowCount: number;
-    duration: number;
-}
+import type { QueryResult } from "@shared/types/report.types";
 
 interface ExecutionState {
     isExecuting: boolean;

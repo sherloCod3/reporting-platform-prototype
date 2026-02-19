@@ -1,24 +1,17 @@
 import { api } from '@/utils/api';
 
+import type { LoginResponse, User } from '@shared/types/api.types';
+
+export type { LoginResponse, User };
+
 export interface LoginRequest {
     email: string;
     password: string;
 }
 
-export interface LoginResponse {
-    success: boolean;
-    data: {
-        token: string;
-        user: User;
-        client: Client;
-        expiresIn: string;
-    };
-}
-
-export interface User {
+export interface Client {
     id: number;
-    email: string;
-    role: 'admin' | 'user' | 'viewer';
+    slug: string;
 }
 
 export interface Client {

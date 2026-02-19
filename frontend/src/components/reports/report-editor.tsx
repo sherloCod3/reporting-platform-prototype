@@ -850,11 +850,12 @@ export function ReportEditor({
                   <tbody>
                     {sqlResult.rows.map((row, i) => (
                       <tr key={i} className="hover:bg-muted/50">
-                        {row.map((cell, j) => (
+                        {sqlResult.columns.map((col, j) => (
                           <td
                             key={j}
                             className="p-1 border-b border-border/50 truncate max-w-[150px]">
-                            {String(cell)}
+                            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                            {String((row as any)[col] ?? "")}
                           </td>
                         ))}
                       </tr>

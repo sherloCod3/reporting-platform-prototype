@@ -7,7 +7,7 @@ import type { ComponentStyle } from "../types";
 
 export interface TableRendererProps {
   columns: string[];
-  rows: any[][];
+  rows: any[];
   showRowNumbers?: boolean;
   className?: string;
   emptyMessage?: string;
@@ -84,11 +84,12 @@ export const TableRenderer = memo(function TableRenderer({
                   {i + 1}
                 </td>
               )}
-              {row.map((cell, j) => (
+              {columns.map((col, j) => (
                 <td
                   key={j}
                   className="px-2 py-1 border-b border-border/20 text-foreground">
-                  {formatCell(cell)}
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                  {formatCell((row as any)[col])}
                 </td>
               ))}
             </tr>
