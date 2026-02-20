@@ -52,7 +52,7 @@ function PreviewHeader({
       )}
 
       {/* Separador decorativo - alinhado com o visual de edição */}
-      <div className="h-px bg-gradient-to-r from-primary/30 via-primary/10 to-transparent mt-4" />
+      <div className="h-px bg-linear-to-r from-primary/30 via-primary/10 to-transparent mt-4" />
     </div>
   );
 }

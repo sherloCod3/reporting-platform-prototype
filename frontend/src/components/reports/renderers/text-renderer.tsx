@@ -6,8 +6,6 @@ import type { ComponentStyle } from '../types';
 
 interface TextRendererProps {
   content: string;
-  width?: number;
-  height?: number;
   style?: ComponentStyle;
   placeholder?: string;
   fontSize?: number;
@@ -18,8 +16,6 @@ interface TextRendererProps {
 
 export const TextRenderer = memo(function TextRenderer({
   content,
-  width,
-  height,
   style,
   placeholder = '(Clique duplo para editar o texto)',
   fontSize,
@@ -50,14 +46,14 @@ export const TextRenderer = memo(function TextRenderer({
       overflow: 'hidden',
       lineHeight: 1.5
     } as React.CSSProperties;
-  }, [width, height, style, fontSize, bold, italic, alignment]);
+  }, [style, fontSize, bold, italic, alignment]);
 
   return (
     <div
       className={cn(
         'whitespace-pre-wrap p-2 transition-colors',
         !content &&
-        'text-muted-foreground/30 italic flex items-center justify-center h-full border-2 border-dashed border-muted-foreground/20'
+          'text-muted-foreground/30 italic flex items-center justify-center h-full border-2 border-dashed border-muted-foreground/20'
       )}
       style={containerStyle}
     >

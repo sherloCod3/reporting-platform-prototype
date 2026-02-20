@@ -53,7 +53,7 @@ export const SectionHeader: React.FC<Readonly<SectionHeaderProps>> = memo(
         className={cn(
           'composer-section group relative border rounded-md transition-all duration-200',
           isSelected
-            ? 'border-primary/40 ring-1 ring-primary/15 bg-primary/[0.03]'
+            ? 'border-primary/40 ring-1 ring-primary/15 bg-primary/3'
             : 'border-border/40 hover:border-border/70 bg-card/50'
         )}
         onClick={() => onSelect(section.id)}
@@ -98,7 +98,7 @@ export const SectionHeader: React.FC<Readonly<SectionHeaderProps>> = memo(
             onClick={e => e.stopPropagation()}
           />
 
-          <div className="h-px bg-gradient-to-r from-primary/30 via-primary/10 to-transparent mt-4" />
+          <div className="h-px bg-linear-to-r from-primary/30 via-primary/10 to-transparent mt-4" />
         </div>
 
         <div

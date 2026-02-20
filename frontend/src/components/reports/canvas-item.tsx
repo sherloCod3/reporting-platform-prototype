@@ -1,6 +1,12 @@
 import React, { memo } from 'react';
 import { cn } from '@/lib/utils';
-import { Table, BarChart, Trash2, Edit, Image as ImageIcon } from 'lucide-react';
+import {
+  Table,
+  BarChart,
+  Trash2,
+  Edit,
+  Image as ImageIcon
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { Component } from './types';
 import { TableRenderer } from './renderers/table-renderer';
@@ -37,12 +43,7 @@ export const CanvasItem = memo(function CanvasItem({
       case 'text':
         return (
           <div className="h-full">
-            <TextRenderer
-              content={comp.content || ''}
-              width={comp.width}
-              height={comp.height}
-              style={comp.style}
-            />
+            <TextRenderer content={comp.content || ''} style={comp.style} />
           </div>
         );
 

@@ -116,7 +116,7 @@ export const SectionTable: React.FC<Readonly<SectionTableProps>> = memo(
         className={cn(
           'composer-section group relative border rounded-md transition-all duration-200',
           isSelected
-            ? 'border-primary/40 ring-1 ring-primary/15 bg-primary/[0.03]'
+            ? 'border-primary/40 ring-1 ring-primary/15 bg-primary/3'
             : 'border-border/40 hover:border-border/70 bg-card/50'
         )}
         onClick={() => onSelect(section.id)}
