@@ -1,23 +1,18 @@
-// Limites de segurança
-
 export const SECURITY_LIMITS = {
-    // queries
-    MAX_QUERY_LENGTH: 35_000,   // 35k caracteres
-    MAX_QUERY_TIMEOUT: 30_000,  // 30 segundos
-    MAX_RESULT_ROWS: 50_000,    // 50k linhas
+  MAX_QUERY_LENGTH: 35_000,
+  MAX_QUERY_TIMEOUT: 30_000,
+  MAX_RESULT_ROWS: 50_000,
 
-    // rate limiting
-    QUERY_RATE_LIMIT: {
-        windowMs: 60_000,   // 1 minuto
-        maxRequests: 10     // 10 queries/min
-    },
+  QUERY_RATE_LIMIT: {
+    windowMs: 60_000,
+    maxRequests: 10
+  },
 
-    GENERAL_RATE_LIMIT: {
-        windowMs: 60_000,
-        maxRequest: 60      // 60 req/min
-    },
+  GENERAL_RATE_LIMIT: {
+    windowMs: 60_000,
+    maxRequest: 60
+  },
 
-    // database
-    DB_CONNECTION_TIMEOUT: 15_000,  // 10 segundos
-    DB_POOL_SIZE: 10    // 10 conexões simultâneas
+  DB_CONNECTION_TIMEOUT: 15_000,
+  DB_POOL_SIZE: 10
 } as const;

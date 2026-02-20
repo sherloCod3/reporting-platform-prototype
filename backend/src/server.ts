@@ -6,12 +6,14 @@ import { errorHandler } from './middlewares/errorHandler.js';
 
 const app = express();
 
-app.use(cors({
+app.use(
+  cors({
     origin: process.env.FRONTEND_URL || 'http://localhost:5173',
     credentials: true
-}));
+  })
+);
 
-// Configure JSON body parser with increased limit for large payloads (e.g., HTML content)
+// Limite aumentado para payloads grandes (ex: conteudo HTML de relatorios)
 app.use(express.json({ limit: '50mb' }));
 
 app.use((req, res, next) => requestLogger(req, res, next));

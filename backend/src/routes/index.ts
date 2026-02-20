@@ -9,8 +9,8 @@ const router = Router();
 
 router.get('/health', healthCheck);
 router.use('/auth', authRoutes);
-router.use('/reports', reportRoutes); // Execuções
-router.use('/definitions', reportDefRoutes); // CRUD de definições
-router.use('/db', dbRoutes); // Database connection management
+router.use('/reports', reportRoutes);
+router.use('/definitions', reportDefRoutes);
+router.use('/db', dbRoutes);
 
 export default router;

@@ -1,26 +1,26 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
-import { api } from "@/utils/api";
-import { Button } from "@/components/ui/button";
-import { Plus, MoreVertical, FileText, Calendar } from "lucide-react";
+import Link from 'next/link';
+import { useQuery } from '@tanstack/react-query';
+import { api } from '@/utils/api';
+import { Button } from '@/components/ui/button';
+import { Plus, MoreVertical, FileText, Calendar } from 'lucide-react';
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+  CardDescription
+} from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Skeleton } from "@/components/ui/skeleton";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
+import { Skeleton } from '@/components/ui/skeleton';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 interface Report {
   id: number;
@@ -30,17 +30,16 @@ interface Report {
 }
 
 export default function ReportsPage() {
-  // Ensuring response data is treated as an array
   const {
     data: reports,
     isLoading,
-    isError,
+    isError
   } = useQuery({
-    queryKey: ["reports"],
+    queryKey: ['reports'],
     queryFn: async () => {
-      const response = await api.get<Report[]>("/definitions");
+      const response = await api.get<Report[]>('/definitions');
       return response.data;
-    },
+    }
   });
 
   if (isLoading) {
@@ -92,7 +91,7 @@ export default function ReportsPage() {
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {reports?.map((report) => (
+          {reports?.map(report => (
             <ReportCard key={report.id} report={report} />
           ))}
         </div>
@@ -109,12 +108,13 @@ function ReportCard({ report }: { report: Report }) {
           <CardTitle className="text-base font-semibold group-hover:text-blue-600 transition-colors">
             <Link
               href={`/reports/${report.id}/edit`}
-              className="hover:underline">
+              className="hover:underline"
+            >
               {report.name}
             </Link>
           </CardTitle>
           <CardDescription className="line-clamp-2 min-h-10">
-            {report.description || "Sem descrição"}
+            {report.description || 'Sem descrição'}
           </CardDescription>
         </div>
         <DropdownMenu>
@@ -145,7 +145,7 @@ function ReportCard({ report }: { report: Report }) {
         <div className="flex items-center text-sm text-gray-500 mt-2">
           <Calendar className="mr-2 h-4 w-4" />
           {format(new Date(report.created_at), "d 'de' MMMM, yyyy", {
-            locale: ptBR,
+            locale: ptBR
           })}
         </div>
       </CardContent>
@@ -161,7 +161,7 @@ function ReportsLoading() {
         <Skeleton className="h-10 w-32" />
       </div>
       <div className="grid gap-4 md:grid-cols-3">
-        {[1, 2, 3].map((i) => (
+        {[1, 2, 3].map(i => (
           <Skeleton key={i} className="h-40 w-full" />
         ))}
       </div>

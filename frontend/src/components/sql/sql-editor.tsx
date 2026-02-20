@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import Editor from "@monaco-editor/react";
-import { useTheme } from "next-themes";
-import { Loader2 } from "lucide-react";
-import { useRef, useEffect } from "react";
+import Editor from '@monaco-editor/react';
+import { useTheme } from 'next-themes';
+import { Loader2 } from 'lucide-react';
+import { useRef, useEffect } from 'react';
 
 interface SqlEditorProps {
   value: string;
@@ -16,13 +16,12 @@ interface SqlEditorProps {
 export function SqlEditor({
   value,
   onChange,
-  height = "400px",
+  height = '400px',
   readOnly = false,
-  onExecute,
+  onExecute
 }: SqlEditorProps) {
   const { theme } = useTheme();
 
-  // Store editor instance and container references
   const editorRef = useRef<{
     layout: () => void;
     addCommand: (keybinding: number, handler: () => void) => void;
@@ -31,11 +30,10 @@ export function SqlEditor({
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   const handleEditorChange = (value: string | undefined) => {
-    onChange(value || "");
+    onChange(value || '');
   };
 
   const handleEditorMount = (editor: unknown, monaco: unknown) => {
-    // Type assertion for Monaco editor instance
     const typedEditor = editor as {
       layout: () => void;
       addCommand: (keybinding: number, handler: () => void) => void;
@@ -47,74 +45,67 @@ export function SqlEditor({
       languages: {
         setLanguageConfiguration: (
           languageId: string,
-          configuration: Record<string, unknown>,
+          configuration: Record<string, unknown>
         ) => void;
       };
     };
 
-    // Store editor reference
     editorRef.current = typedEditor;
 
-    // Configure SQL language features
-    typedMonaco.languages.setLanguageConfiguration("mysql", {
+    typedMonaco.languages.setLanguageConfiguration('mysql', {
       comments: {
-        lineComment: "--",
-        blockComment: ["/*", "*/"],
+        lineComment: '--',
+        blockComment: ['/*', '*/']
       },
       brackets: [
-        ["[", "]"],
-        ["(", ")"],
+        ['[', ']'],
+        ['(', ')']
       ],
       autoClosingPairs: [
-        { open: "[", close: "]" },
-        { open: "(", close: ")" },
+        { open: '[', close: ']' },
+        { open: '(', close: ')' },
         { open: "'", close: "'" },
-        { open: "`", close: "`" },
-      ],
+        { open: '`', close: '`' }
+      ]
     });
 
-    // Add keyboard shortcut for execute (Ctrl+Enter or Cmd+Enter)
     typedEditor.addCommand(
       typedMonaco.KeyMod.CtrlCmd | typedMonaco.KeyCode.Enter,
       () => {
         onExecute?.();
-      },
+      }
     );
 
-    // Configure editor options for large queries (IDE-like)
     typedEditor.updateOptions({
       fontSize: 13,
       lineHeight: 20,
-      minimap: { enabled: true, side: "right", size: "fit" },
+      minimap: { enabled: true, side: 'right', size: 'fit' },
       scrollBeyondLastLine: false,
-      wordWrap: "off", // Better for large queries
+      wordWrap: 'off',
       formatOnPaste: true,
       formatOnType: true,
-      autoIndent: "full",
+      autoIndent: 'full',
       tabSize: 2,
-      renderWhitespace: "selection",
-      renderLineHighlight: "all",
-      cursorBlinking: "smooth",
+      renderWhitespace: 'selection',
+      renderLineHighlight: 'all',
+      cursorBlinking: 'smooth',
       smoothScrolling: true,
-      cursorSmoothCaretAnimation: "on",
+      cursorSmoothCaretAnimation: 'on',
       bracketPairColorization: { enabled: true },
       guides: {
         bracketPairs: true,
-        indentation: true,
-      },
+        indentation: true
+      }
     });
 
-    // Initial layout call to ensure correct sizing
     typedEditor.layout();
   };
 
-  // ResizeObserver to handle container size changes
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
     const resizeObserver = new ResizeObserver(() => {
-      // Call layout() when container size changes
       if (editorRef.current) {
         editorRef.current.layout();
       }
@@ -130,33 +121,34 @@ export function SqlEditor({
   return (
     <div
       ref={containerRef}
-      className="border rounded-md overflow-hidden bg-background h-full w-full">
+      className="border rounded-md overflow-hidden bg-background h-full w-full"
+    >
       <Editor
         height={height}
         defaultLanguage="mysql"
         value={value}
         onChange={handleEditorChange}
-        theme={theme === "dark" ? "vs-dark" : "vs-light"}
+        theme={theme === 'dark' ? 'vs-dark' : 'vs-light'}
         onMount={handleEditorMount}
         options={{
           readOnly,
-          minimap: { enabled: true, side: "right", size: "fit" },
+          minimap: { enabled: true, side: 'right', size: 'fit' },
           fontSize: 13,
-          lineNumbers: "on",
+          lineNumbers: 'on',
           scrollBeyondLastLine: false,
-          automaticLayout: false, // We handle layout manually with ResizeObserver
-          wordWrap: "off",
+          automaticLayout: false,
+          wordWrap: 'off',
           padding: { top: 12, bottom: 12 },
-          renderWhitespace: "selection",
-          renderLineHighlight: "all",
-          cursorBlinking: "smooth",
+          renderWhitespace: 'selection',
+          renderLineHighlight: 'all',
+          cursorBlinking: 'smooth',
           smoothScrolling: true,
-          cursorSmoothCaretAnimation: "on",
+          cursorSmoothCaretAnimation: 'on',
           bracketPairColorization: { enabled: true },
           guides: {
             bracketPairs: true,
-            indentation: true,
-          },
+            indentation: true
+          }
         }}
         loading={
           <div className="flex items-center justify-center h-full">

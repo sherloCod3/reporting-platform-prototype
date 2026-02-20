@@ -1,112 +1,128 @@
 import type { Request, Response, NextFunction } from 'express';
 import mysql from 'mysql2/promise';
-import { AuthService } from '../services/auth.service.js'; // verifyToken
-import { AuthRepository } from '../repositories/auth.repository.js'; // client conn
+import { AuthService } from '../services/auth.service.js';
+import { AuthRepository } from '../repositories/auth.repository.js';
 import { env } from '../config/env.config.js';
 import { ErrorFactory } from '../types/errors.types.js';
 
-// Connection pool cache by destination and credentials
+// Cache de pools de conexao por destino e credenciais
 const poolCache = new Map<string, mysql.Pool>();
 
-// Client connection details cache
-const clientConnCache = new Map<number, {
-    value: { host: string; port: number; db: string; slug: string }
+// Cache de dados de conexao do cliente (TTL de 60s)
+const clientConnCache = new Map<
+  number,
+  {
+    value: { host: string; port: number; db: string; slug: string };
     expiresAt: number;
-}>();
+  }
+>();
 
 const CLIENT_CONN_TTL_MS = 60_000;
 
-// Selects database credentials based on user role
+// Seleciona credenciais do banco conforme a role do usuario
 function pickDbCredential(role: 'admin' | 'user' | 'viewer') {
-    if (role === 'admin') {
-        // Admin gets write access
-        return { user: env.REPORT_DB_WRITE_USER, password: env.REPORT_DB_WRITE_PASSWORD };
-    }
-    // user and viewer only get read access
-    return { user: env.REPORT_DB_READ_USER, password: env.REPORT_DB_READ_PASSWORD };
+  if (role === 'admin') {
+    return {
+      user: env.REPORT_DB_WRITE_USER,
+      password: env.REPORT_DB_WRITE_PASSWORD
+    };
+  }
+  return {
+    user: env.REPORT_DB_READ_USER,
+    password: env.REPORT_DB_READ_PASSWORD
+  };
 }
 
 function getOrCreatePool(
-    clientConn: { host: string; port: number; db: string; slug: string },
-    cred: { user: string; password: string }
+  clientConn: { host: string; port: number; db: string; slug: string },
+  cred: { user: string; password: string }
 ): mysql.Pool {
-    const poolKey = `${clientConn.host}:${clientConn.port}:${clientConn.db}:${cred.user}`;
-    let pool = poolCache.get(poolKey);
+  const poolKey = `${clientConn.host}:${clientConn.port}:${clientConn.db}:${cred.user}`;
+  let pool = poolCache.get(poolKey);
 
-    if (!pool) {
-        pool = mysql.createPool({
-            host: clientConn.host,
-            port: clientConn.port,
-            user: cred.user,
-            password: cred.password,
-            database: clientConn.db,
-            waitForConnections: true,
-            connectionLimit: 10,
-            connectTimeout: 10_000,
-        });
+  if (!pool) {
+    pool = mysql.createPool({
+      host: clientConn.host,
+      port: clientConn.port,
+      user: cred.user,
+      password: cred.password,
+      database: clientConn.db,
+      waitForConnections: true,
+      connectionLimit: 10,
+      connectTimeout: 10_000
+    });
 
-        poolCache.set(poolKey, pool);
-    }
+    poolCache.set(poolKey, pool);
+  }
 
-    return pool;
+  return pool;
 }
 
 /**
- * Middleware to authenticate requests and inject database connection.
- * Verifies the JWT token and establishes a connection to the client-specific database.
+ * Middleware de autenticacao.
+ * Valida o JWT, busca a conexao do cliente e injeta o pool no request.
  */
-export async function authenticate(req: Request, _res: Response, next: NextFunction) {
-    try {
-        const header = req.headers.authorization;
-        if (!header?.startsWith('Bearer ')) {
-            throw ErrorFactory.unauthorized('Token não fornecido');
-        }
-
-        const token = header.substring(7); // remove a palavra "Bearer"
-        const payload = AuthService.verifyToken(token);
-        req.user = payload; // injeta o usuário no request
-
-        // tenta pegar conn do cache
-        const cached = clientConnCache.get(payload.clientId);
-        const now = Date.now();
-
-        let clientConn: { host: string; port: number; db: string; slug: string } | null = null;
-
-        if (cached && cached.expiresAt > now) { // verifica se o cache é válido
-            clientConn = cached.value;
-        } else {
-            const row = await AuthRepository.getClientConnection(payload.clientId); // busca no auth db
-            if (!row) {
-                throw ErrorFactory.unauthorized('Cliente inválido ou inativo'); // 401
-            }
-
-            clientConn = { // montagem do conn
-                // FORÇADO: Usar host do jumpserver para todas as conexões externas
-                host: env.REPORT_DB_HOST,
-                port: row.db_port,
-                db: row.db_name,
-                slug: row.slug
-            };
-
-            clientConnCache.set(payload.clientId, {
-                value: clientConn,
-                expiresAt: now + CLIENT_CONN_TTL_MS,
-            });
-        }
-
-        // FORÇADO: Sempre usar credenciais de LEITURA, ignorando role de admin
-        // const cred = pickDbCredential(payload.role);
-        const cred = { user: env.REPORT_DB_READ_USER, password: env.REPORT_DB_READ_PASSWORD };
-
-        const pool = getOrCreatePool(clientConn, cred);
-
-        // Inject connection info and credentials for database management
-        req.db = pool;
-        req.clientConn = clientConn;
-        req.dbCredentials = cred;
-
-        next();
-    } catch (err) {
-        next(err); // manda para o error handler
+export async function authenticate(
+  req: Request,
+  _res: Response,
+  next: NextFunction
+) {
+  try {
+    const header = req.headers.authorization;
+    if (!header?.startsWith('Bearer ')) {
+      throw ErrorFactory.unauthorized('Token não fornecido');
     }
+
+    const token = header.substring(7);
+    const payload = AuthService.verifyToken(token);
+    req.user = payload;
+
+    const cached = clientConnCache.get(payload.clientId);
+    const now = Date.now();
+
+    let clientConn: {
+      host: string;
+      port: number;
+      db: string;
+      slug: string;
+    } | null = null;
+
+    if (cached && cached.expiresAt > now) {
+      clientConn = cached.value;
+    } else {
+      const row = await AuthRepository.getClientConnection(payload.clientId);
+      if (!row) {
+        throw ErrorFactory.unauthorized('Cliente inválido ou inativo'); // 401
+      }
+
+      clientConn = {
+        // Usa host do jumpserver para conexoes externas
+        host: env.REPORT_DB_HOST,
+        port: row.db_port,
+        db: row.db_name,
+        slug: row.slug
+      };
+
+      clientConnCache.set(payload.clientId, {
+        value: clientConn,
+        expiresAt: now + CLIENT_CONN_TTL_MS
+      });
+    }
+
+    // Por seguranca, usa credenciais somente-leitura para todos os usuarios
+    const cred = {
+      user: env.REPORT_DB_READ_USER,
+      password: env.REPORT_DB_READ_PASSWORD
+    };
+
+    const pool = getOrCreatePool(clientConn, cred);
+
+    req.db = pool;
+    req.clientConn = clientConn;
+    req.dbCredentials = cred;
+
+    next();
+  } catch (err) {
+    next(err);
+  }
 }

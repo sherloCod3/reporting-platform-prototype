@@ -1,22 +1,19 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useDatabase } from "@/hooks/use-database";
-import { Database, Check, ChevronDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useState } from 'react';
+import { useDatabase } from '@/hooks/use-database';
+import { Database, Check, ChevronDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
 
-/**
- * Database Selector Component
- * Dropdown menu for viewing and switching between available databases.
- */
+/** Dropdown para selecionar e alternar entre bancos de dados disponiveis. */
 export function DatabaseSelector() {
   const { status, databases, isLoading, fetchDatabases, switchDatabase } =
     useDatabase();
@@ -42,11 +39,12 @@ export function DatabaseSelector() {
         <Button
           variant="outline"
           className="gap-2 min-w-[180px] justify-between"
-          disabled={!status?.connected}>
+          disabled={!status?.connected}
+        >
           <div className="flex items-center gap-2">
             <Database className="h-4 w-4" />
             <span className="truncate">
-              {status?.database || "Select database"}
+              {status?.database || 'Select database'}
             </span>
           </div>
           <ChevronDown className="h-4 w-4 opacity-50" />
@@ -64,11 +62,12 @@ export function DatabaseSelector() {
             <span className="text-muted-foreground">No databases found</span>
           </DropdownMenuItem>
         ) : (
-          databases.map((db) => (
+          databases.map(db => (
             <DropdownMenuItem
               key={db}
               onClick={() => handleSelectDatabase(db)}
-              className="flex items-center justify-between cursor-pointer">
+              className="flex items-center justify-between cursor-pointer"
+            >
               <span>{db}</span>
               {status?.database === db && (
                 <Check className="h-4 w-4 text-green-600" />

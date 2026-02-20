@@ -4,20 +4,20 @@ import { testConnection } from './config/database.config.js';
 
 import { initAuthSchema } from './db/init-schema.js';
 
-// Start server
+// Inicia o servidor
 async function startServer() {
-    try {
-        await testConnection();
-        await initAuthSchema();
-        app.listen(env.PORT, () => {
-            console.log(`Backend rodando na porta ${env.PORT}`);
-            console.log(`Ambiente: ${process.env.NODE_ENV || 'development'}`);
-        });
-    } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        console.error('⚠️ Servidor não iniciado:', message);
-        process.exit(1);
-    }
+  try {
+    await testConnection();
+    await initAuthSchema();
+    app.listen(env.PORT, () => {
+      console.log(`Backend rodando na porta ${env.PORT}`);
+      console.log(`Ambiente: ${process.env.NODE_ENV || 'development'}`);
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('Servidor nao iniciado:', message);
+    process.exit(1);
+  }
 }
 
 startServer();

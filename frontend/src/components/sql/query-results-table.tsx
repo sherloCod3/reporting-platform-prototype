@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useMemo } from "react";
-import { Clock, Download, Table2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import type { QueryResult } from "@shared/types/report.types";
+import { useMemo } from 'react';
+import { Clock, Download, Table2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import type { QueryResult } from '@shared/types/report.types';
 
 interface QueryResultsTableProps {
   result: QueryResult;
@@ -18,36 +18,35 @@ export function QueryResultsTable({ result }: QueryResultsTableProps) {
   }, [result.duration]);
 
   const formatCellValue = (value: unknown): string => {
-    if (value === null) return "NULL";
-    if (value === undefined) return "";
-    if (typeof value === "boolean") return value ? "TRUE" : "FALSE";
-    if (typeof value === "object") return JSON.stringify(value);
+    if (value === null) return 'NULL';
+    if (value === undefined) return '';
+    if (typeof value === 'boolean') return value ? 'TRUE' : 'FALSE';
+    if (typeof value === 'object') return JSON.stringify(value);
     return String(value);
   };
 
   const exportToCSV = () => {
-    const headers = result.columns.join(",");
+    const headers = result.columns.join(',');
     const rows = result.rows
-      .map((row) =>
+      .map(row =>
         result.columns
-          .map((col) => {
+          .map(col => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const cell = (row as any)[col];
             const value = formatCellValue(cell);
-            // Escape quotes and wrap in quotes if contains comma
-            if (value.includes(",") || value.includes('"')) {
+            if (value.includes(',') || value.includes('"')) {
               return `"${value.replace(/"/g, '""')}"`;
             }
             return value;
           })
-          .join(","),
+          .join(',')
       )
-      .join("\n");
+      .join('\n');
 
     const csv = `${headers}\n${rows}`;
-    const blob = new Blob([csv], { type: "text/csv" });
+    const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     a.href = url;
     a.download = `query-results-${Date.now()}.csv`;
     a.click();
@@ -56,7 +55,6 @@ export function QueryResultsTable({ result }: QueryResultsTableProps) {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Results Header */}
       <div className="flex items-center justify-between px-3 py-2 border-b border-border bg-muted/20">
         <div className="flex items-center gap-4 text-xs text-muted-foreground">
           <div className="flex items-center gap-1">
@@ -73,13 +71,13 @@ export function QueryResultsTable({ result }: QueryResultsTableProps) {
           variant="outline"
           size="sm"
           onClick={exportToCSV}
-          className="flex items-center gap-1">
+          className="flex items-center gap-1"
+        >
           <Download className="w-4 h-4" />
           Export CSV
         </Button>
       </div>
 
-      {/* Results Table */}
       <div className="flex-1 overflow-auto">
         <table className="w-full text-sm">
           <thead className="bg-muted/40 sticky top-0">
@@ -87,7 +85,8 @@ export function QueryResultsTable({ result }: QueryResultsTableProps) {
               {result.columns.map((column, index) => (
                 <th
                   key={index}
-                  className="p-2 text-left font-semibold border-b border-border whitespace-nowrap text-xs text-muted-foreground">
+                  className="p-2 text-left font-semibold border-b border-border whitespace-nowrap text-xs text-muted-foreground"
+                >
                   {column}
                 </th>
               ))}
@@ -97,7 +96,8 @@ export function QueryResultsTable({ result }: QueryResultsTableProps) {
             {result.rows.map((row, rowIndex) => (
               <tr
                 key={rowIndex}
-                className="border-b border-border hover:bg-muted/30">
+                className="border-b border-border hover:bg-muted/30"
+              >
                 {result.columns.map((column, cellIndex) => {
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   const cell = (row as any)[column];
@@ -105,7 +105,8 @@ export function QueryResultsTable({ result }: QueryResultsTableProps) {
                     <td
                       key={cellIndex}
                       className="p-2 max-w-md truncate"
-                      title={formatCellValue(cell)}>
+                      title={formatCellValue(cell)}
+                    >
                       {cell === null ? (
                         <span className="text-slate-400 italic">NULL</span>
                       ) : (

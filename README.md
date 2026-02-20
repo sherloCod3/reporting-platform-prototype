@@ -1,9 +1,9 @@
-# 📊 Reporting Platform Prototype
+# Reporting Platform Prototype
 
-> 🚧 Technical prototype of a modern full-stack reporting system  
+> Technical prototype of a full-stack reporting system.  
 > Built for experimentation, architecture validation, and portfolio demonstration.
 
-⚠️ **Disclaimer**  
+**Disclaimer**  
 This repository represents a **technical prototype**.  
 Product name, branding, licensing, and commercial availability are subject to change.  
 This project may serve as the foundation for a future proprietary product.
@@ -18,29 +18,29 @@ This project may serve as the foundation for a future proprietary product.
 
 ---
 
-## 📋 **Table of Contents**
+## Table of Contents
 
-- [Overview](#-overview)
-- [Features](#-features)
-- [Tech Stack](#-tech-stack)
-- [Getting Started](#-getting-started)
-- [Project Structure](#-project-structure)
-- [Environment Variables](#-environment-variables)
-- [Development](#-development)
-- [Deployment](#-deployment)
-- [Contributing](#-contributing)
-- [License](#-license)
+- [Overview](#overview)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Getting Started](#getting-started)
+- [Project Structure](#project-structure)
+- [Environment Variables](#environment-variables)
+- [Development](#development)
+- [Deployment](#deployment)
+- [Contributing](#contributing)
+- [License](#license)
 
 ---
 
-## 🎯 Overview
+## Overview
 
-This project is a modern, self-hosted reporting platform prototype inspired by
-enterprise reporting tools. It focuses on performance, security, and developer
-experience, allowing teams to execute SQL-based reports and export them as
-professional documents.
+This project is a self-hosted reporting platform prototype inspired by
+enterprise reporting tools. It allows teams to execute SQL-based reports
+and export them as PDF documents.
 
 The main goal of this repository is to explore:
+
 - Reporting system architecture
 - Secure SQL execution
 - PDF generation pipelines
@@ -48,31 +48,31 @@ The main goal of this repository is to explore:
 
 ---
 
-## ✨ **Features**
+## Features
 
-### **Current (v0.1.0)**
+### Current (v0.1.0)
 
-- ✅ SQL query execution with validation
-- ✅ Professional PDF export (Puppeteer)
-- ✅ Real-time query results display
-- ✅ Docker Compose setup
-- ✅ TypeScript throughout
-- ✅ Rate limiting & security
+- SQL query execution with validation
+- PDF export (Puppeteer)
+- Query results display
+- Docker Compose setup
+- TypeScript throughout
+- Rate limiting and security
 
-### **Planned (v0.2.0+)**
+### Planned (v0.2.0+)
 
-- 🔄 Pagination & performance optimization
-- 🔄 JWT authentication
-- 🔄 Saved query templates
-- 🔄 Excel export
-- 🔄 Interactive charts
-- 🔄 Scheduled reports
+- Pagination and performance optimization
+- JWT authentication
+- Saved query templates
+- Excel export
+- Interactive charts
+- Scheduled reports
 
 ---
 
-## 🛠️ **Tech Stack**
+## Tech Stack
 
-### **Backend**
+### Backend
 
 - **Runtime:** Node.js 20+
 - **Framework:** Express.js
@@ -81,7 +81,7 @@ The main goal of this repository is to explore:
 - **PDF:** Puppeteer 21
 - **ORM:** mysql2 (native driver)
 
-### **Frontend**
+### Frontend
 
 - **Framework:** React 19
 - **Build Tool:** Vite 5
@@ -90,24 +90,24 @@ The main goal of this repository is to explore:
 - **HTTP:** Axios
 - **Icons:** Lucide React
 
-### **Infrastructure**
+### Infrastructure
 
 - **Containerization:** Docker + Docker Compose
-- **Reverse Proxy:** (Nginx - planned)
+- **Reverse Proxy:** Nginx (planned)
 - **CI/CD:** GitHub Actions (planned)
-- **Monitoring:** (Planned)
+- **Monitoring:** Planned
 
 ---
 
-## 🚀 **Getting Started**
+## Getting Started
 
-### **Prerequisites**
+### Prerequisites
 
 - Node.js 20+ ([Download](https://nodejs.org/))
 - Docker & Docker Compose ([Download](https://www.docker.com/))
 - Git ([Download](https://git-scm.com/))
 
-### **Quick Start (5 minutes)**
+### Quick Start
 
 ```bash
 # 1. Clone the repository
@@ -127,12 +127,12 @@ docker-compose up -d
 # MySQL:    localhost:3306
 ```
 
-### **Manual Setup (Alternative)**
+### Manual Setup (Alternative)
 
 <details>
 <summary>Click to expand</summary>
 
-#### **Backend Setup**
+#### Backend Setup
 
 ```bash
 cd backend
@@ -152,7 +152,7 @@ npm run dev
 # Backend available at http://localhost:3000
 ```
 
-#### **Frontend Setup**
+#### Frontend Setup
 
 ```bash
 cd frontend
@@ -169,7 +169,7 @@ npm run dev
 # Frontend available at http://localhost:5173
 ```
 
-#### **Database Setup**
+#### Database Setup
 
 ```bash
 # Start MySQL locally or use Docker
@@ -188,7 +188,7 @@ docker run -d \
 
 ---
 
-## 📁 **Project Structure**
+## Project Structure
 
 ```
 reporting-platform-prototype/
@@ -227,9 +227,9 @@ reporting-platform-prototype/
 
 ---
 
-## ⚙️ **Environment Variables**
+## Environment Variables
 
-### **Required Variables**
+### Required Variables
 
 Create a `.env` file in the project root:
 
@@ -250,7 +250,7 @@ VITE_API_URL=http://localhost:3000/api
 VITE_API_TIMEOUT=30000
 ```
 
-### **Optional Variables**
+### Optional Variables
 
 ```bash
 # Puppeteer
@@ -261,15 +261,15 @@ VITE_ENABLE_EXPORT_PDF=true
 VITE_ENABLE_SAVE_QUERIES=false
 ```
 
-**🔒 Security Note:** Never commit `.env` to version control!
+**Security Note:** Never commit `.env` to version control.
 
 ---
 
-## 💻 **Development**
+## Development
 
-### **Available Scripts**
+### Available Scripts
 
-#### **Backend**
+#### Backend
 
 ```bash
 npm run dev      # Start with hot-reload (ts-node-dev)
@@ -278,7 +278,7 @@ npm run start    # Start production build
 npm test         # Run tests (planned)
 ```
 
-#### **Frontend**
+#### Frontend
 
 ```bash
 npm run dev      # Start Vite dev server
@@ -287,13 +287,13 @@ npm run preview  # Preview production build
 npm run lint     # Run ESLint
 ```
 
-### **Code Style**
+### Code Style
 
 - **Linting:** ESLint with TypeScript rules
 - **Formatting:** Prettier (planned)
 - **Commits:** Conventional Commits (enforced)
 
-### **Branching Strategy**
+### Branching Strategy
 
 ```
 main           → Production-ready code
@@ -303,7 +303,7 @@ fix/*          → Bug fixes
 hotfix/*       → Urgent production fixes
 ```
 
-### **Making Changes**
+### Making Changes
 
 ```bash
 # 1. Create feature branch
@@ -320,9 +320,9 @@ git push -u origin feature/your-feature-name
 
 ---
 
-## 🐳 **Docker**
+## Docker
 
-### **Build Images**
+### Build Images
 
 ```bash
 # Build all services
@@ -332,7 +332,7 @@ docker-compose build
 docker-compose build backend
 ```
 
-### **Manage Containers**
+### Manage Containers
 
 ```bash
 # Start services
@@ -352,7 +352,7 @@ docker-compose exec backend sh
 docker-compose exec mysql mysql -u root -p
 ```
 
-### **Data Persistence**
+### Data Persistence
 
 MySQL data is persisted in a Docker volume:
 
@@ -369,9 +369,9 @@ docker-compose exec -T mysql mysql -u root -p relatorios < backup.sql
 
 ---
 
-## 🚢 **Deployment**
+## Deployment
 
-### **Production Checklist**
+### Production Checklist
 
 - [ ] Set `NODE_ENV=production`
 - [ ] Use strong passwords (16+ chars)
@@ -381,7 +381,7 @@ docker-compose exec -T mysql mysql -u root -p relatorios < backup.sql
 - [ ] Configure backups
 - [ ] Review security best practices
 
-### **Deployment Options**
+### Deployment Options
 
 <details>
 <summary>AWS (Recommended)</summary>
@@ -415,11 +415,11 @@ docker-compose exec -T mysql mysql -u root -p relatorios < backup.sql
 
 ---
 
-## 🤝 **Contributing**
+## Contributing
 
 Please follow these guidelines:
 
-### **Commit Messages**
+### Commit Messages
 
 Follow [Conventional Commits](https://www.conventionalcommits.org/):
 
@@ -433,7 +433,7 @@ test: add tests
 chore: maintenance tasks
 ```
 
-### **Pull Request Process**
+### Pull Request Process
 
 1. Fork the repository
 2. Create your feature branch
@@ -442,7 +442,7 @@ chore: maintenance tasks
 5. Update documentation
 6. Submit PR with clear description
 
-### **Code Review**
+### Code Review
 
 - All PRs require 1 approval
 - Address review comments
@@ -450,9 +450,9 @@ chore: maintenance tasks
 
 ---
 
-## 📊 **Roadmap**
+## Roadmap
 
-### **Q1 2025 (Prototype Phase)**
+### Q1 2025 (Prototype Phase)
 
 - [x] Core SQL execution
 - [x] PDF export
@@ -460,14 +460,15 @@ chore: maintenance tasks
 - [x] Authentication (JWT)
 - [x] Multi-tenant support
 
-### **Q2 2025**
+### Q2 2025
+
 - [ ] Visual query builder
 - [ ] Advanced filters
 - [ ] Advanced tools
 - [ ] Interactive charts
 - [ ] Saved templates
 
-### **Q3 2025**
+### Q3 2025
 
 - [ ] Excel export
 - [ ] Dashboard analytics
@@ -475,7 +476,7 @@ chore: maintenance tasks
 
 ---
 
-## 📝 License
+## License
 
 This repository contains proprietary source code and is shared publicly
 for demonstration and portfolio purposes only.
@@ -486,31 +487,31 @@ Future licensing terms may change upon product officialization.
 
 ---
 
-## 👥 **Team**
+## Team
 
-- **Developer:** Alexandre Cavalari  ([@github](https://github.com/sherlocod3))
+- **Developer:** Alexandre Cavalari ([@github](https://github.com/sherlocod3))
 - **Contributors:** See [CONTRIBUTORS.md](./CONTRIBUTORS.md)
 
 ---
 
-## 📞 **Support**
+## Support
 
-### **Issues & Bugs**
+### Issues and Bugs
 
 Report bugs via [GitHub Issues](https://github.com/sherlocod3/reporting-platform-prototype/issues)
 
-### **Questions**
+### Questions
 
-- 📧 Email: alexandre.cavalari@doqr.com.br
+- Email: alexandre.cavalari@doqr.com.br
 
-### **Documentation**
+### Documentation
 
-- 📖 [Wiki](https://github.com/YOUR-USERNAME/reporting-platform-prototype/wiki) (planned)
-- 📚 [API Docs](https://api.notreadyyet.com/docs) (planned)
+- [Wiki](https://github.com/YOUR-USERNAME/reporting-platform-prototype/wiki) (planned)
+- [API Docs](https://api.notreadyyet.com/docs) (planned)
 
 ---
 
-## 🙏 **Acknowledgments**
+## Acknowledgments
 
 - Inspired by Bold Reports
 - Built with [Express](https://expressjs.com/)
@@ -519,7 +520,7 @@ Report bugs via [GitHub Issues](https://github.com/sherlocod3/reporting-platform
 
 ---
 
-## 📈 **Stats**
+## Stats
 
 ![GitHub last commit](https://img.shields.io/github/last-commit/sherlocod3/reporting-platform-prototype)
 ![GitHub issues](https://img.shields.io/github/issues/sherlocod3/reporting-platform-prototype)
@@ -527,4 +528,4 @@ Report bugs via [GitHub Issues](https://github.com/sherlocod3/reporting-platform
 
 ---
 
-**Made with ❤️ by [Alexandre Cavalari - DoQR]**
+**Made by Alexandre Cavalari - DoQR**

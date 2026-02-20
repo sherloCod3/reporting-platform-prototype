@@ -1,29 +1,29 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { Plus, Pencil, Trash2, Search, RefreshCw } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useEffect, useState } from 'react';
+import { Plus, Pencil, Trash2, Search, RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+  TableRow
+} from '@/components/ui/table';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { toast } from "sonner";
-import { UserService, User } from "@/services/users/users";
-import { UserForm } from "@/components/users/user-form";
+  DialogTitle
+} from '@/components/ui/dialog';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
+import { UserService, User } from '@/services/users/users';
+import { UserForm } from '@/components/users/user-form';
 
 /**
  * User Management Dashboard Page.
@@ -32,7 +32,7 @@ import { UserForm } from "@/components/users/user-form";
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
@@ -42,7 +42,7 @@ export default function UsersPage() {
       const data = await UserService.getAll();
       setUsers(data);
     } catch {
-      toast.error("Could not fetch user list.");
+      toast.error('Could not fetch user list.');
     } finally {
       setIsLoading(false);
     }
@@ -57,10 +57,10 @@ export default function UsersPage() {
 
     try {
       await UserService.delete(user.id);
-      toast.success("User deleted");
+      toast.success('User deleted');
       loadUsers();
     } catch {
-      toast.error("Failed to delete user");
+      toast.error('Failed to delete user');
     }
   };
 
@@ -80,10 +80,10 @@ export default function UsersPage() {
   };
 
   const filteredUsers = users.filter(
-    (u) =>
+    u =>
       u.email.toLowerCase().includes(search.toLowerCase()) ||
       u.role.toLowerCase().includes(search.toLowerCase()) ||
-      u.client_slug?.toLowerCase().includes(search.toLowerCase()),
+      u.client_slug?.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -97,7 +97,8 @@ export default function UsersPage() {
         </div>
         <Button
           onClick={handleCreate}
-          className="bg-blue-600 hover:bg-blue-700">
+          className="bg-blue-600 hover:bg-blue-700"
+        >
           <Plus className="mr-2 h-4 w-4" /> Add User
         </Button>
       </div>
@@ -113,16 +114,17 @@ export default function UsersPage() {
                   placeholder="Search users..."
                   className="pl-8"
                   value={search}
-                  onChange={(e) => setSearch(e.target.value)}
+                  onChange={e => setSearch(e.target.value)}
                 />
               </div>
               <Button
                 variant="outline"
                 size="icon"
                 onClick={loadUsers}
-                title="Refresh">
+                title="Refresh"
+              >
                 <RefreshCw
-                  className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`}
+                  className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`}
                 />
               </Button>
             </div>
@@ -146,7 +148,8 @@ export default function UsersPage() {
                   <TableRow>
                     <TableCell
                       colSpan={6}
-                      className="text-center py-8 text-muted-foreground">
+                      className="text-center py-8 text-muted-foreground"
+                    >
                       Loading users...
                     </TableCell>
                   </TableRow>
@@ -154,12 +157,13 @@ export default function UsersPage() {
                   <TableRow>
                     <TableCell
                       colSpan={6}
-                      className="text-center py-8 text-muted-foreground">
+                      className="text-center py-8 text-muted-foreground"
+                    >
                       No users found.
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredUsers.map((user) => (
+                  filteredUsers.map(user => (
                     <TableRow key={user.id}>
                       <TableCell>{user.id}</TableCell>
                       <TableCell className="font-medium">
@@ -189,13 +193,15 @@ export default function UsersPage() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => handleEdit(user)}>
+                            onClick={() => handleEdit(user)}
+                          >
                             <Pencil className="h-4 w-4 text-gray-500" />
                           </Button>
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => handleDelete(user)}>
+                            onClick={() => handleDelete(user)}
+                          >
                             <Trash2 className="h-4 w-4 text-red-500" />
                           </Button>
                         </div>
@@ -213,15 +219,15 @@ export default function UsersPage() {
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle>
-              {selectedUser ? "Edit User" : "Create New User"}
+              {selectedUser ? 'Edit User' : 'Create New User'}
             </DialogTitle>
             <DialogDescription className="sr-only">
               User creation and editing form
             </DialogDescription>
             <DialogDescription>
               {selectedUser
-                ? "Update user details and permissions."
-                : "Add a new user to the system."}
+                ? 'Update user details and permissions.'
+                : 'Add a new user to the system.'}
             </DialogDescription>
           </DialogHeader>
 

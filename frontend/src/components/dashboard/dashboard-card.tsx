@@ -1,5 +1,5 @@
-import { cn } from "@/lib/utils";
-import { LucideIcon } from "lucide-react";
+import { cn } from '@/lib/utils';
+import { LucideIcon } from 'lucide-react';
 
 interface DashboardCardProps {
   title: string;
@@ -14,16 +14,17 @@ export function DashboardCard({
   description,
   icon: Icon,
   action,
-  onClick,
+  onClick
 }: DashboardCardProps) {
   return (
     <div
       onClick={onClick}
       className={cn(
-        "bg-card rounded-lg border border-border overflow-hidden",
-        "hover:border-primary/50 hover:shadow-sm",
-        "ui-motion duration-200 cursor-pointer group flex flex-col h-full",
-      )}>
+        'bg-card rounded-lg border border-border overflow-hidden',
+        'hover:border-primary/50 hover:shadow-sm',
+        'ui-motion duration-200 cursor-pointer group flex flex-col h-full'
+      )}
+    >
       <div className="bg-muted/40 border-l-2 border-l-primary h-20 flex items-center px-4">
         <Icon className="w-5 h-5 text-primary" />
       </div>

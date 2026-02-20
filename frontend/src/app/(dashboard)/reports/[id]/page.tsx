@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useParams } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
-import { reportApi } from "@/features/reports/api/reportApi";
-import { ReportEditor } from "@/components/reports/report-editor";
-import { Skeleton } from "@/components/ui/skeleton";
+import { useParams } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
+import { reportApi } from '@/features/reports/api/reportApi';
+import { ReportEditor } from '@/components/reports/report-editor';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function EditReportPage() {
   const params = useParams();
@@ -14,10 +14,10 @@ export default function EditReportPage() {
   const {
     data: report,
     isLoading,
-    isError,
+    isError
   } = useQuery({
-    queryKey: ["report", reportId],
-    queryFn: () => reportApi.getById(reportId),
+    queryKey: ['report', reportId],
+    queryFn: () => reportApi.getById(reportId)
   });
 
   if (isLoading) {
@@ -39,7 +39,7 @@ export default function EditReportPage() {
       initialData={{
         title: report?.title,
         description: report?.description,
-        components: report?.components,
+        components: report?.components
       }}
     />
   );

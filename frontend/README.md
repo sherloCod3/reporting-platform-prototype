@@ -1,27 +1,31 @@
-# QReports - Professional Frontend
+# QReports - Frontend
 
-Modern, production-grade frontend for QReports, built with Next.js 14+ (App Router), TypeScript, and Shadcn/UI.
-Designed to be calm, legible, and optimized for heavy data workloads.
+Frontend for QReports, built with Next.js 14+ (App Router), TypeScript, and Shadcn/UI.
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
+
 - Node.js 18+
 - Backend running (see `backend/README.md` or root README)
 
 ### Installation
+
 ```bash
 cd frontend
 npm install
 ```
 
 ### Running Locally
+
 ```bash
 npm run dev
 ```
+
 The app will be available at `http://localhost:3000`.
 
-## 🛠 Tech Stack
+## Tech Stack
+
 - **Framework**: Next.js 14 (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS + Shadcn/UI (Radix Primitives)
@@ -30,7 +34,8 @@ The app will be available at `http://localhost:3000`.
 - **Forms**: React Hook Form + Zod
 - **Tables**: TanStack Table (Headless)
 
-## 🔗 Backend Integration
+## Backend Integration
+
 This frontend connects to the Express backend.
 The backend was extended with the following endpoints to support the frontend:
 
@@ -41,14 +46,16 @@ The backend was extended with the following endpoints to support the frontend:
 - `PUT /api/definitions/:id`: Update report.
 - `POST /api/reports/execute`: Execute report SQL.
 
-## ⚙️ Environment Variables
+## Environment Variables
+
 Create a `.env.local` file in the `frontend` directory:
 
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:3000/api
 ```
 
-## 📂 Project Structure
+## Project Structure
+
 - `app/`: Next.js App Router pages and layouts.
   - `(auth)/`: Authentication routes (Login).
   - `(dashboard)/`: Protected routes (Main app).
@@ -58,9 +65,10 @@ NEXT_PUBLIC_API_URL=http://localhost:3000/api
 - `contexts/`: Global state (AuthContext).
 - `lib/`: Utilities (API client, Query Client).
 
-## ✨ Key Features
+## Key Features
+
 - **AppShell**: Responsive sidebar, mobile support.
-- **Authentication**: Secure JWT auth with interceptors.
-- **Report Builder**: Create/Edit SQL reports with metadata.
-- **Report Runner**: Execute SQL and view results in a paginated table.
-- **Data Visualization**: Clean, tabular data presentation.
+- **Authentication**: JWT auth with interceptors.
+- **Report Builder**: Create and edit SQL reports with metadata.
+- **Report Runner**: Execute SQL and view results in a table.
+- **Data Visualization**: Tabular data presentation.

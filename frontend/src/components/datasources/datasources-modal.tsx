@@ -1,25 +1,25 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+  DialogFooter
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Database,
   Plus,
   Trash2,
   Edit2,
   Server,
-  CheckCircle2,
-} from "lucide-react";
+  CheckCircle2
+} from 'lucide-react';
 
 interface DatasourcesModalProps {
   open: boolean;
@@ -28,36 +28,34 @@ interface DatasourcesModalProps {
 
 export function DatasourcesModal({
   open,
-  onOpenChange,
+  onOpenChange
 }: DatasourcesModalProps) {
-  const [view, setView] = useState<"list" | "form">("list");
+  const [view, setView] = useState<'list' | 'form'>('list');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Mock data
   const [datasources] = useState([
     {
       id: 1,
-      name: "Banco Principal",
-      type: "PostgreSQL",
-      host: "localhost",
-      port: "5432",
+      name: 'Banco Principal',
+      type: 'PostgreSQL',
+      host: 'localhost',
+      port: '5432'
     },
     {
       id: 2,
-      name: "DW Analytics",
-      type: "MySQL",
-      host: "192.168.1.5",
-      port: "3306",
-    },
+      name: 'DW Analytics',
+      type: 'MySQL',
+      host: '192.168.1.5',
+      port: '3306'
+    }
   ]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 1000));
     setIsLoading(false);
-    setView("list");
+    setView('list');
   };
 
   return (
@@ -70,29 +68,28 @@ export function DatasourcesModal({
               Fontes de Dados
             </DialogTitle>
             <DialogDescription className="text-xs text-muted-foreground">
-              {view === "list"
-                ? "Gerencie suas conexões de banco de dados."
-                : "Configure os detalhes da sua conexão."}
+              {view === 'list'
+                ? 'Gerencie suas conexões de banco de dados.'
+                : 'Configure os detalhes da sua conexão.'}
             </DialogDescription>
           </DialogHeader>
         </div>
 
         <div className="p-6">
-          {view === "list" ? (
+          {view === 'list' ? (
             <div className="space-y-4">
               <div className="grid gap-3">
-                {datasources.map((ds) => (
+                {datasources.map(ds => (
                   <div
                     key={ds.id}
-                    className="group flex items-center justify-between p-4 rounded-lg border border-border hover:border-primary/50 hover:shadow-sm transition-all bg-background">
+                    className="group flex items-center justify-between p-4 rounded-lg border border-border hover:border-primary/50 hover:shadow-sm transition-all bg-background"
+                  >
                     <div className="flex items-center gap-4">
                       <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground group-hover:text-primary transition-colors">
                         <Server className="h-5 w-5" />
                       </div>
                       <div>
-                        <h4 className="font-semibold">
-                          {ds.name}
-                        </h4>
+                        <h4 className="font-semibold">{ds.name}</h4>
                         <p className="text-xs text-muted-foreground">
                           {ds.type} • {ds.host}:{ds.port}
                         </p>
@@ -102,22 +99,22 @@ export function DatasourcesModal({
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 hover:text-primary">
+                        className="h-8 w-8 hover:text-primary"
+                      >
                         <Edit2 className="h-4 w-4" />
                       </Button>
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 hover:text-red-600">
+                        className="h-8 w-8 hover:text-red-600"
+                      >
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>
                 ))}
               </div>
-              <Button
-                onClick={() => setView("form")}
-                className="w-full">
+              <Button onClick={() => setView('form')} className="w-full">
                 <Plus className="mr-2 h-4 w-4" /> Nova Conexão
               </Button>
             </div>
@@ -168,20 +165,19 @@ export function DatasourcesModal({
                 <Button
                   type="button"
                   variant="ghost"
-                  onClick={() => setView("list")}>
+                  onClick={() => setView('list')}
+                >
                   Cancelar
                 </Button>
                 <Button
                   type="button"
                   variant="outline"
-                  className="text-green-600 border-green-200 hover:bg-green-50">
+                  className="text-green-600 border-green-200 hover:bg-green-50"
+                >
                   <CheckCircle2 className="mr-2 h-4 w-4" /> Testar
                 </Button>
-                <Button
-                  type="submit"
-                  disabled={isLoading}
-                  className="">
-                  {isLoading ? "Salvando..." : "Salvar Conexão"}
+                <Button type="submit" disabled={isLoading} className="">
+                  {isLoading ? 'Salvando...' : 'Salvar Conexão'}
                 </Button>
               </DialogFooter>
             </form>

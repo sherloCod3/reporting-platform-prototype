@@ -1,1 +1,1 @@
-export * from "@shared/types/api.types.js";
+export * from '@shared/types/api.types.js';

@@ -1,12 +1,12 @@
-import { useState } from "react";
-import axios from "axios";
+import { useState } from 'react';
+import axios from 'axios';
 import { Play, Download, AlertCircle, CheckCircle } from 'lucide-react';
 
 const API_URL = 'http://localhost:3000/api/reports';
 
 interface QueryResult {
   success: boolean;
-  data?: any [];
+  data?: any[];
   meta?: {
     rowCount: number;
     executionTime: string;
@@ -17,7 +17,9 @@ interface QueryResult {
 
 function App() {
   const [query, setQuery] = useState('SELECT * FROM clientes LIMIT 10');
-  const [resumeToPipeableStream, setResult] = useState<QueryResult | null>(null);
+  const [resumeToPipeableStream, setResult] = useState<QueryResult | null>(
+    null
+  );
   const [loading, setLoading] = useState(false);
 
   // Executar query
@@ -29,12 +31,14 @@ function App() {
       const response = await axios.post(`${API_URL}/execute`, { query });
       setResult(response.data);
     } catch (error: any) {
-      setResult(error.response?.data || {
-        success: false,
-        message: 'Erro desconhecido ao executar consulta'
-      });
+      setResult(
+        error.response?.data || {
+          success: false,
+          message: 'Erro desconhecido ao executar consulta'
+        }
+      );
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   };
 
@@ -62,7 +66,7 @@ function App() {
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Erro ao exportar PDF:', error);
-      alert ('❌ Erro ao gerar PDF');
+      alert('❌ Erro ao gerar PDF');
     }
   };
 
@@ -74,9 +78,7 @@ function App() {
           <h1 className="text-3xl font-bold text-gray-800 mb-2">
             📊 Ferramenta de Relatórios MVP
           </h1>
-          <p className="text-gray-600">
-            Conectado ao MySQL • Versão 1.0.0
-          </p>
+          <p className="text-gray-600">Conectado ao MySQL • Versão 1.0.0</p>
         </div>
 
         {/* Editor SQL */}
@@ -86,7 +88,7 @@ function App() {
           </label>
           <textarea
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={e => setQuery(e.target.value)}
             className="w-full h-40 p-4 border border-gray-300 rounded-lg font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="Digite sua query SQL aqui..."
           />
@@ -131,7 +133,7 @@ function App() {
                 <table id="result-table" className="w-full border-collapse">
                   <thead>
                     <tr className="bg-gray-100">
-                      {Object.keys(result.data[0]).map((col) => (
+                      {Object.keys(result.data[0]).map(col => (
                         <th
                           key={col}
                           className="border border-gray-300 px-4 py-2 text-left font-bold text-gray-700"

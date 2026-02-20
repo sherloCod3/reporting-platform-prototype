@@ -2,46 +2,38 @@ import axios from 'axios';
 import { API_URL } from './constants';
 
 export const api = axios.create({
-    baseURL: API_URL,
-    headers: {
-        'Content-Type': 'application/json',
-    },
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json'
+  }
 });
 
-/**
- * Request interceptor
- * Automatically attaches the authentication token to every outgoing request.
- * This ensures that protected routes are accessible without manually adding headers.
- */
-api.interceptors.request.use((config) => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('@qreports:token') : null;
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
+/** Anexa o token JWT em todas as requisicoes de saida. */
+api.interceptors.request.use(config => {
+  const token =
+    typeof window !== 'undefined'
+      ? localStorage.getItem('@qreports:token')
+      : null;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
-/**
- * Response interceptor
- * centralized error handling for authentication failures.
- * If the API returns a 401 Unauthorized, we clear the session and redirect the user to the login page.
- */
+/** Redireciona para /login ao receber 401, limpando a sessao. */
 api.interceptors.response.use(
-    (response) => response,
-    (error) => {
-        if (error.response?.status === 401) {
-            if (typeof window !== 'undefined') {
-                localStorage.removeItem('@qreports:token');
-                localStorage.removeItem('@qreports:user');
+  response => response,
+  error => {
+    if (error.response?.status === 401) {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('@qreports:token');
+        localStorage.removeItem('@qreports:user');
 
-                // Prevent infinite redirect loops if already on the login page
-                if (!window.location.pathname.includes('/login')) {
-                    window.location.href = '/login';
-                }
-            }
+        if (!window.location.pathname.includes('/login')) {
+          window.location.href = '/login';
         }
-        return Promise.reject(error);
+      }
     }
+    return Promise.reject(error);
+  }
 );
-
-

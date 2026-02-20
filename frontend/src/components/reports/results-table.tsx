@@ -6,16 +6,20 @@ import {
   TableCell,
   TableHead,
   TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+  TableRow
+} from '@/components/ui/table';
 
 interface ResultsTableProps {
-    data: Record<string, unknown>[];
+  data: Record<string, unknown>[];
 }
 
 export function ResultsTable({ data }: ResultsTableProps) {
   if (!data || data.length === 0) {
-    return <div className="text-center p-4 text-gray-500">Nenhum dado encontrado.</div>;
+    return (
+      <div className="text-center p-4 text-gray-500">
+        Nenhum dado encontrado.
+      </div>
+    );
   }
 
   const columns = Object.keys(data[0]);
@@ -25,7 +29,7 @@ export function ResultsTable({ data }: ResultsTableProps) {
       <Table>
         <TableHeader>
           <TableRow>
-            {columns.map((col) => (
+            {columns.map(col => (
               <TableHead key={col}>{col}</TableHead>
             ))}
           </TableRow>
@@ -33,7 +37,7 @@ export function ResultsTable({ data }: ResultsTableProps) {
         <TableBody>
           {data.map((row, i) => (
             <TableRow key={i}>
-              {columns.map((col) => (
+              {columns.map(col => (
                 <TableCell key={col}>{String(row[col])}</TableCell>
               ))}
             </TableRow>

@@ -1,25 +1,19 @@
-import type { QueryResult } from "@shared/types/report.types.js";
-
-// Re-export specific types used internally if needed, or deprecate this file in favor of direct imports.
-// For now, we keep it but point to shared types to avoid breaking changes in imports if possible, 
-// though direct imports are preferred.
+import type { QueryResult } from '@shared/types/report.types.js';
 
 export type { QueryResult };
 
-// Frontend envia para executar
 export interface ExecuteQueryRequest {
-    query: string;
-    params?: any[]; // statements futuros
+  query: string;
+  params?: any[];
 }
 
-// Frontend envia para gerar PDF
 export interface GeneratePdfRequest {
-    htmlContent: string;
-    title?: string;
-    orientation?: 'portrait' | 'landscape';
+  htmlContent: string;
+  title?: string;
+  orientation?: 'portrait' | 'landscape';
 }
 
 export interface ReportExecutionResult {
-    success: boolean;
-    data: QueryResult;
+  success: boolean;
+  data: QueryResult;
 }

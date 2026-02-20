@@ -1,7 +1,7 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* QReports Global Styles */
-@import "tw-animate-css";
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -75,10 +75,10 @@
   --input: oklch(0.88 0.02 265);
   --ring: oklch(0.45 0.15 265); /* Matches primary */
   --chart-1: oklch(0.45 0.15 265); /* Blue */
-  --chart-2: oklch(0.60 0.12 180); /* Teal */
-  --chart-3: oklch(0.60 0.12 30);  /* Ochre */
-  --chart-4: oklch(0.55 0.10 300); /* Purple */
-  --chart-5: oklch(0.65 0.15 10);  /* Red-Orange */
+  --chart-2: oklch(0.6 0.12 180); /* Teal */
+  --chart-3: oklch(0.6 0.12 30); /* Ochre */
+  --chart-4: oklch(0.55 0.1 300); /* Purple */
+  --chart-5: oklch(0.65 0.15 10); /* Red-Orange */
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.45 0.15 265);
@@ -99,37 +99,37 @@
 
 .dark {
   /* VS Code GitHub Dark Theme - Soft & Standardized */
-  --bg-app: #14181e;     /* Main Background (Darker Workspace) */
-  --bg-panel: #1f2428;   /* Sidebar / Panels */
+  --bg-app: #14181e; /* Main Background (Darker Workspace) */
+  --bg-panel: #1f2428; /* Sidebar / Panels */
   --bg-surface: #282e34; /* Cards / Elevated */
-  --bg-canvas: #24292e;  /* Report Canvas (Paper) */
+  --bg-canvas: #24292e; /* Report Canvas (Paper) */
 
   --background: var(--bg-app);
-  --foreground: #D1DEDF; /* Soft White */
+  --foreground: #d1dedf; /* Soft White */
 
   /* Surface Hierarchy */
   --card: var(--bg-surface);
-  --card-foreground: #D1DEDF;
-  
+  --card-foreground: #d1dedf;
+
   --popover: var(--bg-surface);
-  --popover-foreground: #D1DEDF;
-  
+  --popover-foreground: #d1dedf;
+
   /* Primary - Muted Blue */
-  --primary: #4C8BD4;
+  --primary: #4c8bd4;
   --primary-foreground: #24292e;
-  
+
   --secondary: #35393d; /* Input/Border Gray */
-  --secondary-foreground: #D1DEDF;
-  
+  --secondary-foreground: #d1dedf;
+
   --muted: #1f2428; /* Panel Background */
   --muted-foreground: #818b98; /* Disabled/Muted Gray */
-  
+
   --accent: #282e34; /* Surface Gray */
-  --accent-foreground: #D1DEDF;
-  
+  --accent-foreground: #d1dedf;
+
   --destructive: #d1242f; /* Red from user (or standard GitHub #da3633) */
   --destructive-foreground: #f0f6fc;
-  
+
   /* Borders - Subtle Gray */
   --border: #35393d;
   --input: #35393d;
@@ -137,24 +137,24 @@
 
   /* Border dark */
   --border-dark: #1b1f23;
-  
-  --chart-1: #4C8BD4; /* Primary Blue */
-  --chart-2: #30B44E; /* Green */
+
+  --chart-1: #4c8bd4; /* Primary Blue */
+  --chart-2: #30b44e; /* Green */
   --chart-3: #d1242f; /* Red */
   --chart-4: #e3b341; /* Yellow/Gold (standard GitHub) */
   --chart-5: #6f42c1; /* Purple (standard GitHub) */
-  
+
   /* Brand Overrides for Dark Mode */
-  --brand-primary: var(--primary);       /* #4C8BD4 */
-  --brand-primary-dark: #376b9f;         /* Darker shade of #4C8BD4 */
-  
+  --brand-primary: var(--primary); /* #4C8BD4 */
+  --brand-primary-dark: #376b9f; /* Darker shade of #4C8BD4 */
+
   /* Sidebar - Darker Panel */
   --sidebar: var(--bg-panel);
-  --sidebar-foreground: #D1DEDF;
-  --sidebar-primary: #4C8BD4;
+  --sidebar-foreground: #d1dedf;
+  --sidebar-primary: #4c8bd4;
   --sidebar-primary-foreground: #24292e;
   --sidebar-accent: #2e363d; /* Slightly lighter than panel for hover */
-  --sidebar-accent-foreground: #D1DEDF;
+  --sidebar-accent-foreground: #d1dedf;
   --sidebar-border: #35393d;
   --sidebar-ring: #58a6ff;
 }
@@ -170,86 +170,118 @@
 
 /* UI Motion */
 .ui-motion {
-    transition:
-        background-color 0.2s ease,
-        color 0.2s ease,
-        border-color 0.2s ease,
-        transform 0.2s ease,
-        opacity 0.2s ease,
-        box-shadow 0.2s ease;
-    will-change: transform;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    opacity 0.2s ease,
+    box-shadow 0.2s ease;
+  will-change: transform;
 }
 
 /* Scrollbar (shared) */
 ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: var(--scrollbar-thumb);
-    border-radius: 4px;
+  background: var(--scrollbar-thumb);
+  border-radius: 4px;
 }
 
 .dark ::-webkit-scrollbar-thumb {
-    background: var(--scrollbar-thumb-dark);
+  background: var(--scrollbar-thumb-dark);
 }
 
 /* Report Gradients */
 
 /* UI Kit Components */
 .ui-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    border-radius: 0.5rem;
-    padding: 0.75rem 1.25rem;
-    font-weight: 500;
-    border: 1px solid transparent;
-    cursor: pointer;
-    -webkit-user-select: none;
-    user-select: none;
-    transition: background-color 0.2s, color 0.2s, border-color 0.2s, transform 0.2s, opacity 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+  transition:
+    background-color 0.2s,
+    color 0.2s,
+    border-color 0.2s,
+    transform 0.2s,
+    opacity 0.2s;
 }
-.ui-btn:disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
-.ui-btn-primary { background: var(--brand-primary); color: #fff; }
+.ui-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.ui-btn-primary {
+  background: var(--brand-primary);
+  color: #fff;
+}
 
 /* Editor Specific Styles */
 .canvas-grid {
-    background-image: linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px),
-                      linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
-    background-size: var(--grid-size) var(--grid-size);
-    background-position: -1px -1px;
+  background-image:
+    linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+  background-size: var(--grid-size) var(--grid-size);
+  background-position: -1px -1px;
 }
 .dark .canvas-grid {
-    background-image: linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-                      linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
 }
 
 .guide-line {
-    position: absolute;
-    background: var(--brand-primary);
-    opacity: 0.5;
-    z-index: 40;
-    pointer-events: none;
+  position: absolute;
+  background: var(--brand-primary);
+  opacity: 0.5;
+  z-index: 40;
+  pointer-events: none;
 }
-.guide-line-vertical { width: 2px; height: 100%; }
-.guide-line-horizontal { height: 2px; width: 100%; }
-.snapped { box-shadow: 0 0 0 2px var(--brand-primary); }
+.guide-line-vertical {
+  width: 2px;
+  height: 100%;
+}
+.guide-line-horizontal {
+  height: 2px;
+  width: 100%;
+}
+.snapped {
+  box-shadow: 0 0 0 2px var(--brand-primary);
+}
 
 @keyframes modalFadeIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
-.modal-content { animation: modalFadeIn 0.2s ease-out; }
-
+.modal-content {
+  animation: modalFadeIn 0.2s ease-out;
+}
 
 .canvas-grid-pattern {
-    background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
-    background-size: 20px 20px;
+  background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 .dark .canvas-grid-pattern {
-    background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-image: radial-gradient(
+    rgba(255, 255, 255, 0.1) 1px,
+    transparent 1px
+  );
 }
 
 /* ============================================================
@@ -258,43 +290,43 @@
 
 /* Paper container — simulates a printed A4 page */
 .preview-paper {
-    box-sizing: border-box;
-    background: var(--bg-canvas, #fff);
+  box-sizing: border-box;
+  background: var(--bg-canvas, #fff);
 }
 
 /* Consistent vertical spacing between sections */
 .preview-section {
-    margin-bottom: 16px;
+  margin-bottom: 16px;
 }
 .preview-section:last-child {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 /* Header section — larger type scale for PDF fidelity */
 .preview-header h1 {
-    font-size: 1.25rem;
-    line-height: 1.3;
+  font-size: 1.25rem;
+  line-height: 1.3;
 }
 
 /* Table section — crisp grid lines for print */
 .preview-table table {
-    border-spacing: 0;
+  border-spacing: 0;
 }
 .preview-table th,
 .preview-table td {
-    font-size: 0.7rem;
+  font-size: 0.7rem;
 }
 
 /* Page break — dashed visual separator */
 .preview-page-break {
-    margin-top: 24px;
-    margin-bottom: 24px;
+  margin-top: 24px;
+  margin-bottom: 24px;
 }
 
 /* Composer sections — subtle selection animation */
 .composer-section {
-    transition:
-        border-color 0.2s ease,
-        box-shadow 0.2s ease,
-        background-color 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
 }

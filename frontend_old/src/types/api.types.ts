@@ -1,21 +1,21 @@
 export type DatabaseRow = Record<string, string | number | boolean | null>;
 
 export interface QueryResult<T = DatabaseRow> {
-    columns: string[];
-    rows: T[];
-    rowCount: number;
-    duration: number;
+  columns: string[];
+  rows: T[];
+  rowCount: number;
+  duration: number;
 }
 
 export interface ApiResponse<T> {
-    success: boolean;
-    data: T;
-    message?: string;
-    meta?: Record<string, string | number | boolean | null>;
+  success: boolean;
+  data: T;
+  message?: string;
+  meta?: Record<string, string | number | boolean | null>;
 }
 
 export interface PdfRequest {
-    htmlContent: string;
-    title?: string;
-    orientation?: 'portrait' | 'landscape';
+  htmlContent: string;
+  title?: string;
+  orientation?: 'portrait' | 'landscape';
 }

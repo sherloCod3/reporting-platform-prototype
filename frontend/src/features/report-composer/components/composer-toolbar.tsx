@@ -1,15 +1,7 @@
-"use client";
+'use client';
 
-/**
- * ComposerToolbar — Top toolbar for the report composer.
- *
- * Provides section insertion buttons, undo/redo, preview toggle,
- * and report name display. Matches the visual style of the existing
- * ReportEditor toolbar for consistency.
- */
-
-import React, { memo, useCallback } from "react";
-import { Button } from "@/components/ui/button";
+import React, { memo, useCallback } from 'react';
+import { Button } from '@/components/ui/button';
 import {
   FileText,
   Type,
@@ -18,36 +10,27 @@ import {
   Undo,
   Redo,
   Eye,
-  Pencil,
-} from "lucide-react";
-import type { SectionType } from "@/features/report-composer/types/composer.types";
-
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
+  Pencil
+} from 'lucide-react';
+import type { SectionType } from '@/features/report-composer/types/composer.types';
 
 interface ComposerToolbarProps {
-  /** Report name to display in the center */
   reportName: string;
-  /** Current view mode */
-  viewMode: "edit" | "preview";
-  /** Whether undo is available */
+
+  viewMode: 'edit' | 'preview';
+
   canUndo: boolean;
-  /** Whether redo is available */
+
   canRedo: boolean;
-  /** Called when a section type is inserted */
+
   onInsert: (type: SectionType) => void;
-  /** Called to toggle preview mode */
+
   onTogglePreview: () => void;
-  /** Called to undo */
+
   onUndo: () => void;
-  /** Called to redo */
+
   onRedo: () => void;
 }
-
-// ---------------------------------------------------------------------------
-// Insert Button Data
-// ---------------------------------------------------------------------------
 
 interface InsertButton {
   type: SectionType;
@@ -56,15 +39,11 @@ interface InsertButton {
 }
 
 const INSERT_BUTTONS: readonly InsertButton[] = [
-  { type: "header", label: "Cabeçalho", icon: FileText },
-  { type: "text", label: "Texto", icon: Type },
-  { type: "table", label: "Tabela", icon: Table },
-  { type: "page-break", label: "Quebra", icon: Minus },
+  { type: 'header', label: 'Cabeçalho', icon: FileText },
+  { type: 'text', label: 'Texto', icon: Type },
+  { type: 'table', label: 'Tabela', icon: Table },
+  { type: 'page-break', label: 'Quebra', icon: Minus }
 ] as const;
-
-// ---------------------------------------------------------------------------
-// Component
-// ---------------------------------------------------------------------------
 
 export const ComposerToolbar: React.FC<Readonly<ComposerToolbarProps>> = memo(
   function ComposerToolbar({
@@ -75,22 +54,21 @@ export const ComposerToolbar: React.FC<Readonly<ComposerToolbarProps>> = memo(
     onInsert,
     onTogglePreview,
     onUndo,
-    onRedo,
+    onRedo
   }) {
-    /** Wraps onInsert for each button to avoid inline closures */
     const handleInsert = useCallback(
       (type: SectionType): void => {
         onInsert(type);
       },
-      [onInsert],
+      [onInsert]
     );
 
     return (
       <div className="h-14 border-b border-border bg-surface/80 backdrop-blur-sm flex items-center justify-between px-4 z-20">
-        {/* Left: Insert Tools */}
+        {/* Left: Ferramentas de Inserção */}
         <div className="flex items-center gap-1">
           <div className="flex items-center gap-1">
-            {INSERT_BUTTONS.map((btn) => {
+            {INSERT_BUTTONS.map(btn => {
               const Icon = btn.icon;
               return (
                 <Button
@@ -99,8 +77,9 @@ export const ComposerToolbar: React.FC<Readonly<ComposerToolbarProps>> = memo(
                   size="sm"
                   className="h-8 px-2 text-xs font-medium text-muted-foreground hover:text-foreground"
                   onClick={() => handleInsert(btn.type)}
-                  disabled={viewMode === "preview"}
-                  title={`Inserir ${btn.label}`}>
+                  disabled={viewMode === 'preview'}
+                  title={`Inserir ${btn.label}`}
+                >
                   <Icon className="w-4 h-4 mr-1.5" />
                   {btn.label}
                 </Button>
@@ -109,12 +88,12 @@ export const ComposerToolbar: React.FC<Readonly<ComposerToolbarProps>> = memo(
           </div>
         </div>
 
-        {/* Center: Report Name */}
+        {/* Center: Nome do Relatório */}
         <div className="absolute left-1/2 transform -translate-x-1/2 text-sm font-semibold text-muted-foreground opacity-50 select-none">
-          {reportName || "Relatório Sem Título"}
+          {reportName || 'Relatório Sem Título'}
         </div>
 
-        {/* Right: Actions */}
+        {/* Right: Ações */}
         <div className="flex items-center gap-2">
           {/* Undo/Redo */}
           <div className="flex items-center bg-muted/30 rounded-md border border-border/50">
@@ -124,7 +103,8 @@ export const ComposerToolbar: React.FC<Readonly<ComposerToolbarProps>> = memo(
               className="h-8 w-8"
               onClick={onUndo}
               disabled={!canUndo}
-              title="Desfazer">
+              title="Desfazer"
+            >
               <Undo className="w-4 h-4" />
             </Button>
             <Button
@@ -133,20 +113,22 @@ export const ComposerToolbar: React.FC<Readonly<ComposerToolbarProps>> = memo(
               className="h-8 w-8"
               onClick={onRedo}
               disabled={!canRedo}
-              title="Refazer">
+              title="Refazer"
+            >
               <Redo className="w-4 h-4" />
             </Button>
           </div>
 
           <div className="w-px h-6 bg-border mx-1" />
 
-          {/* Preview Toggle */}
+          {/* Botão de alternância de visualização */}
           <Button
-            variant={viewMode === "preview" ? "default" : "outline"}
+            variant={viewMode === 'preview' ? 'default' : 'outline'}
             size="sm"
             className="h-8 px-4 text-xs font-medium gap-1.5"
-            onClick={onTogglePreview}>
-            {viewMode === "preview" ? (
+            onClick={onTogglePreview}
+          >
+            {viewMode === 'preview' ? (
               <>
                 <Pencil className="w-3.5 h-3.5" />
                 Editar
@@ -161,7 +143,7 @@ export const ComposerToolbar: React.FC<Readonly<ComposerToolbarProps>> = memo(
         </div>
       </div>
     );
-  },
+  }
 );
 
 export default ComposerToolbar;

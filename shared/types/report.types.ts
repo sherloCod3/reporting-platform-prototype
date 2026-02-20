@@ -1,16 +1,15 @@
-// Basic interface for DB row (formerly imported from mysql2)
 export interface RowDataPacket {
-    [ column: string ]: any;
+  [column: string]: any;
 }
 
 export interface QueryResult {
-    columns: string[];
-    rows: RowDataPacket[] | any[]; // Backend returns RowDataPacket[], Frontend sees JSON objects
-    rowCount: number;
-    duration: number; // in ms
+  columns: string[];
+  rows: RowDataPacket[] | any[];
+  rowCount: number;
+  duration: number;
 }
 
 export interface ReportExecutionResult {
-    success: boolean;
-    data: QueryResult;
+  success: boolean;
+  data: QueryResult;
 }

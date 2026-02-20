@@ -10,16 +10,16 @@ Projeto atual usa gradientes/cores vibrantes. Meta: UI neutra, content-first, in
 
 **Substituir:**
 
-- ❌ Gradientes (`gradient-bg`, `gradient-report-*`)
-- ❌ Cores vibrantes (indigo-500, purple-600)
-- ❌ Borders dashed em componentes
+- Gradientes (`gradient-bg`, `gradient-report-*`)
+- Cores vibrantes (indigo-500, purple-600)
+- Borders dashed em componentes
 
 **Por:**
 
-- ✅ Paleta neutra (grays 50-900)
-- ✅ Accent color único: `#0066FF` (blue)
-- ✅ Borders sólidas 1px
-- ✅ Sombras mínimas (apenas elevação funcional)
+- Paleta neutra (grays 50-900)
+- Accent color unico: `#0066FF` (blue)
+- Borders solidas 1px
+- Sombras minimas (apenas elevacao funcional)
 
 **Referência de cores:**
 

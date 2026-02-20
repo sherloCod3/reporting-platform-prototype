@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState, useRef, useEffect, useCallback } from "react";
-import { Button } from "@/components/ui/button";
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { Button } from '@/components/ui/button';
 import {
   Type,
   Table,
@@ -20,24 +20,24 @@ import {
   Eye,
   Edit2,
   PanelRightClose,
-  PanelRightOpen,
-} from "lucide-react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { SqlEditor } from "@/components/sql/sql-editor";
-import { useSqlExecution } from "@/hooks/use-sql-execution";
-import { toast } from "sonner";
+  PanelRightOpen
+} from 'lucide-react';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { SqlEditor } from '@/components/sql/sql-editor';
+import { useSqlExecution } from '@/hooks/use-sql-execution';
+import { toast } from 'sonner';
 import type {
   Component,
   SqlResult,
   ResizeHandle,
   AlignmentLine,
-  ReportData,
-} from "./types";
-import { useReportEditor } from "@/hooks/use-report-editor";
-import { CanvasItem } from "./canvas-item";
-import { AlignmentGuides } from "./alignment-guides";
-import { PropertiesPanel } from "./properties-panel";
-import { AxiosError } from "axios";
+  ReportData
+} from './types';
+import { useReportEditor } from '@/hooks/use-report-editor';
+import { CanvasItem } from './canvas-item';
+import { AlignmentGuides } from './alignment-guides';
+import { PropertiesPanel } from './properties-panel';
+import { AxiosError } from 'axios';
 
 interface ReportEditorProps {
   initialData?: Partial<ReportData>;
@@ -46,12 +46,8 @@ interface ReportEditorProps {
 
 export function ReportEditor({
   initialData,
-  onSave,
+  onSave
 }: Readonly<ReportEditorProps>) {
-  // ------------------------------------------------------------------
-  // State Management
-  // ------------------------------------------------------------------
-
   const {
     state,
     dispatch,
@@ -59,40 +55,32 @@ export function ReportEditor({
     deleteComponent,
     undo,
     redo,
-    snapToGrid,
+    snapToGrid
   } = useReportEditor({
     title: initialData?.title,
     description: initialData?.description,
-    components: initialData?.components,
+    components: initialData?.components
   });
 
-  // Dragging State (Local to avoid hook thrashing)
   const dragOffset = useRef({ x: 0, y: 0 });
 
-  // Canvas Refs
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const paperRef = useRef<HTMLDivElement | null>(null);
 
   const PAPER_W = 794;
   const PAPER_H = 1123;
 
-  // UI State
   const [zoom, setZoom] = useState(1);
-  const [activeTool, setActiveTool] = useState<"select" | "hand">("select");
-  const [mode, setMode] = useState<"edit" | "preview">("edit");
+  const [activeTool, setActiveTool] = useState<'select' | 'hand'>('select');
+  const [mode, setMode] = useState<'edit' | 'preview'>('edit');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-  // SQL Modal State
   const [sqlModalOpen, setSqlModalOpen] = useState(false);
   const [editingComponentId, setEditingComponentId] = useState<number | null>(
-    null,
+    null
   );
-  const [sqlQuery, setSqlQuery] = useState("");
+  const [sqlQuery, setSqlQuery] = useState('');
   const [sqlResult, setSqlResult] = useState<SqlResult | null>(null);
-
-  // ------------------------------------------------------------------
-  // Helpers
-  // ------------------------------------------------------------------
 
   const clampZoom = (value: number) => Math.min(2, Math.max(0.25, value));
 
@@ -109,14 +97,10 @@ export function ReportEditor({
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     dispatch({
-      type: "UPDATE_METADATA",
-      changes: { title: e.target.value },
+      type: 'UPDATE_METADATA',
+      changes: { title: e.target.value }
     });
   };
-
-  // ------------------------------------------------------------------
-  // Interaction Handlers
-  // ------------------------------------------------------------------
 
   const calculateAlignment = useCallback(
     (
@@ -126,87 +110,79 @@ export function ReportEditor({
       w: number,
       h: number,
       components: Component[],
-      gridSnapper: (val: number) => number,
+      gridSnapper: (val: number) => number
     ) => {
-      const SNAP_THRESHOLD = 10; // Increased from 5 to 8-10 for stickier alignment
+      const SNAP_THRESHOLD = 10;
       const lines: AlignmentLine[] = [];
 
-      // 1. Start with Raw Position
       let finalX = x;
       let finalY = y;
 
-      // Flags to track if we found an alignment snap
       let snappedX = false;
       let snappedY = false;
 
-      // Edges to check: [value, type, isCenter]
       const horizontalCandidates = [
-        { val: y, type: "start" }, // Top
-        { val: y + h / 2, type: "center" }, // Middle
-        { val: y + h, type: "end" }, // Bottom
+        { val: y, type: 'start' },
+        { val: y + h / 2, type: 'center' },
+        { val: y + h, type: 'end' }
       ];
 
       const verticalCandidates = [
-        { val: x, type: "start" }, // Left
-        { val: x + w / 2, type: "center" }, // Center
-        { val: x + w, type: "end" }, // Right
+        { val: x, type: 'start' },
+        { val: x + w / 2, type: 'center' },
+        { val: x + w, type: 'end' }
       ];
 
-      // 2. Check Alignments (Highest Priority)
-      components.forEach((other) => {
+      components.forEach(other => {
         if (other.id === id) return;
 
         const otherCenters = {
           x: other.x + other.width / 2,
-          y: other.y + other.height / 2,
+          y: other.y + other.height / 2
         };
 
         const otherH = [
-          other.y, // Top
-          otherCenters.y, // Middle
-          other.y + other.height, // Bottom
+          other.y,
+          otherCenters.y,
+          other.y + other.height
         ];
 
         const otherV = [
-          other.x, // Left
-          otherCenters.x, // Center
-          other.x + other.width, // Right
+          other.x,
+          otherCenters.x,
+          other.x + other.width
         ];
 
-        // Check Horizontal Alignment (Y-axis)
-        // Only snap if we haven't already hard-snapped to a line (or prioritize closest?)
-        // For simplicity, we accumulate small diffs, but let's strictly set if matched
         if (!snappedY) {
-          horizontalCandidates.forEach((cand) => {
-            otherH.forEach((target) => {
+          horizontalCandidates.forEach(cand => {
+            otherH.forEach(target => {
               if (Math.abs(cand.val - target) < SNAP_THRESHOLD) {
                 const diff = target - cand.val;
                 finalY += diff;
-                snappedY = true; // Mark as snapped to alignment
+                snappedY = true;
                 lines.push({
-                  type: "horizontal",
+                  type: 'horizontal',
                   y: target,
-                  start: Math.min(x, other.x), // Visuals use current pos
-                  end: Math.max(x + w, other.x + other.width),
+                  start: Math.min(x, other.x),
+                  end: Math.max(x + w, other.x + other.width)
                 });
               }
             });
           });
         }
 
-        // Check Vertical Alignment (X-axis)
         if (!snappedX) {
-          verticalCandidates.forEach((cand) => {
-            otherV.forEach((target) => {
+          verticalCandidates.forEach(cand => {
+            otherV.forEach(target => {
               if (Math.abs(cand.val - target) < SNAP_THRESHOLD) {
                 const diff = target - cand.val;
                 finalX += diff;
-                snappedX = true; // Mark as snapped to alignment
+                snappedX = true;
                 lines.push({
-                  type: "vertical",
+                  type: 'vertical',
                   x: target,
                   start: Math.min(y, other.y),
-                  end: Math.max(y + h, other.y + other.height),
+                  end: Math.max(y + h, other.y + other.height)
                 });
               }
             });
@@ -214,7 +190,6 @@ export function ReportEditor({
         }
       });
 
-      // 3. Fallback to Grid Snap if NO alignment found
       if (!snappedX) {
         finalX = gridSnapper(x);
       }
@@ -224,45 +199,42 @@ export function ReportEditor({
 
       return { x: finalX, y: finalY, lines };
     },
-    [],
+    []
   );
 
   const startDrag = useCallback(
     (e: React.MouseEvent, id: number) => {
       e.stopPropagation();
-      if (activeTool !== "select") return;
+      if (activeTool !== 'select') return;
 
-      dispatch({ type: "SET_DRAGGING", id });
-      dispatch({ type: "SELECT_COMPONENT", id });
+      dispatch({ type: 'SET_DRAGGING', id });
+      dispatch({ type: 'SELECT_COMPONENT', id });
 
-      // Calculate offset
-      const currentComp = state.components.find((c) => c.id === id);
+      const currentComp = state.components.find(c => c.id === id);
       if (paperRef.current && currentComp) {
         const paperRect = paperRef.current.getBoundingClientRect();
-        // Calculate cursor position relative to component top-left
-        // Note: we need to account for zoom scale in the offset calculation
         const relativeX = (e.clientX - paperRect.left) / zoom;
         const relativeY = (e.clientY - paperRect.top) / zoom;
 
         dragOffset.current = {
           x: relativeX - currentComp.x,
-          y: relativeY - currentComp.y,
+          y: relativeY - currentComp.y
         };
       }
     },
-    [activeTool, state.components, zoom, dispatch],
+    [activeTool, state.components, zoom, dispatch]
   );
 
   const startResize = useCallback(
     (e: React.MouseEvent, id: number, handle: ResizeHandle) => {
       e.stopPropagation();
-      e.preventDefault(); // Prevent native drag/select interactions
+      e.preventDefault();
 
-      const comp = state.components.find((c) => c.id === id);
+      const comp = state.components.find(c => c.id === id);
       if (!comp) return;
 
       dispatch({
-        type: "SET_RESIZING",
+        type: 'SET_RESIZING',
         payload: {
           id,
           handle,
@@ -272,48 +244,44 @@ export function ReportEditor({
             x: comp.x,
             y: comp.y,
             width: comp.width,
-            height: comp.height,
-          },
-        },
+            height: comp.height
+          }
+        }
       });
     },
-    [state.components, dispatch],
+    [state.components, dispatch]
   );
 
-  // Global Drag listeners
   useEffect(() => {
-    // Define handleMouseUp first so it can be called by handleMouseMove
     const handleMouseUp = () => {
-      // Clear alignment lines on drop
       if (state.alignmentLines.length > 0) {
-        dispatch({ type: "SET_ALIGNMENT_LINES", lines: [] });
+        dispatch({ type: 'SET_ALIGNMENT_LINES', lines: [] });
       }
 
       if (state.draggingId !== null) {
         dispatch({
-          type: "BATCH",
+          type: 'BATCH',
           actions: [
-            { type: "COMMIT_HISTORY" },
-            { type: "SET_DRAGGING", id: null },
-          ],
+            { type: 'COMMIT_HISTORY' },
+            { type: 'SET_DRAGGING', id: null }
+          ]
         });
       } else if (state.resizing) {
         dispatch({
-          type: "BATCH",
+          type: 'BATCH',
           actions: [
-            { type: "COMMIT_HISTORY" },
-            { type: "SET_RESIZING", payload: null },
-            { type: "SELECT_COMPONENT", id: state.resizing.id }, // Re-select after resize
-          ],
+            { type: 'COMMIT_HISTORY' },
+            { type: 'SET_RESIZING', payload: null },
+            { type: 'SELECT_COMPONENT', id: state.resizing.id }
+          ]
         });
       }
     };
 
     const handleMouseMove = (e: MouseEvent) => {
-      // Disable global drag in preview mode (safety check)
-      if (mode === "preview") return;
+      if (mode === 'preview') return;
 
-      // Robustness: If buttons are 0, mouse is not pressed. Cancel operation.
+      // Se o botao do mouse foi solto fora da janela, cancela a operacao
       if (e.buttons === 0) {
         handleMouseUp();
         return;
@@ -322,14 +290,11 @@ export function ReportEditor({
       if (state.draggingId !== null && paperRef.current) {
         const paperRect = paperRef.current.getBoundingClientRect();
 
-        // Calculate raw position relative to paper
-        // We divide by zoom to convert screen pixels back to CSS pixels
         const rawX = (e.clientX - paperRect.left) / zoom - dragOffset.current.x;
         const rawY = (e.clientY - paperRect.top) / zoom - dragOffset.current.y;
 
-        // Use Alignment instead of just grid snapping for drag
         const currentComp = state.components.find(
-          (c) => c.id === state.draggingId,
+          c => c.id === state.draggingId
         );
         if (currentComp) {
           const { x, y, lines } = calculateAlignment(
@@ -339,22 +304,20 @@ export function ReportEditor({
             currentComp.width,
             currentComp.height,
             state.components,
-            snapToGrid,
+            snapToGrid
           );
 
           dispatch({
-            type: "BATCH",
+            type: 'BATCH',
             actions: [
-              { type: "MOVE_COMPONENT", id: state.draggingId, x, y },
-              { type: "SET_ALIGNMENT_LINES", lines },
-            ],
+              { type: 'MOVE_COMPONENT', id: state.draggingId, x, y },
+              { type: 'SET_ALIGNMENT_LINES', lines }
+            ]
           });
         }
       } else if (state.resizing) {
-        // RESIZE LOGIC
         const { handle, startX, startY, initialBounds } = state.resizing;
 
-        // Calculate delta in CSS pixels (accounting for zoom)
         const deltaX = (e.clientX - startX) / zoom;
         const deltaY = (e.clientY - startY) / zoom;
 
@@ -363,59 +326,56 @@ export function ReportEditor({
         let newW = initialBounds.width;
         let newH = initialBounds.height;
 
-        // Apply delta based on handle
-        if (handle.includes("e")) newW = initialBounds.width + deltaX;
-        if (handle.includes("w")) {
+        if (handle.includes('e')) newW = initialBounds.width + deltaX;
+        if (handle.includes('w')) {
           newW = initialBounds.width - deltaX;
           newX = initialBounds.x + deltaX;
         }
-        if (handle.includes("s")) newH = initialBounds.height + deltaY;
-        if (handle.includes("n")) {
+        if (handle.includes('s')) newH = initialBounds.height + deltaY;
+        if (handle.includes('n')) {
           newH = initialBounds.height - deltaY;
           newY = initialBounds.y + deltaY;
         }
 
-        // Enforce Minimums & Corrections
         const MIN_SIZE = 20;
 
         if (newW < MIN_SIZE) {
           newW = MIN_SIZE;
-          if (handle.includes("w")) {
+          if (handle.includes('w')) {
             newX = initialBounds.x + initialBounds.width - MIN_SIZE;
           }
         }
         if (newH < MIN_SIZE) {
           newH = MIN_SIZE;
-          if (handle.includes("n")) {
+          if (handle.includes('n')) {
             newY = initialBounds.y + initialBounds.height - MIN_SIZE;
           }
         }
 
-        // Apply Snap to Grid
         const snappedX = snapToGrid(newX);
         const snappedY = snapToGrid(newY);
         const snappedW = snapToGrid(newW);
         const snappedH = snapToGrid(newH);
 
         dispatch({
-          type: "RESIZE_COMPONENT",
+          type: 'RESIZE_COMPONENT',
           id: state.resizing.id,
           x: snappedX,
           y: snappedY,
           width: snappedW,
-          height: snappedH,
+          height: snappedH
         });
       }
     };
 
     if (state.draggingId !== null || state.resizing !== null) {
-      globalThis.addEventListener("mousemove", handleMouseMove);
-      globalThis.addEventListener("mouseup", handleMouseUp);
+      globalThis.addEventListener('mousemove', handleMouseMove);
+      globalThis.addEventListener('mouseup', handleMouseUp);
     }
 
     return () => {
-      globalThis.removeEventListener("mousemove", handleMouseMove);
-      globalThis.removeEventListener("mouseup", handleMouseUp);
+      globalThis.removeEventListener('mousemove', handleMouseMove);
+      globalThis.removeEventListener('mouseup', handleMouseUp);
     };
   }, [
     state.draggingId,
@@ -426,75 +386,72 @@ export function ReportEditor({
     mode,
     calculateAlignment,
     state.components,
-    state.alignmentLines.length,
+    state.alignmentLines.length
   ]);
 
-  // Keyboard Shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (mode === "preview") return;
+      if (mode === 'preview') return;
 
-      // Delete
-      if (e.key === "Delete" || e.key === "Backspace") {
+      if (e.key === 'Delete' || e.key === 'Backspace') {
         if (state.selectedId !== null) {
-          dispatch({ type: "DELETE_COMPONENT", id: state.selectedId });
+          dispatch({ type: 'DELETE_COMPONENT', id: state.selectedId });
         }
       }
 
-      // Arrows (Nudge)
       if (state.selectedId !== null) {
-        const comp = state.components.find((c) => c.id === state.selectedId);
+        const comp = state.components.find(c => c.id === state.selectedId);
         if (comp) {
           const step = e.shiftKey ? 10 : 1;
           let { x, y } = comp;
           let handled = false;
 
-          if (e.key === "ArrowLeft") {
+          if (e.key === 'ArrowLeft') {
             x -= step;
             handled = true;
           }
-          if (e.key === "ArrowRight") {
+          if (e.key === 'ArrowRight') {
             x += step;
             handled = true;
           }
-          if (e.key === "ArrowUp") {
+          if (e.key === 'ArrowUp') {
             y -= step;
             handled = true;
           }
-          if (e.key === "ArrowDown") {
+          if (e.key === 'ArrowDown') {
             y += step;
             handled = true;
           }
 
           if (handled) {
             e.preventDefault();
-            dispatch({ type: "MOVE_COMPONENT", id: comp.id, x, y });
+            dispatch({ type: 'MOVE_COMPONENT', id: comp.id, x, y });
           }
         }
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [state.selectedId, state.components, dispatch, mode]);
 
   const openSqlEditor = useCallback(
     (id?: number) => {
       if (id !== undefined) {
-        const comp = state.components.find((c) => c.id === id);
+        const comp = state.components.find(c => c.id === id);
         if (comp) {
           setEditingComponentId(id);
-          setSqlQuery(comp.sqlQuery || "");
+          setSqlQuery(comp.sqlQuery || '');
           setSqlResult(comp.sqlResult || null);
         }
       } else {
         setEditingComponentId(null);
-        setSqlQuery("");
+        setSqlQuery('');
         setSqlResult(null);
       }
       setSqlModalOpen(true);
     },
-    [state.components],
+    [state.components]
   );
 
   const { executeQuery, isExecuting } = useSqlExecution();
@@ -507,148 +464,152 @@ export function ReportEditor({
           columns: queryResult.columns,
           rows: queryResult.rows,
           rowCount: queryResult.rowCount,
-          duration: queryResult.duration,
+          duration: queryResult.duration
         });
-        toast.success("Query executed successfully");
+        toast.success('Consulta executada com sucesso');
       }
     } catch (err: unknown) {
       const error = err as AxiosError<{ message: string }>;
-      toast.error(error.response?.data?.message || "Failed to execute query");
+      toast.error(
+        error.response?.data?.message || 'Falha ao executar consulta'
+      );
     }
   };
 
   const saveSqlToComponent = () => {
     if (editingComponentId !== null) {
       dispatch({
-        type: "BATCH",
+        type: 'BATCH',
         actions: [
           {
-            type: "UPDATE_COMPONENT",
+            type: 'UPDATE_COMPONENT',
             id: editingComponentId,
-            changes: { sqlQuery, sqlResult: sqlResult || undefined },
+            changes: { sqlQuery, sqlResult: sqlResult || undefined }
           },
-          { type: "COMMIT_HISTORY" },
-        ],
+          { type: 'COMMIT_HISTORY' }
+        ]
       });
       setSqlModalOpen(false);
-      toast.success("SQL query saved to component");
+      toast.success('Consulta SQL salva no componente');
     }
   };
 
   const updateComponent = (id: number, changes: Partial<Component>) => {
-    dispatch({ type: "UPDATE_COMPONENT", id, changes });
+    dispatch({ type: 'UPDATE_COMPONENT', id, changes });
   };
 
   const selectedComponent = state.selectedId
-    ? state.components.find((c) => c.id === state.selectedId) || null
+    ? state.components.find(c => c.id === state.selectedId) || null
     : null;
 
   return (
     <div className="flex flex-col h-[calc(100vh-6rem)] w-full bg-app text-foreground border border-border rounded-lg overflow-hidden relative shadow-sm">
-      {/* 1. Header & Toolbar (New Layout) */}
       <div className="h-14 border-b border-border bg-surface/80 backdrop-blur-sm flex items-center justify-between px-4 z-20">
-        {/* Left: Tools */}
         <div className="flex items-center gap-1">
-          {/* Mode Toggle */}
           <div className="bg-muted/50 p-1 rounded-md flex gap-1 border border-border/50 mr-2">
             <Button
-              variant={mode === "edit" ? "secondary" : "ghost"}
+              variant={mode === 'edit' ? 'secondary' : 'ghost'}
               size="sm"
               className="h-8 px-3 text-xs"
-              onClick={() => setMode("edit")}
-              title="Edit Mode">
+              onClick={() => setMode('edit')}
+              title="Modo Edição"
+            >
               <Edit2 className="w-3.5 h-3.5 mr-1.5" />
               Edit
             </Button>
             <Button
-              variant={mode === "preview" ? "secondary" : "ghost"}
+              variant={mode === 'preview' ? 'secondary' : 'ghost'}
               size="sm"
               className="h-8 px-3 text-xs"
               onClick={() => {
-                setMode("preview");
-                dispatch({ type: "SELECT_COMPONENT", id: null });
+                setMode('preview');
+                dispatch({ type: 'SELECT_COMPONENT', id: null });
               }}
-              title="Preview Mode">
+              title="Modo Visualização"
+            >
               <Eye className="w-3.5 h-3.5 mr-1.5" />
               Preview
             </Button>
           </div>
 
-          {mode === "edit" && (
+          {mode === 'edit' && (
             <>
               <div className="bg-muted/50 p-1 rounded-md flex gap-1 border border-border/50">
                 <Button
-                  variant={activeTool === "select" ? "secondary" : "ghost"}
+                  variant={activeTool === 'select' ? 'secondary' : 'ghost'}
                   size="icon"
                   className="h-8 w-8"
-                  onClick={() => setActiveTool("select")}
-                  title="Select Tool (V)">
+                  onClick={() => setActiveTool('select')}
+                  title="Selecionar (V)"
+                >
                   <MousePointer2 className="w-4 h-4" />
                 </Button>
                 <Button
-                  variant={activeTool === "hand" ? "secondary" : "ghost"}
+                  variant={activeTool === 'hand' ? 'secondary' : 'ghost'}
                   size="icon"
                   className="h-8 w-8"
-                  onClick={() => setActiveTool("hand")}
-                  title="Hand Tool (H)">
+                  onClick={() => setActiveTool('hand')}
+                  title="Mover (H)"
+                >
                   <Layout className="w-4 h-4 rotate-45" />
                 </Button>
               </div>
 
               <div className="w-px h-6 bg-border mx-2" />
 
-              {/* Insert Tools */}
               <div className="flex items-center gap-1">
                 <Button
                   variant="ghost"
                   size="sm"
                   className="h-8 px-2 text-xs font-medium text-muted-foreground hover:text-foreground"
-                  onClick={() => addComponent("text")}>
+                  onClick={() => addComponent('text')}
+                >
                   <Type className="w-4 h-4 mr-1.5" />
-                  Text
+                  Texto
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
                   className="h-8 px-2 text-xs font-medium text-muted-foreground hover:text-foreground"
-                  onClick={() => addComponent("table")}>
+                  onClick={() => addComponent('table')}
+                >
                   <Table className="w-4 h-4 mr-1.5" />
-                  Table
+                  Tabela
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
                   className="h-8 px-2 text-xs font-medium text-muted-foreground hover:text-foreground"
-                  onClick={() => addComponent("chart")}>
+                  onClick={() => addComponent('chart')}
+                >
                   <BarChart className="w-4 h-4 mr-1.5" />
-                  Chart
+                  Gráfico
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
                   className="h-8 px-2 text-xs font-medium text-muted-foreground hover:text-foreground"
-                  onClick={() => addComponent("image")}>
+                  onClick={() => addComponent('image')}
+                >
                   <ImageIcon className="w-4 h-4 mr-1.5" />
-                  Image
+                  Imagem
                 </Button>
               </div>
             </>
           )}
         </div>
 
-        {/* Center: Title (Editable) */}
         <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center">
           <input
             type="text"
             value={state.title}
             onChange={handleTitleChange}
-            disabled={mode === "preview"}
+            disabled={mode === 'preview'}
             className="text-sm font-semibold text-center bg-transparent border-none outline-none focus:ring-1 focus:ring-primary rounded px-2 w-64 text-foreground placeholder:text-muted-foreground/50 transition-colors"
-            placeholder="Untitled Report"
+            placeholder="Relatório Sem Título"
           />
         </div>
 
-        {/* Right: Actions */}
         <div className="flex items-center gap-2">
           <div className="flex items-center bg-muted/30 rounded-md border border-border/50">
             <Button
@@ -656,7 +617,8 @@ export function ReportEditor({
               size="icon"
               className="h-8 w-8"
               onClick={undo}
-              disabled={state.historyIndex <= 0}>
+              disabled={state.historyIndex <= 0}
+            >
               <Undo className="w-4 h-4" />
             </Button>
             <Button
@@ -664,7 +626,8 @@ export function ReportEditor({
               size="icon"
               className="h-8 w-8"
               onClick={redo}
-              disabled={state.historyIndex >= state.history.length - 1}>
+              disabled={state.historyIndex >= state.history.length - 1}
+            >
               <Redo className="w-4 h-4" />
             </Button>
           </div>
@@ -676,7 +639,8 @@ export function ReportEditor({
             size="icon"
             className="h-8 w-8"
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            title={isSidebarOpen ? "Close Sidebar" : "Open Sidebar"}>
+            title={isSidebarOpen ? 'Fechar Painel' : 'Abrir Painel'}
+          >
             {isSidebarOpen ? (
               <PanelRightClose className="w-4 h-4 text-muted-foreground" />
             ) : (
@@ -690,7 +654,8 @@ export function ReportEditor({
             variant="ghost"
             size="sm"
             className="h-8 w-8 p-0"
-            title="Page Settings">
+            title="Configurações da Página"
+          >
             <Settings className="w-4 h-4 text-muted-foreground" />
           </Button>
 
@@ -701,56 +666,54 @@ export function ReportEditor({
               onSave?.({
                 title: state.title,
                 description: state.description,
-                components: state.components,
+                components: state.components
               })
-            }>
-            Save Report
+            }
+          >
+            Salvar Relatório
           </Button>
         </div>
       </div>
 
-      {/* Main Content Area (Workspace + Sidebar) */}
       <div className="flex-1 flex overflow-hidden relative">
-        {/* 2. Workspace Area */}
         <div
           ref={viewportRef}
           className="flex-1 bg-app overflow-auto relative cursor-grab active:cursor-grabbing"
-          onClick={() => dispatch({ type: "SELECT_COMPONENT", id: null })}>
+          onClick={() => dispatch({ type: 'SELECT_COMPONENT', id: null })}
+        >
           <div className="min-w-full min-h-full p-16 flex justify-center items-start">
             <div
               ref={paperRef}
               id="canvas-area"
-              className={`bg-canvas shadow-lg border border-border/50 relative transition-transform duration-200 ease-out origin-top ${
-                mode === "edit" ? "canvas-grid-pattern" : ""
-              }`}
+              className={`bg-canvas shadow-lg border border-border/50 relative transition-transform duration-200 ease-out origin-top ${mode === 'edit' ? 'canvas-grid-pattern' : ''
+                }`}
               style={{
                 width: PAPER_W,
                 height: PAPER_H,
-                transform: `scale(${zoom})`,
+                transform: `scale(${zoom})`
               }}
-              onClick={(e) => {
+              onClick={e => {
                 e.stopPropagation();
-                // User Request: Click inside canvas also deselects
-                dispatch({ type: "SELECT_COMPONENT", id: null });
-              }}>
+                dispatch({ type: 'SELECT_COMPONENT', id: null });
+              }}
+            >
               <AlignmentGuides lines={state.alignmentLines} zoom={zoom} />
-              {state.components.map((comp) => (
+              {state.components.map(comp => (
                 <CanvasItem
                   key={comp.id}
                   component={comp}
                   isSelected={state.selectedId === comp.id}
-                  onSelect={(id) => dispatch({ type: "SELECT_COMPONENT", id })}
+                  onSelect={id => dispatch({ type: 'SELECT_COMPONENT', id })}
                   onDelete={deleteComponent}
                   onEditSql={openSqlEditor}
                   onDragStart={startDrag}
                   onResizeStart={startResize}
-                  readOnly={mode === "preview"}
+                  readOnly={mode === 'preview'}
                 />
               ))}
             </div>
           </div>
 
-          {/* Floating Zoom Controls (Bottom Right) */}
           <div className="absolute bottom-6 right-6 flex items-center gap-1 bg-background/95 backdrop-blur border border-border rounded-lg shadow-md p-1 pl-3 z-30">
             <span className="text-xs font-mono text-muted-foreground w-12 text-center">
               {Math.round(zoom * 100)}%
@@ -760,14 +723,16 @@ export function ReportEditor({
               variant="ghost"
               size="icon"
               className="h-7 w-7"
-              onClick={() => setZoom((z) => clampZoom(z - 0.1))}>
+              onClick={() => setZoom(z => clampZoom(z - 0.1))}
+            >
               <Minus className="w-3.5 h-3.5" />
             </Button>
             <Button
               variant="ghost"
               size="icon"
               className="h-7 w-7"
-              onClick={() => setZoom((z) => clampZoom(z + 0.1))}>
+              onClick={() => setZoom(z => clampZoom(z + 0.1))}
+            >
               <Plus className="w-3.5 h-3.5" />
             </Button>
             <div className="w-px h-4 bg-border mx-1" />
@@ -776,14 +741,14 @@ export function ReportEditor({
               size="icon"
               className="h-7 w-7"
               onClick={fitToViewport}
-              title="Fit to screen">
+              title="Ajustar à tela"
+            >
               <Maximize2 className="w-3.5 h-3.5" />
             </Button>
           </div>
         </div>
 
-        {/* 3. Properties Panel (Right Sidebar) */}
-        {mode === "edit" && isSidebarOpen && (
+        {mode === 'edit' && isSidebarOpen && (
           <PropertiesPanel
             component={selectedComponent}
             onUpdate={updateComponent}
@@ -791,20 +756,20 @@ export function ReportEditor({
         )}
       </div>
 
-      {/* SQL Editor Modal */}
       <Dialog open={sqlModalOpen} onOpenChange={setSqlModalOpen}>
         <DialogContent className="max-w-4xl h-[80vh] flex flex-col p-6 gap-0">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <Database className="w-5 h-5 text-primary" />
-              Configure Data Source
+              Configurar Fonte de Dados
             </h2>
             <div className="flex items-center gap-2">
               <Button
                 variant="default"
                 size="sm"
                 onClick={handleExecuteSql}
-                disabled={isExecuting}>
+                disabled={isExecuting}
+              >
                 <Play className="w-4 h-4 mr-2 fill-current" />
                 Run Query
               </Button>
@@ -812,7 +777,8 @@ export function ReportEditor({
                 <Button
                   variant="secondary"
                   size="sm"
-                  onClick={saveSqlToComponent}>
+                  onClick={saveSqlToComponent}
+                >
                   Save & Close
                 </Button>
               )}
@@ -827,21 +793,20 @@ export function ReportEditor({
                 height="100%"
               />
             </div>
-            {/* Results Preview Panel (Mini) */}
             {sqlResult && (
               <div className="h-48 border-t border-border bg-background p-2 overflow-auto">
                 <div className="text-xs text-muted-foreground mb-2 flex justify-between">
                   <span>Results: {sqlResult.rowCount} rows</span>
                   <span>{sqlResult.duration}ms</span>
                 </div>
-                {/* Simple Table Preview */}
                 <table className="w-full text-xs text-left">
                   <thead className="text-muted-foreground font-medium">
                     <tr>
-                      {sqlResult.columns.map((c) => (
+                      {sqlResult.columns.map(c => (
                         <th
                           key={c}
-                          className="p-1 border-b border-border font-normal">
+                          className="p-1 border-b border-border font-normal"
+                        >
                           {c}
                         </th>
                       ))}
@@ -853,9 +818,10 @@ export function ReportEditor({
                         {sqlResult.columns.map((col, j) => (
                           <td
                             key={j}
-                            className="p-1 border-b border-border/50 truncate max-w-[150px]">
+                            className="p-1 border-b border-border/50 truncate max-w-[150px]"
+                          >
                             {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                            {String((row as any)[col] ?? "")}
+                            {String((row as any)[col] ?? '')}
                           </td>
                         ))}
                       </tr>

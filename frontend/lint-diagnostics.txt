@@ -1,0 +1,13 @@
+
+> frontend@0.1.0 lint
+> eslint
+
+
+C:\Users\DoQR\Documents\qreports-tool\frontend\src\components\reports\renderers\text-renderer.tsx
+  53:6  warning  React Hook useMemo has unnecessary dependencies: 'height' and 'width'. Either exclude them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\DoQR\Documents\qreports-tool\frontend\src\features\reports\api\reportApi.ts
+  1:10  warning  'Component' is defined but never used  @typescript-eslint/no-unused-vars
+
+Ô£û 2 problems (0 errors, 2 warnings)
+

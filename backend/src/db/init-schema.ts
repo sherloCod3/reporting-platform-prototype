@@ -1,11 +1,11 @@
 import { authPool } from '../config/authDb.config.js';
 
 export async function initAuthSchema(): Promise<void> {
-    try {
-        console.log('Iniciando verificação de schema do banco de autenticação...');
+  try {
+    console.log('Iniciando verificação de schema do banco de autenticação...');
 
-        // Reports table (Report Definitions)
-        await authPool.execute(`
+    // Tabela de definicoes de relatorios
+    await authPool.execute(`
             CREATE TABLE IF NOT EXISTS reports (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 name VARCHAR(255) NOT NULL,
@@ -17,9 +17,9 @@ export async function initAuthSchema(): Promise<void> {
             )
         `);
 
-        console.log('✅ Schema inicializado com sucesso.');
-    } catch (error) {
-        console.error('❌ Erro ao inicializar schema:', error);
-        throw error; // Re-throw to stop server startup if schema fails
-    }
+    console.log('Schema inicializado com sucesso.');
+  } catch (error) {
+    console.error('Erro ao inicializar schema:', error);
+    throw error;
+  }
 }

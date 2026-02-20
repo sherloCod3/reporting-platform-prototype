@@ -1,30 +1,32 @@
-import { Component, ReportData } from "@/components/reports/types";
-import { api } from "@/utils/api";
+import { Component, ReportData } from '@/components/reports/types';
+import { api } from '@/utils/api';
 
-// Ideally, we import this from a shared types package or the backend
 export interface Report extends ReportData {
-    created_at: string;
-    updated_at: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export const reportApi = {
-    create: async (data: Omit<ReportData, "id">): Promise<Report> => {
-        const payload = {
-            title: data.title,
-            description: data.description,
-            components: data.components
-        };
-        const response = await api.post<Report>("/reports", payload);
-        return response.data;
-    },
+  create: async (data: Omit<ReportData, 'id'>): Promise<Report> => {
+    const payload = {
+      title: data.title,
+      description: data.description,
+      components: data.components
+    };
+    const response = await api.post<Report>('/reports', payload);
+    return response.data;
+  },
 
-    getById: async (id: number): Promise<Report> => {
-        const response = await api.get<Report>(`/reports/${id}`);
-        return response.data;
-    },
+  getById: async (id: number): Promise<Report> => {
+    const response = await api.get<Report>(`/reports/${id}`);
+    return response.data;
+  },
 
-    update: async (id: number, data: Partial<Omit<ReportData, "id">>): Promise<Report> => {
-        const response = await api.put<Report>(`/reports/${id}`, data);
-        return response.data;
-    },
+  update: async (
+    id: number,
+    data: Partial<Omit<ReportData, 'id'>>
+  ): Promise<Report> => {
+    const response = await api.put<Report>(`/reports/${id}`, data);
+    return response.data;
+  }
 };

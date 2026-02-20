@@ -1,11 +1,11 @@
-import React, { memo } from "react";
-import { cn } from "@/lib/utils";
-import { Table, BarChart, Trash2, Edit } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import type { Component } from "./types";
-import { TableRenderer } from "./renderers/table-renderer";
-import { TextRenderer } from "./renderers/text-renderer";
-import type { ResizeHandle } from "./types";
+import React, { memo } from 'react';
+import { cn } from '@/lib/utils';
+import { Table, BarChart, Trash2, Edit, Image as ImageIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import type { Component } from './types';
+import { TableRenderer } from './renderers/table-renderer';
+import { TextRenderer } from './renderers/text-renderer';
+import type { ResizeHandle } from './types';
 
 interface CanvasItemProps {
   component: Component;
@@ -17,7 +17,7 @@ interface CanvasItemProps {
   onResizeStart?: (
     e: React.MouseEvent,
     id: number,
-    handle: ResizeHandle,
+    handle: ResizeHandle
   ) => void;
   readOnly?: boolean;
 }
@@ -30,16 +30,15 @@ export const CanvasItem = memo(function CanvasItem({
   onEditSql,
   onDragStart,
   onResizeStart,
-  readOnly = false,
+  readOnly = false
 }: CanvasItemProps) {
-  // Render different content based on type
   const renderContent = () => {
     switch (comp.type) {
-      case "text":
+      case 'text':
         return (
           <div className="h-full">
             <TextRenderer
-              content={comp.content || ""}
+              content={comp.content || ''}
               width={comp.width}
               height={comp.height}
               style={comp.style}
@@ -47,21 +46,21 @@ export const CanvasItem = memo(function CanvasItem({
           </div>
         );
 
-      case "image":
+      case 'image':
         return (
-          <div className="flex items-center justify-center h-full bg-muted/30 text-3xl text-muted-foreground select-none">
-            🖼️
+          <div className="flex items-center justify-center h-full bg-muted/30 text-muted-foreground select-none">
+            <ImageIcon className="w-14 h-14" />
           </div>
         );
 
-      case "chart":
+      case 'chart':
         return (
           <div className="flex items-center justify-center h-full bg-muted/30 text-primary/60 select-none">
             <BarChart className="w-14 h-14" />
           </div>
         );
 
-      case "table":
+      case 'table':
         return (
           <div className="w-full h-full overflow-hidden select-none">
             {comp.sqlResult ? (
@@ -97,46 +96,48 @@ export const CanvasItem = memo(function CanvasItem({
   return (
     <div
       className={cn(
-        "absolute bg-card transition-all duration-200 ease-out",
-        !readOnly && "cursor-move hover:shadow-md",
+        'absolute bg-card transition-all duration-200 ease-out',
+        !readOnly && 'cursor-move hover:shadow-md',
         isSelected && !readOnly
-          ? "border-2 border-primary ring-1 ring-primary/20 z-10 shadow-lg"
+          ? 'border-2 border-primary ring-1 ring-primary/20 z-10 shadow-lg'
           : !readOnly
-            ? "border border-border shadow-sm"
-            : "", // No border in preview if not selected or just clean look
+            ? 'border border-border shadow-sm'
+            : ''
       )}
       style={{
         left: comp.x,
         top: comp.y,
         width: comp.width,
-        height: comp.height,
+        height: comp.height
       }}
-      onMouseDown={(e) => !readOnly && onDragStart(e, comp.id)}
-      onClick={(e) => {
+      onMouseDown={e => !readOnly && onDragStart(e, comp.id)}
+      onClick={e => {
         e.stopPropagation();
         onSelect(comp.id);
       }}
       role="button"
-      tabIndex={0}>
-      {/* Selection Actions Toolbar (Only when selected and not read-only) */}
+      tabIndex={0}
+    >
       {!readOnly && (
         <div
           className={cn(
-            "absolute -top-10 right-0 flex gap-1 rounded-md border border-border bg-popover/95 backdrop-blur shadow-sm p-1",
-            "transition-opacity duration-150",
+            'absolute -top-10 right-0 flex gap-1 rounded-md border border-border bg-popover/95 backdrop-blur shadow-sm p-1',
+            'transition-opacity duration-150',
             isSelected
-              ? "opacity-100 pointer-events-auto"
-              : "opacity-0 pointer-events-none",
-          )}>
-          {comp.type === "table" && onEditSql && (
+              ? 'opacity-100 pointer-events-auto'
+              : 'opacity-0 pointer-events-none'
+          )}
+        >
+          {comp.type === 'table' && onEditSql && (
             <Button
               variant="ghost"
               size="sm"
               className="h-8 px-2 text-xs hover:bg-muted"
-              onClick={(e) => {
+              onClick={e => {
                 e.stopPropagation();
                 onEditSql(comp.id);
-              }}>
+              }}
+            >
               <Edit className="w-3.5 h-3.5 mr-1.5" />
               Editar SQL
             </Button>
@@ -146,59 +147,54 @@ export const CanvasItem = memo(function CanvasItem({
             size="icon"
             className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive"
             title="Delete component"
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               onDelete(comp.id);
-            }}>
+            }}
+          >
             <Trash2 className="w-3.5 h-3.5" />
           </Button>
         </div>
       )}
 
-      {/* Resize Handle Hints (Only when selected and not read-only) */}
-      {/* Resize Handles (Only when selected and not read-only) */}
       {!readOnly && isSelected && (
         <>
-          {(["nw", "n", "ne", "e", "se", "s", "sw", "w"] as ResizeHandle[]).map(
-            (handle) => (
+          {(['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'] as ResizeHandle[]).map(
+            handle => (
               <div
                 key={handle}
                 className={cn(
-                  "absolute w-3 h-3 bg-white border border-primary rounded-full z-20",
-                  "hover:bg-primary hover:scale-125 transition-transform",
-                  // Position logic
-                  handle.includes("n") ? "-top-1.5" : "",
-                  handle.includes("s") ? "-bottom-1.5" : "",
-                  handle.includes("w") ? "-left-1.5" : "",
-                  handle.includes("e") ? "-right-1.5" : "",
-                  // Center logic
-                  handle === "n" || handle === "s"
-                    ? "left-1/2 -translate-x-1/2"
-                    : "",
-                  handle === "w" || handle === "e"
-                    ? "top-1/2 -translate-y-1/2"
-                    : "",
-                  // Cursor logic
-                  handle === "nw" || handle === "se"
-                    ? "cursor-nwse-resize"
-                    : "",
-                  handle === "ne" || handle === "sw"
-                    ? "cursor-nesw-resize"
-                    : "",
-                  handle === "n" || handle === "s" ? "cursor-ns-resize" : "",
-                  handle === "w" || handle === "e" ? "cursor-ew-resize" : "",
+                  'absolute w-3 h-3 bg-white border border-primary rounded-full z-20',
+                  'hover:bg-primary hover:scale-125 transition-transform',
+                  handle.includes('n') ? '-top-1.5' : '',
+                  handle.includes('s') ? '-bottom-1.5' : '',
+                  handle.includes('w') ? '-left-1.5' : '',
+                  handle.includes('e') ? '-right-1.5' : '',
+                  handle === 'n' || handle === 's'
+                    ? 'left-1/2 -translate-x-1/2'
+                    : '',
+                  handle === 'w' || handle === 'e'
+                    ? 'top-1/2 -translate-y-1/2'
+                    : '',
+                  handle === 'nw' || handle === 'se'
+                    ? 'cursor-nwse-resize'
+                    : '',
+                  handle === 'ne' || handle === 'sw'
+                    ? 'cursor-nesw-resize'
+                    : '',
+                  handle === 'n' || handle === 's' ? 'cursor-ns-resize' : '',
+                  handle === 'w' || handle === 'e' ? 'cursor-ew-resize' : ''
                 )}
-                onMouseDown={(e) => {
-                  e.stopPropagation(); // CRITICAL: Prevent drag start
+                onMouseDown={e => {
+                  e.stopPropagation();
                   onResizeStart?.(e, comp.id, handle);
                 }}
               />
-            ),
+            )
           )}
         </>
       )}
 
-      {/* Render Component Content */}
       <div className="w-full h-full overflow-hidden">{renderContent()}</div>
     </div>
   );

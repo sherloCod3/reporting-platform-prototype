@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   LayoutDashboard,
@@ -8,11 +8,11 @@ import {
   User,
   ChevronRight,
   GalleryVerticalEnd,
-  type LucideIcon,
-} from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
-import Link from "next/link";
-import * as React from "react";
+  type LucideIcon
+} from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import Link from 'next/link';
+import * as React from 'react';
 
 import {
   Sidebar,
@@ -29,22 +29,19 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  SidebarRail,
-} from "@/components/ui/sidebar";
+  SidebarRail
+} from '@/components/ui/sidebar';
 import {
   Collapsible,
   CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import { useAuth } from "@/hooks/use-auth";
-import { ConnectionStatus } from "@/components/database/connection-status";
-import { DatabaseSelector } from "@/components/database/database-selector";
-import { useSidebar } from "@/components/ui/sidebar";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
-// import { Button } from '@/components/ui/button';
-// import { Separator } from '@/components/ui/separator';
+  CollapsibleTrigger
+} from '@/components/ui/collapsible';
+import { useAuth } from '@/hooks/use-auth';
+import { ConnectionStatus } from '@/components/database/connection-status';
+import { DatabaseSelector } from '@/components/database/database-selector';
+import { useSidebar } from '@/components/ui/sidebar';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 
-// Define the navigation structure
 type NavItem = {
   title: string;
   url: string;
@@ -54,54 +51,52 @@ type NavItem = {
     title: string;
     url: string;
   }[];
-  action?: string; // custom action identifier
+  action?: string;
   badge?: string;
 };
 
-// Navigation configuration
-// This structure defines the main sidebar menu items including nested sub-menus.
 const getNavItems = (): NavItem[] => [
   {
-    title: "Dashboard",
-    url: "/",
-    icon: LayoutDashboard,
+    title: 'Dashboard',
+    url: '/',
+    icon: LayoutDashboard
   },
   {
-    title: "Relatórios",
-    url: "/reports",
+    title: 'Relatórios',
+    url: '/reports',
     icon: FileBarChart,
-    badge: "24",
+    badge: '24'
   },
   {
-    title: "Fontes de Dados",
-    url: "#",
+    title: 'Fontes de Dados',
+    url: '#',
     icon: Database,
-    action: "datasources",
+    action: 'datasources'
   },
   {
-    title: "Users",
-    url: "/users",
-    icon: User,
+    title: 'Users',
+    url: '/users',
+    icon: User
   },
   {
-    title: "Configurações",
-    url: "#",
+    title: 'Configurações',
+    url: '#',
     icon: Settings,
     items: [
       {
-        title: "Geral",
-        url: "/settings",
+        title: 'Geral',
+        url: '/settings'
       },
       {
-        title: "Equipe",
-        url: "/settings/team",
+        title: 'Equipe',
+        url: '/settings/team'
       },
       {
-        title: "Faturamento",
-        url: "/settings/billing",
-      },
-    ],
-  },
+        title: 'Faturamento',
+        url: '/settings/billing'
+      }
+    ]
+  }
 ];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -109,15 +104,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const router = useRouter();
   const { user, client, logout } = useAuth();
   const { state } = useSidebar();
-  const isCollapsed = state === "collapsed";
+  const isCollapsed = state === 'collapsed';
 
-  // Generate navigation items based on current context
   const items = getNavItems();
 
   const handleNavClick = (item: NavItem, e: React.MouseEvent) => {
-    if (item.action === "datasources") {
+    if (item.action === 'datasources') {
       e.preventDefault();
-      router.push("?action=datasources");
+      router.push('?action=datasources');
     }
   };
 
@@ -154,12 +148,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarGroupLabel>Menu</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => {
-                // Determine active state for parent items
+              {items.map(item => {
                 const isActive =
                   pathname === item.url ||
-                  (item.url !== "/" &&
-                    item.url !== "#" &&
+                  (item.url !== '/' &&
+                    item.url !== '#' &&
                     pathname.startsWith(item.url));
 
                 if (item.items && item.items.length > 0) {
@@ -167,13 +160,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     <Collapsible
                       key={item.title}
                       asChild
-                      defaultOpen={isActive} // Open if one of children is active
-                      className="group/collapsible">
+                      defaultOpen={isActive}
+                      className="group/collapsible"
+                    >
                       <SidebarMenuItem>
                         <CollapsibleTrigger asChild>
                           <SidebarMenuButton
                             tooltip={item.title}
-                            isActive={isActive}>
+                            isActive={isActive}
+                          >
                             {item.icon && <item.icon />}
                             <span>{item.title}</span>
                             <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
@@ -181,13 +176,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         </CollapsibleTrigger>
                         <CollapsibleContent>
                           <SidebarMenuSub>
-                            {item.items.map((subItem) => {
+                            {item.items.map(subItem => {
                               const isSubActive = pathname === subItem.url;
                               return (
                                 <SidebarMenuSubItem key={subItem.title}>
                                   <SidebarMenuSubButton
                                     asChild
-                                    isActive={isSubActive}>
+                                    isActive={isSubActive}
+                                  >
                                     <Link href={subItem.url}>
                                       <span>{subItem.title}</span>
                                     </Link>
@@ -208,7 +204,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       asChild
                       isActive={isActive}
                       tooltip={item.title}
-                      onClick={(e) => handleNavClick(item, e)}>
+                      onClick={e => handleNavClick(item, e)}
+                    >
                       <Link href={item.url}>
                         {item.icon && <item.icon />}
                         <span>{item.title}</span>
@@ -229,7 +226,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+            >
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-accent text-sidebar-foreground font-semibold text-xs shrink-0">
                 {user?.email?.[0]?.toUpperCase()}
               </div>
@@ -248,7 +246,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarMenuButton
               onClick={logout}
               tooltip="Sair"
-              className="text-red-600 hover:text-red-700 hover:bg-red-50">
+              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+            >
               <LogOutIcon />
               <span>Sair</span>
             </SidebarMenuButton>
@@ -260,8 +259,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   );
 }
 
-// Helper for the logout icon which was missing in imports
-function LogOutIcon(props: React.ComponentProps<"svg">) {
+function LogOutIcon(props: React.ComponentProps<'svg'>) {
   return (
     <svg
       {...props}
@@ -274,7 +272,8 @@ function LogOutIcon(props: React.ComponentProps<"svg">) {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="lucide lucide-log-out">
+      className="lucide lucide-log-out"
+    >
       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
       <polyline points="16 17 21 12 16 7" />
       <line x1="21" x2="9" y1="12" y2="12" />

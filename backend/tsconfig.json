@@ -21,11 +21,11 @@
     "declaration": true,
     "declarationMap": true,
 
-    // Stricter Typechecking Options
+    // Opções de verificação de tipo mais rigorosas
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
 
-    // Style Options
+    // Opções de estilo
     // "noImplicitReturns": true,
     // "noImplicitOverride": true,
     // "noUnusedLocals": true,
@@ -33,7 +33,7 @@
     // "noFallthroughCasesInSwitch": true,
     // "noPropertyAccessFromIndexSignature": true,
 
-    // Recommended Options
+    // Opções recomendadas
     "strict": true,
     "jsx": "react-jsx",
     "verbatimModuleSyntax": true,

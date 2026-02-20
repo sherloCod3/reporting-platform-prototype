@@ -1,46 +1,30 @@
-"use client";
+'use client';
 
-/**
- * PreviewSectionRenderer — Dispatch component that maps each SectionType
- * to its read-only preview rendering for the PDF-faithful preview mode.
- *
- * This component is purely presentational — no editing, no interaction.
- * It renders exactly how each section will appear in the final PDF output.
- */
-
-import React, { memo } from "react";
-import { FileText, Calendar, Minus } from "lucide-react";
+import React, { memo } from 'react';
+import { FileText, Calendar, Minus } from 'lucide-react';
 import type {
   ReportSection,
   HeaderSection,
   TextSection,
-  TableSection,
-} from "@/features/report-composer/types/composer.types";
-import { TableRenderer } from "@/components/reports/renderers/table-renderer";
-import { TextRenderer } from "@/components/reports/renderers/text-renderer";
-
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
+  TableSection
+} from '@/features/report-composer/types/composer.types';
+import { TableRenderer } from '@/components/reports/renderers/table-renderer';
+import { TextRenderer } from '@/components/reports/renderers/text-renderer';
 
 interface PreviewSectionRendererProps {
-  /** The section to render in preview mode */
   section: ReportSection;
 }
 
-// ---------------------------------------------------------------------------
-// Sub-Renderers (Private — PDF-faithful output)
-// ---------------------------------------------------------------------------
+// Sub-Renderers (Privados - saída fiel ao PDF)
 
-/** Renders a header section with title, subtitle, logo, and date */
 function PreviewHeader({
-  section,
+  section
 }: {
   section: HeaderSection;
 }): React.ReactElement {
   return (
     <div className="preview-section preview-header">
-      {/* Top row: logo and date */}
+      {/* Linha superior: logo e data */}
       <div className="flex items-center justify-between mb-3">
         {section.showLogo && (
           <div className="flex items-center gap-2 text-muted-foreground/60">
@@ -53,29 +37,28 @@ function PreviewHeader({
           <div className="flex items-center gap-1 text-muted-foreground/50 ml-auto">
             <Calendar className="w-3 h-3" />
             <span className="text-[10px] font-mono">
-              {new Date().toLocaleDateString("pt-BR")}
+              {new Date().toLocaleDateString('pt-BR')}
             </span>
           </div>
         )}
       </div>
 
-      {/* Title and Subtitle */}
+      {/* Título e Subtítulo */}
       <h1 className="text-xl font-bold text-foreground leading-tight">
-        {section.title || "Título do Relatório"}
+        {section.title || 'Título do Relatório'}
       </h1>
       {section.subtitle && (
         <p className="text-sm text-muted-foreground mt-1">{section.subtitle}</p>
       )}
 
-      {/* Decorative separator — matches the edit mode visual */}
+      {/* Separador decorativo - alinhado com o visual de edição */}
       <div className="h-px bg-gradient-to-r from-primary/30 via-primary/10 to-transparent mt-4" />
     </div>
   );
 }
 
-/** Renders a text section with formatting applied */
 function PreviewText({
-  section,
+  section
 }: {
   section: TextSection;
 }): React.ReactElement {
@@ -92,9 +75,8 @@ function PreviewText({
   );
 }
 
-/** Renders a table section with data from the SQL binding */
 function PreviewTable({
-  section,
+  section
 }: {
   section: TableSection;
 }): React.ReactElement {
@@ -116,7 +98,6 @@ function PreviewTable({
   );
 }
 
-/** Renders a visual page break separator */
 function PreviewPageBreak(): React.ReactElement {
   return (
     <div className="preview-section preview-page-break">
@@ -133,21 +114,17 @@ function PreviewPageBreak(): React.ReactElement {
   );
 }
 
-// ---------------------------------------------------------------------------
-// Main Component
-// ---------------------------------------------------------------------------
-
 export const PreviewSectionRenderer: React.FC<
   Readonly<PreviewSectionRendererProps>
 > = memo(function PreviewSectionRenderer({ section }) {
   switch (section.type) {
-    case "header":
+    case 'header':
       return <PreviewHeader section={section} />;
-    case "text":
+    case 'text':
       return <PreviewText section={section} />;
-    case "table":
+    case 'table':
       return <PreviewTable section={section} />;
-    case "page-break":
+    case 'page-break':
       return <PreviewPageBreak />;
   }
 });

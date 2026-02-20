@@ -1,4 +1,4 @@
-# ⚠️ Experimental / Archived
+# Experimental / Archived
 
 This feature explores a **section-based, vertical document composer**.
 It is **NOT** wired into production routes and does not represent
@@ -12,4 +12,4 @@ Kept for reference and potential future extraction of UI patterns
 The product uses a **canvas-first, free-layout model** (`Component` with
 absolute `x/y/width/height` positioning). This composer uses an incompatible
 vertical-stack model (`ReportSection` with `order`). The two paradigms
-cannot be merged — see the reconciliation analysis for details.
+cannot be merged, see the reconciliation analysis for details.

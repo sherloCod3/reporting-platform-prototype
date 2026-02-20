@@ -426,7 +426,7 @@
 
 ### Recommended Improvements
 
-- **SEC-05-ITEM-15:** Implement SQL parsing (AST-based) instead of string matching for robust injection prevention
+- **SEC-05-ITEM-15:** Implement SQL parsing (AST-based) instead of string matching for effective injection prevention
   - Impact Level: High
   - Risk Category: Security
   - Status: Open
