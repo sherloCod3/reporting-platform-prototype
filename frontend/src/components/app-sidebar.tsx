@@ -226,7 +226,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground mb-1"
             >
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-accent text-sidebar-foreground font-semibold text-xs shrink-0">
                 {user?.email?.[0]?.toUpperCase()}
@@ -239,20 +239,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
-          <SidebarMenuItem>
-            <ThemeToggle />
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              onClick={logout}
-              tooltip="Sair"
-              className="text-red-600 hover:text-red-700 hover:bg-red-50"
-            >
-              <LogOutIcon />
-              <span>Sair</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
         </SidebarMenu>
+        <div className="flex flex-row items-center justify-between group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-2 p-1 px-2 mt-2 border-t border-border/40 pt-3">
+          <ThemeToggle />
+          <button
+            onClick={logout}
+            title="Sair"
+            className="flex items-center justify-center w-9 h-9 rounded-md text-muted-foreground hover:bg-destructive hover:text-destructive-foreground transition-colors"
+          >
+            <LogOutIcon className="w-[1.2rem] h-[1.2rem]" />
+          </button>
+        </div>
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

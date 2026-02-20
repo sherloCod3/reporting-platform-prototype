@@ -76,23 +76,31 @@ function SectionEditRenderer({
       return (
         <div
           className={cn(
-            'composer-section group relative border rounded-md transition-all duration-200 cursor-pointer',
+            'composer-section group relative border rounded-xl transition-all duration-300 ease-out cursor-pointer overflow-hidden mt-4 mb-4',
             isSelected
-              ? 'border-primary/40 ring-1 ring-primary/15 bg-primary/3'
-              : 'border-border/40 hover:border-border/70 bg-card/50'
+              ? 'border-brand-primary ring-1 ring-brand-primary/20 bg-brand-primary/5 shadow-shadow-glow'
+              : 'border-border/40 hover:border-border/80 bg-card/60 hover:shadow-elevation-1'
           )}
           onClick={() => onSelect(section.id)}
           role="button"
           tabIndex={0}
         >
-          <div className="flex items-center gap-3 px-6 py-3">
-            <div className="flex-1 border-t-2 border-dashed border-muted-foreground/20" />
-            <span className="text-[10px] uppercase tracking-widest text-muted-foreground/30 flex items-center gap-1 select-none">
-              <Minus className="w-3 h-3" />
+          {isSelected && (
+            <div className="absolute left-0 top-0 bottom-0 w-1 bg-brand-primary rounded-l-xl z-10" />
+          )}
+          <div className="flex items-center gap-3 px-6 py-4">
+            <div className="flex-1 border-t-2 border-dashed border-muted-foreground/30" />
+            <span
+              className={cn(
+                'text-[10px] uppercase tracking-widest flex items-center gap-1 select-none font-medium transition-colors',
+                isSelected ? 'text-brand-primary' : 'text-muted-foreground/50'
+              )}
+            >
+              <Minus className={cn('w-3 h-3', isSelected && 'animate-pulse')} />
               Quebra de Página
-              <Minus className="w-3 h-3" />
+              <Minus className={cn('w-3 h-3', isSelected && 'animate-pulse')} />
             </span>
-            <div className="flex-1 border-t-2 border-dashed border-muted-foreground/20" />
+            <div className="flex-1 border-t-2 border-dashed border-muted-foreground/30" />
           </div>
         </div>
       );

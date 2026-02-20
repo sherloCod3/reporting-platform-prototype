@@ -44,7 +44,7 @@ export const ReportPreview: React.FC<Readonly<ReportPreviewProps>> = memo(
         {/* Container de papel centralizado */}
         <div className="min-w-full min-h-full p-16 flex justify-center items-start">
           <div
-            className="preview-paper bg-canvas shadow-lg border border-border/50 relative transition-transform duration-200 ease-out origin-top"
+            className="preview-paper bg-canvas shadow-elevation-3 border border-border/40 relative transition-transform duration-200 ease-out origin-top"
             style={{
               width: pageConfig.width,
               minHeight: pageConfig.height,
@@ -62,8 +62,15 @@ export const ReportPreview: React.FC<Readonly<ReportPreviewProps>> = memo(
 
             {/* Estado vazio */}
             {sections.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-32 text-muted-foreground/20 select-none">
-                <span className="text-sm">Nenhuma seção para visualizar</span>
+              <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-muted-foreground/30 select-none">
+                <div className="flex flex-col items-center text-center max-w-[200px] opacity-70">
+                  <span className="text-[13px] font-medium mb-1">
+                    Página em branco
+                  </span>
+                  <span className="text-[11px] leading-relaxed">
+                    As seções adicionadas aparecerão publicadas aqui.
+                  </span>
+                </div>
               </div>
             )}
           </div>

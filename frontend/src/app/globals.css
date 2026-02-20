@@ -94,69 +94,79 @@
   --grid-size: 20px;
   --scrollbar-thumb: #cbd5e1;
   --scrollbar-thumb-dark: #334155;
-  --page-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+  --page-shadow: 0 2px 4px -1px oklch(0 0 0 / 0.06), 0 1px 2px -1px oklch(0 0 0 / 0.04);
+  --shadow-elevation-1: 0 2px 4px -1px oklch(0 0 0 / 0.06), 0 1px 2px -1px oklch(0 0 0 / 0.04);
+  --shadow-elevation-2: 0 4px 6px -1px oklch(0 0 0 / 0.08), 0 2px 4px -2px oklch(0 0 0 / 0.04);
+  --shadow-elevation-3: 0 10px 15px -3px oklch(0 0 0 / 0.1), 0 4px 6px -4px oklch(0 0 0 / 0.05);
+  --shadow-glow: 0 0 8px oklch(0.45 0.15 265 / 0.5), 0 0 16px oklch(0.45 0.15 265 / 0.3);
 }
 
 .dark {
-  /* VS Code GitHub Dark Theme - Soft & Standardized */
-  --bg-app: #14181e; /* Main Background (Darker Workspace) */
-  --bg-panel: #1f2428; /* Sidebar / Panels */
-  --bg-surface: #282e34; /* Cards / Elevated */
-  --bg-canvas: #24292e; /* Report Canvas (Paper) */
+  /* OKLCH Scale with 265 Hue Tint (Chroma increased for visibility) */
+  --bg-app: oklch(0.18 0.035 265); /* Main Background - visible tint */
+  --bg-panel: oklch(0.22 0.04 265); /* Sidebar / Panels */
+  --bg-surface: oklch(0.26 0.045 265); /* Cards / Elevated */
+  --bg-canvas: oklch(0.24 0.04 265); /* Report Canvas */
 
   --background: var(--bg-app);
-  --foreground: #d1dedf; /* Soft White */
+  --foreground: oklch(0.92 0.02 265); /* Soft Tinted White */
 
   /* Surface Hierarchy */
   --card: var(--bg-surface);
-  --card-foreground: #d1dedf;
+  --card-foreground: var(--foreground);
 
   --popover: var(--bg-surface);
-  --popover-foreground: #d1dedf;
+  --popover-foreground: var(--foreground);
 
-  /* Primary - Muted Blue */
-  --primary: #4c8bd4;
-  --primary-foreground: #24292e;
+  /* Primary - Vivid Blue */
+  --primary: oklch(0.65 0.20 265);
+  --primary-foreground: oklch(0.15 0.04 265);
 
-  --secondary: #35393d; /* Input/Border Gray */
-  --secondary-foreground: #d1dedf;
+  --secondary: oklch(0.32 0.05 265); /* Input/Border Gray */
+  --secondary-foreground: var(--foreground);
 
-  --muted: #1f2428; /* Panel Background */
-  --muted-foreground: #818b98; /* Disabled/Muted Gray */
+  --muted: oklch(0.25 0.04 265); /* Panel Background */
+  --muted-foreground: oklch(0.70 0.03 265); /* Disabled/Muted Gray */
 
-  --accent: #282e34; /* Surface Gray */
-  --accent-foreground: #d1dedf;
+  --accent: oklch(0.32 0.05 265); /* Surface Gray */
+  --accent-foreground: var(--foreground);
 
-  --destructive: #d1242f; /* Red from user (or standard GitHub #da3633) */
-  --destructive-foreground: #f0f6fc;
+  --destructive: oklch(0.45 0.15 25); /* More coherent, deeper red */
+  --destructive-foreground: oklch(0.95 0.02 25); /* Soft reddish white */
 
-  /* Borders - Subtle Gray */
-  --border: #35393d;
-  --input: #35393d;
-  --ring: #58a6ff; /* Bright Blue focus ring */
+  /* Borders - Subtle Gray with tint */
+  --border: oklch(0.35 0.05 265);
+  --input: oklch(0.35 0.05 265);
+  --ring: var(--primary); /* Bright Blue focus ring */
 
   /* Border dark */
-  --border-dark: #1b1f23;
+  --border-dark: oklch(0.25 0.04 265);
 
-  --chart-1: #4c8bd4; /* Primary Blue */
-  --chart-2: #30b44e; /* Green */
-  --chart-3: #d1242f; /* Red */
-  --chart-4: #e3b341; /* Yellow/Gold (standard GitHub) */
-  --chart-5: #6f42c1; /* Purple (standard GitHub) */
+  --chart-1: oklch(0.65 0.20 265); /* Primary Blue */
+  --chart-2: oklch(0.70 0.15 160); /* Teal/Cyan */
+  --chart-3: oklch(0.65 0.20 25);  /* Red */
+  --chart-4: oklch(0.75 0.15 80);  /* Gold */
+  --chart-5: oklch(0.65 0.15 320); /* Magenta */
 
   /* Brand Overrides for Dark Mode */
-  --brand-primary: var(--primary); /* #4C8BD4 */
-  --brand-primary-dark: #376b9f; /* Darker shade of #4C8BD4 */
+  --brand-primary: var(--primary);
+  --brand-primary-dark: oklch(0.50 0.15 265);
 
   /* Sidebar - Darker Panel */
   --sidebar: var(--bg-panel);
-  --sidebar-foreground: #d1dedf;
-  --sidebar-primary: #4c8bd4;
-  --sidebar-primary-foreground: #24292e;
-  --sidebar-accent: #2e363d; /* Slightly lighter than panel for hover */
-  --sidebar-accent-foreground: #d1dedf;
-  --sidebar-border: #35393d;
-  --sidebar-ring: #58a6ff;
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: oklch(0.35 0.05 265); /* Clearly visibly lighter blue for hover */
+  --sidebar-accent-foreground: var(--primary);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--ring);
+  
+  --page-shadow: 0 2px 4px -1px oklch(0 0 0 / 0.3), 0 1px 2px -1px oklch(0 0 0 / 0.2);
+  --shadow-elevation-1: 0 2px 4px -1px oklch(0 0 0 / 0.3), 0 1px 2px -1px oklch(0 0 0 / 0.2);
+  --shadow-elevation-2: 0 4px 6px -1px oklch(0 0 0 / 0.4), 0 2px 4px -2px oklch(0 0 0 / 0.2);
+  --shadow-elevation-3: 0 10px 15px -3px oklch(0 0 0 / 0.5), 0 4px 6px -4px oklch(0 0 0 / 0.25);
+  --shadow-glow: 0 0 8px oklch(0.65 0.15 265 / 0.6), 0 0 16px oklch(0.65 0.15 265 / 0.4);
 }
 
 @layer base {
@@ -255,8 +265,15 @@
   height: 2px;
   width: 100%;
 }
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 4px var(--brand-primary); }
+  50% { box-shadow: var(--shadow-glow); }
+}
+
 .snapped {
-  box-shadow: 0 0 0 2px var(--brand-primary);
+  animation: glowPulse 2s ease-in-out infinite;
+  z-index: 50;
 }
 
 @keyframes modalFadeIn {

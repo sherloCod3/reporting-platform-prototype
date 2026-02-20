@@ -63,13 +63,17 @@ export const SectionPanel: React.FC<Readonly<SectionPanelProps>> = memo(
           </span>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-2 py-2 space-y-1">
+        <div className="flex-1 overflow-y-auto px-2 py-3 space-y-1">
           {sections.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-12 text-muted-foreground/50 text-xs text-center gap-2 select-none">
-              <FileText className="w-8 h-8 opacity-30" />
-              <span>Nenhuma seção adicionada.</span>
-              <span className="text-[10px] opacity-70">
-                Use a barra de ferramentas para inserir seções.
+            <div className="flex flex-col items-center justify-center py-10 px-4 text-center mt-4">
+              <div className="w-12 h-12 rounded-full bg-muted/50 flex items-center justify-center mb-3 shadow-inner">
+                <FileText className="w-6 h-6 text-muted-foreground/40" />
+              </div>
+              <span className="text-[13px] font-medium text-foreground/80 mb-1">
+                Nenhuma seção
+              </span>
+              <span className="text-[11px] text-muted-foreground leading-relaxed balance">
+                Use a barra de ferramentas para começar seu relatório.
               </span>
             </div>
           )}
@@ -85,19 +89,36 @@ export const SectionPanel: React.FC<Readonly<SectionPanelProps>> = memo(
               <div
                 key={section.id}
                 className={cn(
-                  'group flex items-center gap-2 rounded-md px-2 py-1.5 cursor-pointer transition-colors duration-150',
-                  'hover:bg-muted/40',
-                  isSelected && 'bg-primary/10 border border-primary/20'
+                  'group relative flex items-center gap-3 rounded-lg px-3 py-2 cursor-pointer transition-all duration-200 ease-out outline-none',
+                  'hover:bg-muted/40 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
+                  isSelected
+                    ? 'bg-primary/5 shadow-[inset_2px_0_0_0_var(--brand-primary)]'
+                    : 'text-muted-foreground'
                 )}
                 onClick={() => handleSelect(section.id)}
                 role="button"
                 tabIndex={0}
               >
-                <div className={cn('shrink-0', colorClass)}>
-                  <Icon className="w-3.5 h-3.5" />
+                {/* Visual Indicator of selection (Von Restorff) */}
+                {isSelected && (
+                  <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-brand-primary rounded-l-lg shadow-shadow-glow" />
+                )}
+
+                <div
+                  className={cn(
+                    'shrink-0 transition-transform duration-200',
+                    isSelected ? 'scale-110 text-brand-primary' : colorClass
+                  )}
+                >
+                  <Icon className="w-4 h-4" />
                 </div>
 
-                <span className="flex-1 text-xs font-medium text-foreground truncate">
+                <span
+                  className={cn(
+                    'flex-1 text-[13px] font-medium truncate transition-colors',
+                    isSelected ? 'text-foreground font-semibold' : ''
+                  )}
+                >
                   {section.label}
                 </span>
 

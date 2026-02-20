@@ -112,7 +112,7 @@ export function ReportEditor({
       components: Component[],
       gridSnapper: (val: number) => number
     ) => {
-      const SNAP_THRESHOLD = 10;
+      const SNAP_THRESHOLD = 8;
       const lines: AlignmentLine[] = [];
 
       let finalX = x;
@@ -121,73 +121,95 @@ export function ReportEditor({
       let snappedX = false;
       let snappedY = false;
 
-      const horizontalCandidates = [
-        { val: y, type: 'start' },
-        { val: y + h / 2, type: 'center' },
-        { val: y + h, type: 'end' }
+      // Candidate edges of the dragged component with their absolute offset
+      const hCandidates = [
+        { val: y, offset: 0, type: 'start' },
+        { val: y + h, offset: -h, type: 'end' },
+        { val: y + h / 2, offset: -h / 2, type: 'center' }
+      ];
+      const vCandidates = [
+        { val: x, offset: 0, type: 'start' },
+        { val: x + w, offset: -w, type: 'end' },
+        { val: x + w / 2, offset: -w / 2, type: 'center' }
       ];
 
-      const verticalCandidates = [
-        { val: x, type: 'start' },
-        { val: x + w / 2, type: 'center' },
-        { val: x + w, type: 'end' }
-      ];
+      // Track the globally closest snap for X and Y
+      let bestYDist = SNAP_THRESHOLD;
+      let bestXDist = SNAP_THRESHOLD;
 
       components.forEach(other => {
         if (other.id === id) return;
 
-        const otherCenters = {
-          x: other.x + other.width / 2,
-          y: other.y + other.height / 2
-        };
-
-        const otherH = [
+        const otherHEdges = [
           other.y,
-          otherCenters.y,
-          other.y + other.height
+          other.y + other.height,
+          other.y + other.height / 2
         ];
-
-        const otherV = [
+        const otherVEdges = [
           other.x,
-          otherCenters.x,
-          other.x + other.width
+          other.x + other.width,
+          other.x + other.width / 2
         ];
 
-        if (!snappedY) {
-          horizontalCandidates.forEach(cand => {
-            otherH.forEach(target => {
-              if (Math.abs(cand.val - target) < SNAP_THRESHOLD) {
-                const diff = target - cand.val;
-                finalY += diff;
-                snappedY = true;
-                lines.push({
-                  type: 'horizontal',
-                  y: target,
-                  start: Math.min(x, other.x),
-                  end: Math.max(x + w, other.x + other.width)
-                });
-              }
-            });
-          });
-        }
+        // Find best match for EACH horizontal candidate independently
+        hCandidates.forEach(cand => {
+          let localBestDist = SNAP_THRESHOLD;
+          let localBestTarget: number | null = null;
 
-        if (!snappedX) {
-          verticalCandidates.forEach(cand => {
-            otherV.forEach(target => {
-              if (Math.abs(cand.val - target) < SNAP_THRESHOLD) {
-                const diff = target - cand.val;
-                finalX += diff;
-                snappedX = true;
-                lines.push({
-                  type: 'vertical',
-                  x: target,
-                  start: Math.min(y, other.y),
-                  end: Math.max(y + h, other.y + other.height)
-                });
-              }
-            });
+          otherHEdges.forEach(target => {
+            const dist = Math.abs(cand.val - target);
+            if (dist < localBestDist) {
+              localBestDist = dist;
+              localBestTarget = target;
+            }
           });
-        }
+
+          if (localBestTarget !== null) {
+            snappedY = true;
+            lines.push({
+              type: 'horizontal',
+              y: localBestTarget,
+              start: Math.min(x, other.x),
+              end: Math.max(x + w, other.x + other.width)
+            });
+
+            // If this is the globally tightest snap, use it for positioning
+            if (localBestDist < bestYDist) {
+              bestYDist = localBestDist;
+              finalY = localBestTarget + cand.offset;
+            }
+          }
+        });
+
+        // Find best match for EACH vertical candidate independently
+        vCandidates.forEach(cand => {
+          let localBestDist = SNAP_THRESHOLD;
+          let localBestTarget: number | null = null;
+
+          otherVEdges.forEach(target => {
+            const dist = Math.abs(cand.val - target);
+            if (dist < localBestDist) {
+              localBestDist = dist;
+              localBestTarget = target;
+            }
+          });
+
+          if (localBestTarget !== null) {
+            snappedX = true;
+            lines.push({
+              type: 'vertical',
+              x: localBestTarget,
+              start: Math.min(y, other.y),
+              end: Math.max(y + h, other.y + other.height)
+            });
+
+            // If this is the globally tightest snap, use it for positioning
+            if (localBestDist < bestXDist) {
+              bestXDist = localBestDist;
+              finalX = localBestTarget + cand.offset;
+            }
+          }
+        });
       });
 
       if (!snappedX) {
@@ -685,8 +707,9 @@ export function ReportEditor({
             <div
               ref={paperRef}
               id="canvas-area"
-              className={`bg-canvas shadow-lg border border-border/50 relative transition-transform duration-200 ease-out origin-top ${mode === 'edit' ? 'canvas-grid-pattern' : ''
-                }`}
+              className={`bg-canvas shadow-lg border border-border/50 relative transition-transform duration-200 ease-out origin-top ${
+                mode === 'edit' ? 'canvas-grid-pattern' : ''
+              }`}
               style={{
                 width: PAPER_W,
                 height: PAPER_H,

@@ -51,15 +51,19 @@ export const SectionHeader: React.FC<Readonly<SectionHeaderProps>> = memo(
     return (
       <div
         className={cn(
-          'composer-section group relative border rounded-md transition-all duration-200',
+          'composer-section group relative border rounded-xl transition-all duration-300 ease-out',
           isSelected
-            ? 'border-primary/40 ring-1 ring-primary/15 bg-primary/3'
-            : 'border-border/40 hover:border-border/70 bg-card/50'
+            ? 'border-brand-primary ring-1 ring-brand-primary/20 bg-brand-primary/5 shadow-shadow-glow z-10'
+            : 'border-border/40 hover:border-border/80 bg-card hover:shadow-elevation-1 z-0'
         )}
         onClick={() => onSelect(section.id)}
         role="button"
         tabIndex={0}
       >
+        {/* Visual Indicator of selection (Von Restorff) */}
+        {isSelected && (
+          <div className="absolute left-0 top-0 bottom-0 w-1 bg-brand-primary rounded-l-xl pointer-events-none" />
+        )}
         <div className="px-6 pt-6 pb-4">
           <div className="flex items-center justify-between mb-4">
             {section.showLogo && (
