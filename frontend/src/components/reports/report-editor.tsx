@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
   Type,
@@ -615,18 +616,7 @@ export function ReportEditor({
           )}
         </div>
 
-        <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center">
-          <input
-            type="text"
-            value={state.title}
-            onChange={handleTitleChange}
-            disabled={mode === 'preview'}
-            className="text-sm font-semibold text-center bg-transparent border-none outline-none focus:ring-1 focus:ring-primary rounded px-2 w-64 text-foreground placeholder:text-muted-foreground/50 transition-colors"
-            placeholder="Relatório Sem Título"
-          />
-        </div>
-
-        <div className="flex items-center gap-2">
+        <div className="flex flex-1 justify-end items-center gap-2">
           <div className="flex items-center bg-muted/30 rounded-md border border-border/50">
             <Button
               variant="ghost"
@@ -689,6 +679,23 @@ export function ReportEditor({
             Salvar Relatório
           </Button>
         </div>
+      </div>
+
+      {/* Title & Metadata Top Bar */}
+      <div className="h-14 border-b border-border bg-background flex flex-col justify-center px-4 shrink-0 transition-all">
+        <input
+          type="text"
+          value={state.title}
+          onChange={handleTitleChange}
+          disabled={mode === 'preview'}
+          className={cn(
+            'text-lg font-semibold bg-transparent border-none outline-none focus:ring-1 focus:ring-primary/50 text-foreground transition-all px-2 -ml-2 rounded-sm w-full md:w-1/2',
+            mode === 'preview'
+              ? 'opacity-90'
+              : 'placeholder:text-muted-foreground/30 hover:bg-muted/30'
+          )}
+          placeholder="Dê um nome ao seu relatório..."
+        />
       </div>
 
       <div className="flex-1 flex overflow-hidden relative">
