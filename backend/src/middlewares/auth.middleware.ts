@@ -48,7 +48,9 @@ function getOrCreatePool(
       password: cred.password,
       waitForConnections: true,
       connectionLimit: 10,
-      connectTimeout: 10_000
+      connectTimeout: 10_000,
+      enableKeepAlive: true,
+      keepAliveInitialDelay: 0
     };
 
     // Only set database if it's explicitly provided and not the local auth db

@@ -733,6 +733,7 @@ export function ReportEditor({
                   onEditSql={openSqlEditor}
                   onDragStart={startDrag}
                   onResizeStart={startResize}
+                  onUpdate={updateComponent}
                   readOnly={mode === 'preview'}
                 />
               ))}

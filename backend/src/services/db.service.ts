@@ -89,7 +89,9 @@ export const DbService = {
         database,
         waitForConnections: true,
         connectionLimit: 10,
-        connectTimeout: 10_000
+        connectTimeout: 10_000,
+        enableKeepAlive: true,
+        keepAliveInitialDelay: 0
       });
 
       await this.testConnection(newPool);

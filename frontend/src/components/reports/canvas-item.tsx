@@ -18,6 +18,7 @@ interface CanvasItemProps {
   isSelected: boolean;
   onSelect: (id: number) => void;
   onDelete: (id: number) => void;
+  onUpdate?: (id: number, changes: Partial<Component>) => void;
   onEditSql?: (id: number) => void;
   onDragStart: (e: React.MouseEvent, id: number) => void;
   onResizeStart?: (
@@ -33,16 +34,60 @@ export const CanvasItem = memo(function CanvasItem({
   isSelected,
   onSelect,
   onDelete,
+  onUpdate,
   onEditSql,
   onDragStart,
   onResizeStart,
   readOnly = false
 }: CanvasItemProps) {
+  const [isEditingText, setIsEditingText] = React.useState(false);
+  const [tempText, setTempText] = React.useState('');
+
   const renderContent = () => {
     switch (comp.type) {
       case 'text':
+        if (isEditingText && !readOnly) {
+          return (
+            <textarea
+              className="w-full h-full p-2 bg-background/50 border border-primary resize-none outline-none overflow-hidden styling-inherit"
+              style={{
+                fontFamily: comp.style?.fontFamily ?? 'Inter',
+                fontSize: comp.style?.fontSize
+                  ? `${comp.style.fontSize}px`
+                  : '14px',
+                textAlign: comp.style?.textAlign ?? 'left',
+                fontWeight: comp.style?.fontWeight ?? 'normal',
+                color: comp.style?.color ?? 'inherit'
+              }}
+              value={tempText}
+              title="Editar texto"
+              placeholder="Digite seu texto aqui..."
+              onChange={e => setTempText(e.target.value)}
+              onBlur={() => {
+                setIsEditingText(false);
+                onUpdate?.(comp.id, { content: tempText });
+              }}
+              onKeyDown={e => {
+                // allow exit with escape
+                if (e.key === 'Escape') {
+                  setIsEditingText(false);
+                  onUpdate?.(comp.id, { content: tempText });
+                }
+              }}
+              autoFocus
+            />
+          );
+        }
         return (
-          <div className="h-full">
+          <div
+            className="h-full cursor-text"
+            onDoubleClick={e => {
+              if (readOnly) return;
+              e.stopPropagation();
+              setTempText(comp.content || '');
+              setIsEditingText(true);
+            }}
+          >
             <TextRenderer content={comp.content || ''} style={comp.style} />
           </div>
         );

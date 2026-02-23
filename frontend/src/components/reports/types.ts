@@ -8,6 +8,8 @@ export interface ComponentStyle {
   fontFamily?: string;
   fontSize?: number;
   textAlign?: 'left' | 'center' | 'right' | 'justify';
+  fontWeight?: string | number;
+  fontStyle?: string;
   color?: string;
   backgroundColor?: string;
   borderWidth?: number;
