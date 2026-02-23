@@ -344,41 +344,33 @@ export function ReportEditor({
         const deltaX = (e.clientX - startX) / zoom;
         const deltaY = (e.clientY - startY) / zoom;
 
-        let newX = initialBounds.x;
-        let newY = initialBounds.y;
-        let newW = initialBounds.width;
-        let newH = initialBounds.height;
-
-        if (handle.includes('e')) newW = initialBounds.width + deltaX;
-        if (handle.includes('w')) {
-          newW = initialBounds.width - deltaX;
-          newX = initialBounds.x + deltaX;
-        }
-        if (handle.includes('s')) newH = initialBounds.height + deltaY;
-        if (handle.includes('n')) {
-          newH = initialBounds.height - deltaY;
-          newY = initialBounds.y + deltaY;
-        }
-
+        let snappedX = initialBounds.x;
+        let snappedY = initialBounds.y;
+        let snappedW = initialBounds.width;
+        let snappedH = initialBounds.height;
         const MIN_SIZE = 20;
 
-        if (newW < MIN_SIZE) {
-          newW = MIN_SIZE;
-          if (handle.includes('w')) {
-            newX = initialBounds.x + initialBounds.width - MIN_SIZE;
-          }
+        if (handle.includes('e')) {
+          snappedW = snapToGrid(initialBounds.width + deltaX);
+          if (snappedW < MIN_SIZE) snappedW = MIN_SIZE;
         }
-        if (newH < MIN_SIZE) {
-          newH = MIN_SIZE;
-          if (handle.includes('n')) {
-            newY = initialBounds.y + initialBounds.height - MIN_SIZE;
-          }
+        if (handle.includes('w')) {
+          const rightEdge = initialBounds.x + initialBounds.width;
+          snappedX = snapToGrid(initialBounds.x + deltaX);
+          if (rightEdge - snappedX < MIN_SIZE) snappedX = rightEdge - MIN_SIZE;
+          snappedW = rightEdge - snappedX;
         }
-
-        const snappedX = snapToGrid(newX);
-        const snappedY = snapToGrid(newY);
-        const snappedW = snapToGrid(newW);
-        const snappedH = snapToGrid(newH);
+        if (handle.includes('s')) {
+          snappedH = snapToGrid(initialBounds.height + deltaY);
+          if (snappedH < MIN_SIZE) snappedH = MIN_SIZE;
+        }
+        if (handle.includes('n')) {
+          const bottomEdge = initialBounds.y + initialBounds.height;
+          snappedY = snapToGrid(initialBounds.y + deltaY);
+          if (bottomEdge - snappedY < MIN_SIZE)
+            snappedY = bottomEdge - MIN_SIZE;
+          snappedH = bottomEdge - snappedY;
+        }
 
         dispatch({
           type: 'RESIZE_COMPONENT',
