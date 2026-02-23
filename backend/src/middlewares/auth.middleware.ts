@@ -50,7 +50,9 @@ function getOrCreatePool(
       connectionLimit: 10,
       connectTimeout: 10_000,
       enableKeepAlive: true,
-      keepAliveInitialDelay: 0
+      keepAliveInitialDelay: 0,
+      idleTimeout: 30_000,
+      queueLimit: 0
     };
 
     // Only set database if it's explicitly provided and not the local auth db

@@ -56,11 +56,11 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50/50">
-      <Card className="w-full max-w-md mx-4 shadow-lg border-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <Card className="w-full max-w-md mx-4 shadow-lg">
         <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-2xl font-bold tracking-tight text-gray-900">
-            QReports
+          <CardTitle className="text-2xl font-bold tracking-tight text-foreground">
+            Reporting Platform Prototype
           </CardTitle>
           <CardDescription>
             Entre com suas credenciais para acessar
@@ -95,11 +95,7 @@ export default function LoginPage() {
                   </FormItem>
                 )}
               />
-              <Button
-                type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                disabled={isLoading}
-              >
+              <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : null}
@@ -108,7 +104,7 @@ export default function LoginPage() {
             </form>
           </Form>
         </CardContent>
-        <CardFooter className="text-center text-sm text-gray-500 justify-center">
+        <CardFooter className="text-center text-sm text-muted-foreground justify-center">
           &copy; 2026 QReports Tool
         </CardFooter>
       </Card>
