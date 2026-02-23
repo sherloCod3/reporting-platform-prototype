@@ -27,12 +27,12 @@ function EditReportContent() {
     mutationFn: (data: Partial<Omit<ReportData, 'id'>>) =>
       reportApi.update(reportId, data),
     onSuccess: () => {
-      toast.success('Report saved successfully');
+      toast.success('Relatório salvo com sucesso!');
       queryClient.invalidateQueries({ queryKey: ['report', reportId] });
       queryClient.invalidateQueries({ queryKey: ['reports'] });
     },
     onError: error => {
-      toast.error('Failed to save report');
+      toast.error('Falha ao salvar relatório');
       console.error(error);
     }
   });
