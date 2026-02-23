@@ -41,16 +41,22 @@ function getOrCreatePool(
   let pool = poolCache.get(poolKey);
 
   if (!pool) {
-    pool = mysql.createPool({
+    const poolConfig: mysql.PoolOptions = {
       host: clientConn.host,
       port: clientConn.port,
       user: cred.user,
       password: cred.password,
-      database: clientConn.db,
       waitForConnections: true,
       connectionLimit: 10,
       connectTimeout: 10_000
-    });
+    };
+
+    // Only set database if it's explicitly provided and not the local auth db
+    if (clientConn.db && clientConn.db !== 'relatorios') {
+      poolConfig.database = clientConn.db;
+    }
+
+    pool = mysql.createPool(poolConfig);
 
     poolCache.set(poolKey, pool);
   }
@@ -114,6 +120,11 @@ export async function authenticate(
       user: env.REPORT_DB_READ_USER,
       password: env.REPORT_DB_READ_PASSWORD
     };
+
+    const requestedDb = req.headers[ 'x-database' ];
+    if (requestedDb && typeof requestedDb === 'string') {
+      clientConn = { ...clientConn, db: requestedDb };
+    }
 
     const pool = getOrCreatePool(clientConn, cred);
 

@@ -66,6 +66,11 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(true);
       try {
         await api.post('/db/switch', { database });
+
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('@qreports:database', database);
+        }
+
         toast.success(`Switched to database: ${database}`);
 
         await fetchStatus();
@@ -95,7 +100,8 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
       setStatus(null);
       return;
     }
-  }, [user]);
+    fetchStatus();
+  }, [user, fetchStatus]);
 
   return (
     <DatabaseContext.Provider

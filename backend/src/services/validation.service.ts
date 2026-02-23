@@ -9,11 +9,14 @@ export const validationService = {
   async validateQuery(query: string): Promise<ValidationResult> {
     const normalized = query.trim().toUpperCase();
 
-    // Permite apenas SELECT e CTE (WITH)
-    if (!normalized.startsWith('SELECT') && !normalized.startsWith('WITH')) {
+    // Permite consultas de leitura e exploratórias
+    const allowedPrefixes = [ 'SELECT', 'WITH', 'SHOW', 'DESCRIBE', 'EXPLAIN' ];
+    const isAllowed = allowedPrefixes.some(prefix => normalized.startsWith(prefix));
+
+    if (!isAllowed) {
       return {
         isValid: false,
-        reason: 'Apenas consultas SELECT e/ou CTE (WITH) são permitidas'
+        reason: 'Apenas consultas SELECT, WITH, SHOW, DESCRIBE ou EXPLAIN são permitidas'
       };
     }
 
@@ -55,10 +58,9 @@ export const validationService = {
 };
 
 // TODO: remover apos refatoracao completa do servico
-export function validateSql(query: string): void {
-  validationService.validateQuery(query).then(result => {
-    if (!result.isValid) {
-      throw ErrorFactory.badRequest(result.reason || 'Query inválida');
-    }
-  });
+export async function validateSql(query: string): Promise<void> {
+  const result = await validationService.validateQuery(query);
+  if (!result.isValid) {
+    throw ErrorFactory.badRequest(result.reason || 'Query inválida');
+  }
 }

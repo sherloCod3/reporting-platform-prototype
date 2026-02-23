@@ -22,6 +22,12 @@ export function SqlEditor({
 }: SqlEditorProps) {
   const { theme } = useTheme();
 
+  const onExecuteRef = useRef(onExecute);
+
+  useEffect(() => {
+    onExecuteRef.current = onExecute;
+  }, [onExecute]);
+
   const editorRef = useRef<{
     layout: () => void;
     addCommand: (keybinding: number, handler: () => void) => void;
@@ -117,7 +123,7 @@ export function SqlEditor({
     typedEditor.addCommand(
       typedMonaco.KeyMod.CtrlCmd | typedMonaco.KeyCode.Enter,
       () => {
-        onExecute?.();
+        onExecuteRef.current?.();
       }
     );
 

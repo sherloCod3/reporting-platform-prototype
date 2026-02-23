@@ -10,12 +10,15 @@ export const api = axios.create({
 
 /** Anexa o token JWT em todas as requisicoes de saida. */
 api.interceptors.request.use(config => {
-  const token =
-    typeof window !== 'undefined'
-      ? localStorage.getItem('@qreports:token')
-      : null;
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  if (typeof window !== 'undefined') {
+    const token = localStorage.getItem('@qreports:token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    const db = localStorage.getItem('@qreports:database');
+    if (db) {
+      config.headers[ 'x-database' ] = db;
+    }
   }
   return config;
 });

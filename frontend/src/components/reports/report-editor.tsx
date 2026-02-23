@@ -20,7 +20,8 @@ import {
   Eye,
   Edit2,
   PanelRightClose,
-  PanelRightOpen
+  PanelRightOpen,
+  Loader2
 } from 'lucide-react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { SqlEditor } from '@/components/sql/sql-editor';
@@ -480,6 +481,7 @@ export function ReportEditor({
 
   const handleExecuteSql = async () => {
     try {
+      setSqlResult(null);
       const queryResult = await executeQuery(sqlQuery);
       if (queryResult) {
         setSqlResult({
@@ -780,7 +782,7 @@ export function ReportEditor({
       </div>
 
       <Dialog open={sqlModalOpen} onOpenChange={setSqlModalOpen}>
-        <DialogContent className="max-w-4xl h-[80vh] flex flex-col p-6 gap-0">
+        <DialogContent className="max-w-[90vw] lg:max-w-6xl h-[85vh] flex flex-col p-6 gap-0">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <Database className="w-5 h-5 text-primary" />
@@ -794,7 +796,7 @@ export function ReportEditor({
                 disabled={isExecuting}
               >
                 <Play className="w-4 h-4 mr-2 fill-current" />
-                Run Query
+                Executar
               </Button>
               {editingComponentId !== null && (
                 <Button
@@ -802,57 +804,75 @@ export function ReportEditor({
                   size="sm"
                   onClick={saveSqlToComponent}
                 >
-                  Save & Close
+                  Salvar e Fechar
                 </Button>
               )}
             </div>
           </div>
 
-          <div className="flex-1 min-h-0 border rounded-md overflow-hidden bg-muted/50 flex flex-col">
-            <div className="flex-1 relative">
+          <div className="flex-1 min-h-0 border rounded-md overflow-hidden bg-muted/50 flex flex-col lg:flex-row">
+            <div className="flex-1 lg:flex-[1.2] relative border-b lg:border-b-0 lg:border-r border-border">
               <SqlEditor
                 value={sqlQuery}
                 onChange={setSqlQuery}
                 height="100%"
+                onExecute={handleExecuteSql}
               />
             </div>
-            {sqlResult && (
-              <div className="h-48 border-t border-border bg-background p-2 overflow-auto">
-                <div className="text-xs text-muted-foreground mb-2 flex justify-between">
-                  <span>Results: {sqlResult.rowCount} rows</span>
-                  <span>{sqlResult.duration}ms</span>
+
+            <div className="flex-1 bg-background flex flex-col overflow-hidden relative">
+              {isExecuting ? (
+                <div className="flex-1 flex items-center justify-center text-muted-foreground p-4">
+                  <Loader2 className="w-6 h-6 animate-spin mr-2" />
+                  <span>Executando consulta...</span>
                 </div>
-                <table className="w-full text-xs text-left">
-                  <thead className="text-muted-foreground font-medium">
-                    <tr>
-                      {sqlResult.columns.map(c => (
-                        <th
-                          key={c}
-                          className="p-1 border-b border-border font-normal"
-                        >
-                          {c}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {sqlResult.rows.map((row, i) => (
-                      <tr key={i} className="hover:bg-muted/50">
-                        {sqlResult.columns.map((col, j) => (
-                          <td
-                            key={j}
-                            className="p-1 border-b border-border/50 truncate max-w-[150px]"
+              ) : sqlResult ? (
+                <div className="flex-1 p-2 overflow-auto">
+                  <div className="text-xs text-muted-foreground mb-2 flex justify-between">
+                    <span>Results: {sqlResult.rowCount} rows</span>
+                    <span>{sqlResult.duration}ms</span>
+                  </div>
+                  <table className="w-full text-xs text-left">
+                    <thead className="text-muted-foreground font-medium">
+                      <tr>
+                        {sqlResult.columns.map(c => (
+                          <th
+                            key={c}
+                            className="p-1 border-b border-border font-normal"
                           >
-                            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                            {String((row as any)[col] ?? '')}
-                          </td>
+                            {c}
+                          </th>
                         ))}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+                    </thead>
+                    <tbody>
+                      {sqlResult.rows.map((row, i) => (
+                        <tr key={i} className="hover:bg-muted/50">
+                          {sqlResult.columns.map((col, j) => (
+                            <td
+                              key={j}
+                              className="p-1 border-b border-border/50 truncate max-w-[150px]"
+                            >
+                              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                              {String((row as any)[col] ?? '')}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground p-4 text-center">
+                  <Database className="w-10 h-10 mb-3 opacity-20" />
+                  <p className="text-sm font-medium">Nenhum resultado</p>
+                  <p className="text-xs opacity-70 mt-1 max-w-[250px]">
+                    Execute uma consulta SQL para visualizar e validar os dados
+                    de retorno aqui.
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </DialogContent>
       </Dialog>

@@ -15,7 +15,10 @@ export async function executeQuery(
     }
     const result = await queryService.execute(query, req.db);
     res.json(result);
-  } catch (error) {
+  } catch (error: any) {
+    if (process.env.NODE_ENV !== 'production' && !(error instanceof ErrorFactory)) {
+      console.error('Execute route internal error:', error?.message || error);
+    }
     next(error);
   }
 }

@@ -10,7 +10,7 @@ export const DbService = {
   ): Promise<{ success: boolean; message: string; duration: string }> {
     const startTime = Date.now();
     try {
-      const [rows] = await pool.query('SELECT 1 as test');
+      const [ rows ] = await pool.query('SELECT 1 as test');
       const duration = `${Date.now() - startTime}ms`;
 
       return {
@@ -18,16 +18,17 @@ export const DbService = {
         message: 'Connection successful',
         duration
       };
-    } catch (error) {
+    } catch (error: any) {
+      console.error('testConnection error', error);
       const duration = `${Date.now() - startTime}ms`;
-      throw ErrorFactory.internal('Database connection test failed');
+      throw ErrorFactory.internal(`Database connection test failed: ${error?.message || error}`);
     }
   },
 
   /** Lista bancos disponiveis, excluindo os de sistema. */
   async listDatabases(pool: mysql.Pool): Promise<string[]> {
     try {
-      const [rows] = await pool.query<mysql.RowDataPacket[]>('SHOW DATABASES');
+      const [ rows ] = await pool.query<mysql.RowDataPacket[]>('SHOW DATABASES');
 
       const systemDbs = [
         'information_schema',
@@ -52,11 +53,11 @@ export const DbService = {
     user: string;
   }> {
     try {
-      const [rows] = await pool.query<mysql.RowDataPacket[]>(
+      const [ rows ] = await pool.query<mysql.RowDataPacket[]>(
         'SELECT DATABASE() as db, USER() as user, @@hostname as host'
       );
 
-      const info = rows[0];
+      const info = rows[ 0 ];
       if (!info) {
         throw ErrorFactory.internal('No connection info returned');
       }
@@ -66,9 +67,9 @@ export const DbService = {
         database: info.db || 'none',
         user: info.user
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro em getConnectionInfo:', error);
-      throw ErrorFactory.internal('Failed to get connection info');
+      throw ErrorFactory.internal(`Failed to get connection info: ${error?.message || error}`);
     }
   },
 
