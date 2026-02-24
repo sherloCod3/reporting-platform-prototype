@@ -831,7 +831,7 @@
 - **ROADMAP-08-ITEM-15:** Implement Puppeteer browser pooling (warm instances)
   - Impact Level: High
   - Risk Category: Performance
-  - Status: Open
+  - Status: Done
 
 - **ROADMAP-08-ITEM-16:** Extract in-memory caches (pool, client) to Redis
   - Impact Level: High

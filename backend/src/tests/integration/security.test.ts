@@ -33,7 +33,8 @@ describe('Security Middlewares Integration', () => {
         // Obter CSRF token primeiro
         const csrfRes = await request(app).get('/api/auth/csrf-token');
         const token = csrfRes.body.csrfToken;
-        const cookie = csrfRes.headers[ 'set-cookie' ];
+        const rawCookie = csrfRes.headers[ 'set-cookie' ];
+        const cookie = Array.isArray(rawCookie) ? rawCookie : rawCookie ? [ rawCookie ] : [];
 
         // Generate a string larger than 1MB
         const largeString = 'a'.repeat(2 * 1024 * 1024);
