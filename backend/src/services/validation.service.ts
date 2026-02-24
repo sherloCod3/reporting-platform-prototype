@@ -1,4 +1,6 @@
 import { ErrorFactory } from '../types/errors.types.js';
+import sqlParser from 'node-sql-parser';
+const { Parser } = sqlParser;
 
 interface ValidationResult {
   isValid: boolean;
@@ -7,40 +9,11 @@ interface ValidationResult {
 
 export const validationService = {
   async validateQuery(query: string): Promise<ValidationResult> {
-    const normalized = query.trim().toUpperCase();
-
-    // Permite consultas de leitura e exploratórias
-    const allowedPrefixes = [ 'SELECT', 'WITH', 'SHOW', 'DESCRIBE', 'EXPLAIN' ];
-    const isAllowed = allowedPrefixes.some(prefix => normalized.startsWith(prefix));
-
-    if (!isAllowed) {
-      return {
-        isValid: false,
-        reason: 'Apenas consultas SELECT, WITH, SHOW, DESCRIBE ou EXPLAIN são permitidas'
-      };
-    }
-
-    // Remove literais de string antes de checar comandos proibidos (evita falso positivo)
-    const sqlWithoutStrings = normalized.replace(/'[^']*'/g, '');
-
-    const forbidden = [
-      'DROP',
-      'DELETE',
-      'UPDATE',
-      'ALTER',
-      'TRUNCATE',
-      'INSERT'
-    ];
-    const found = forbidden.find(word => {
-      const regex = new RegExp(`\\b${word}\\b`, 'i');
-      return regex.test(sqlWithoutStrings);
-    });
-
-    if (found) {
-      return { isValid: false, reason: `Comando ${found} não é permitido` };
-    }
-
     const MAX_QUERY_LENGTH = 35_000;
+
+    if (!query || query.trim().length === 0) {
+      return { isValid: false, reason: 'Query vazia' };
+    }
 
     if (query.length > MAX_QUERY_LENGTH) {
       return {
@@ -49,11 +22,33 @@ export const validationService = {
       };
     }
 
-    if (query.length === 0) {
-      return { isValid: false, reason: 'Query vazia' };
-    }
+    const parser = new Parser();
 
-    return { isValid: true };
+    try {
+      // Parse the SQL query into an AST
+      const ast = parser.astify(query, { database: 'MySQL' });
+
+      // astify pode retornar um array de nodes se houver múltiplas statements (separadas por ;)
+      const astList = Array.isArray(ast) ? ast : [ ast ];
+
+      // Verifica se TODAS as statements são do tipo 'select'
+      const isSelectOnly = astList.every(node => node.type === 'select');
+
+      if (!isSelectOnly) {
+        return {
+          isValid: false,
+          reason: 'Apenas consultas SELECT ou WITH são permitidas. Comandos de modificação (DML/DDL) são proibidos.'
+        };
+      }
+
+      return { isValid: true };
+    } catch (error: any) {
+      // Se o parser falhar, a query é malformada ou usa sintaxe não suportada
+      return {
+        isValid: false,
+        reason: `Query SQL inválida ou não suportada: ${error.message}`
+      };
+    }
   }
 };
 

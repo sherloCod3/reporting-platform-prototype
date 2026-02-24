@@ -5,6 +5,11 @@ import { ErrorFactory } from '../types/errors.types.js';
 
 const router = Router();
 
+/** GET /api/auth/csrf-token - Retorna o token CSRF para a sessao atual */
+router.get('/csrf-token', (req, res) => {
+  res.json({ csrfToken: req.csrfToken() });
+});
+
 /** POST /api/auth/login - Autentica usuario e retorna token JWT */
 router.post('/login', async (req, res, next) => {
   try {
@@ -14,6 +19,14 @@ router.post('/login', async (req, res, next) => {
     }
 
     const result = await AuthService.login({ email, password });
+
+    res.cookie('token', result.data.token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 8 * 60 * 60 * 1000 // 8 horas
+    });
+
     res.json(result);
   } catch (error) {
     next(error);
@@ -86,6 +99,15 @@ router.delete('/users/:id', authenticate, async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+});
+
+router.post('/logout', (req, res) => {
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict'
+  });
+  res.json({ success: true, message: 'Logout realizado' });
 });
 
 export default router;

@@ -78,12 +78,20 @@ export async function authenticate(
   next: NextFunction
 ) {
   try {
-    const header = req.headers.authorization;
-    if (!header?.startsWith('Bearer ')) {
-      throw ErrorFactory.unauthorized('Token não fornecido');
+    let token: string | undefined;
+
+    if (req.cookies && req.cookies.token) {
+      token = req.cookies.token;
+    } else {
+      const header = req.headers.authorization;
+      if (header?.startsWith('Bearer ')) {
+        token = header.substring(7);
+      }
     }
 
-    const token = header.substring(7);
+    if (!token) {
+      throw ErrorFactory.unauthorized('Token não fornecido');
+    }
     const payload = AuthService.verifyToken(token);
     req.user = payload;
 

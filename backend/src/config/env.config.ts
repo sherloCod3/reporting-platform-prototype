@@ -4,10 +4,26 @@ import path from 'path';
 dotenv.config();
 dotenv.config({ path: path.resolve(process.cwd(), '../.env') });
 
+import fs from 'fs';
+
 function getEnv(key: string): string {
-  const value = process.env[key];
+  // 1. Tenta ler via Docker Secrets explícito via _FILE
+  const fileKey = `${key}_FILE`;
+  const filePath = process.env[ fileKey ];
+  if (filePath && fs.existsSync(filePath)) {
+    return fs.readFileSync(filePath, 'utf8').trim();
+  }
+
+  // 2. Tenta ler via Docker Secrets padrão (comum em setups Swarm/K8s)
+  const secretPath = `/run/secrets/${key}`;
+  if (fs.existsSync(secretPath)) {
+    return fs.readFileSync(secretPath, 'utf8').trim();
+  }
+
+  // 3. Fallback para variaveis de ambiente
+  const value = process.env[ key ];
   if (!value) {
-    throw new Error(`Variavel de ambiente ausente: ${key}`);
+    throw new Error(`Variavel de ambiente ou secret ausente: ${key}`);
   }
   return value;
 }

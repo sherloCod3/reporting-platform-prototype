@@ -1,7 +1,7 @@
 # Technical System Analysis
 
-> Version: v0.1.5
-> Last updated: 2026-02-18
+> Version: v0.2.0
+> Last updated: 2026-02-24
 > Scope: Full-stack reporting platform prototype
 
 ---
@@ -799,131 +799,90 @@
   - Risk Category: Maintainability
   - Status: Open
 
-### Medium Term (v0.3.0 - v0.5.0)
+### Phase 1: Critical Security & Reliability (High Priority)
 
-- **ROADMAP-08-ITEM-10:** Implement AST-based SQL validation (replace string matching)
+- **ROADMAP-08-ITEM-10:** Implement AST-based SQL parsing for query validation
   - Impact Level: High
   - Risk Category: Security
-  - Status: Open
+  - Status: Done
 
-- **ROADMAP-08-ITEM-11:** Add Puppeteer browser pool with warm instances and max concurrency
+- **ROADMAP-08-ITEM-11:** Move JWT storage from localStorage to httpOnly cookies
+  - Impact Level: Medium
+  - Risk Category: Security
+  - Status: Done
+
+- **ROADMAP-08-ITEM-12:** Enforce strict request payload size limits per endpoint
+  - Impact Level: Medium
+  - Risk Category: Security
+  - Status: Done
+
+- **ROADMAP-08-ITEM-13:** Implement CSRF protection mechanisms
+  - Impact Level: Medium
+  - Risk Category: Security
+  - Status: Done
+
+- **ROADMAP-08-ITEM-14:** Implement proper secrets management
+  - Impact Level: High
+  - Risk Category: Security
+  - Status: Done
+
+### Phase 2: Performance & Scalability (Medium Priority)
+
+- **ROADMAP-08-ITEM-15:** Implement Puppeteer browser pooling (warm instances)
   - Impact Level: High
   - Risk Category: Performance
   - Status: Open
 
-- **ROADMAP-08-ITEM-12:** Implement query result pagination on the execution endpoint
+- **ROADMAP-08-ITEM-16:** Extract in-memory caches (pool, client) to Redis
+  - Impact Level: High
+  - Risk Category: Scalability
+  - Status: Open
+
+- **ROADMAP-08-ITEM-17:** Implement clustering or separate worker processes for PDF rendering
+  - Impact Level: High
+  - Risk Category: Scalability
+  - Status: Open
+
+- **ROADMAP-08-ITEM-18:** Implement pagination for query execution results
   - Impact Level: High
   - Risk Category: Performance
   - Status: Open
 
-- **ROADMAP-08-ITEM-13:** Add Redis for tenant connection cache and JWT blacklist
-  - Impact Level: Medium
-  - Risk Category: Scalability
-  - Status: Open
+### Phase 3: Testing & Maintainability (Medium Priority)
 
-- **ROADMAP-08-ITEM-14:** Implement token refresh rotation with httpOnly cookie storage
-  - Impact Level: Medium
-  - Risk Category: Security
-  - Status: Open
-
-- **ROADMAP-08-ITEM-15:** Add role-guard middleware to replace inline role checks
-  - Impact Level: Low
-  - Risk Category: Maintainability
-  - Status: Open
-
-- **ROADMAP-08-ITEM-16:** Introduce structured JSON logging with correlation IDs
-  - Impact Level: Medium
-  - Risk Category: Maintainability
-  - Status: Open
-
-- **ROADMAP-08-ITEM-17:** Add OpenAPI/Swagger specification with auto-generated docs
-  - Impact Level: Medium
-  - Risk Category: Maintainability
-  - Status: Open
-
-- **ROADMAP-08-ITEM-18:** Set up CI/CD pipeline (lint, type-check, test, build, deploy)
+- **ROADMAP-08-ITEM-19:** Add unit test coverage for services, repositories, and validators
   - Impact Level: High
   - Risk Category: Maintainability
   - Status: Open
 
-- **ROADMAP-08-ITEM-19:** Add E2E test suite for critical paths (Playwright)
+- **ROADMAP-08-ITEM-20:** Implement integration tests for critical API endpoints
   - Impact Level: High
   - Risk Category: Maintainability
   - Status: Open
 
-- **ROADMAP-08-ITEM-20:** Implement database migration system (e.g., `node-pg-migrate` or custom)
+- **ROADMAP-08-ITEM-21:** Standardize API response envelopes
   - Impact Level: Medium
   - Risk Category: Maintainability
   - Status: Open
 
-- **ROADMAP-08-ITEM-21:** Add error boundary components in frontend
-  - Impact Level: Medium
-  - Risk Category: Maintainability
-  - Status: Open
-
-- **ROADMAP-08-ITEM-22:** Unify controller patterns to class-based with DI
-  - Impact Level: Low
-  - Risk Category: Maintainability
-  - Status: Open
-
-### Long Term (v0.6.0+)
-
-- **ROADMAP-08-ITEM-23:** Extract shared type package between frontend and backend
-  - Impact Level: Medium
-  - Risk Category: Maintainability
-  - Status: Open
-
-- **ROADMAP-08-ITEM-24:** Implement horizontal scaling: externalize caches, add connection pooler (ProxySQL), stateless backend
+- **ROADMAP-08-ITEM-22:** Setup CI/CD pipelines (GitHub Actions)
   - Impact Level: High
-  - Risk Category: Scalability
+  - Risk Category: Maintainability
   - Status: Open
 
-- **ROADMAP-08-ITEM-25:** Add tenant-scoped resource quotas (connection limits, rate limits, query timeouts)
-  - Impact Level: Medium
-  - Risk Category: Scalability
-  - Status: Open
+### Phase 4: Production Readiness & Observability (Long Term)
 
-- **ROADMAP-08-ITEM-26:** Implement audit logging for all sensitive operations
-  - Impact Level: Medium
-  - Risk Category: Security
-  - Status: Open
-
-- **ROADMAP-08-ITEM-27:** Add real-time query progress via WebSocket or SSE
-  - Impact Level: Low
-  - Risk Category: Performance
-  - Status: Open
-
-- **ROADMAP-08-ITEM-28:** Implement scheduled report execution with job queue (Bull/BullMQ)
-  - Impact Level: Medium
-  - Risk Category: Scalability
-  - Status: Open
-
-- **ROADMAP-08-ITEM-29:** Add multi-stage Docker builds with Nginx reverse proxy and TLS
+- **ROADMAP-08-ITEM-23:** Setup Nginx reverse proxy with TLS termination
   - Impact Level: High
   - Risk Category: Security
   - Status: Open
 
-- **ROADMAP-08-ITEM-30:** Implement observability stack (Prometheus metrics, Grafana dashboards, Sentry error tracking)
-  - Impact Level: Medium
-  - Risk Category: Maintainability
-  - Status: Open
-
-- **ROADMAP-08-ITEM-31:** Add RBAC with granular permissions beyond admin/user/viewer
-  - Impact Level: Medium
-  - Risk Category: Security
-  - Status: Open
-
-- **ROADMAP-08-ITEM-32:** Implement query result caching with configurable TTL per report
-  - Impact Level: Medium
-  - Risk Category: Performance
-  - Status: Open
-
-- **ROADMAP-08-ITEM-33:** Add Excel export pipeline alongside PDF
-  - Impact Level: Low
-  - Risk Category: Scalability
-  - Status: Open
-
-- **ROADMAP-08-ITEM-34:** Evaluate migration to connection-per-request model with external pooler for better tenant isolation
+- **ROADMAP-08-ITEM-24:** Automate MySQL database backups
   - Impact Level: High
   - Risk Category: Scalability
+  - Status: Open
+
+- **ROADMAP-08-ITEM-25:** Implement structured JSON logging (Winston/Pino)
+  - Impact Level: Medium
+  - Risk Category: Maintainability
   - Status: Open

@@ -5,9 +5,11 @@ services:
     image: mysql:8.0
     container_name: qreports-mysql
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_password
       MYSQL_DATABASE: qreports_auth
       MYSQL_ROOT_HOST: "%"
+    secrets:
+      - db_password
     ports:
       - "3307:3306"
     volumes:
@@ -31,17 +33,23 @@ services:
       AUTH_DB_HOST: mysql
       AUTH_DB_PORT: 3306
       AUTH_DB_USER: root
-      AUTH_DB_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       AUTH_DB_NAME: qreports_auth
+      AUTH_DB_PASSWORD_FILE: /run/secrets/db_password
 
       REPORT_DB_READ_USER: ${REPORT_DB_READ_USER}
-      REPORT_DB_READ_PASSWORD: ${REPORT_DB_READ_PASSWORD}
+      REPORT_DB_READ_PASSWORD_FILE: /run/secrets/report_db_read_password
 
       REPORT_DB_WRITE_USER: ${REPORT_DB_WRITE_USER}
-      REPORT_DB_WRITE_PASSWORD: ${REPORT_DB_WRITE_PASSWORD}
+      REPORT_DB_WRITE_PASSWORD_FILE: /run/secrets/report_db_write_password
 
-      JWT_SECRET: ${JWT_SECRET}
+      JWT_SECRET_FILE: /run/secrets/jwt_secret
       JWT_EXPIRES_IN: 8h
+
+    secrets:
+      - db_password
+      - report_db_read_password
+      - report_db_write_password
+      - jwt_secret
 
     depends_on:
       mysql:
@@ -74,3 +82,13 @@ volumes:
 networks:
   qreports-network:
     driver: bridge
+
+secrets:
+  db_password:
+    file: ./.secrets/db_password.txt
+  report_db_read_password:
+    file: ./.secrets/report_db_read_password.txt
+  report_db_write_password:
+    file: ./.secrets/report_db_write_password.txt
+  jwt_secret:
+    file: ./.secrets/jwt_secret.txt

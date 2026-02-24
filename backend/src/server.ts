@@ -1,5 +1,7 @@
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import csurf from 'csurf';
 import routes from './routes/index.js';
 import { requestLogger } from './middlewares/requestLogger.js';
 import { errorHandler } from './middlewares/errorHandler.js';
@@ -13,8 +15,19 @@ app.use(
   })
 );
 
-// Limite aumentado para payloads grandes (ex: conteudo HTML de relatorios)
-app.use(express.json({ limit: '50mb' }));
+app.use(cookieParser());
+
+// CSRF middleware
+app.use(csurf({
+  cookie: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict'
+  }
+}));
+
+// Limite padrao de 1mb para mitigar ataques de exhaustion de memoria
+app.use(express.json({ limit: '1mb' }));
 
 app.use((req, res, next) => requestLogger(req, res, next));
 app.use('/api', routes);

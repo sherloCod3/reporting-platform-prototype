@@ -450,29 +450,36 @@ chore: maintenance tasks
 
 ---
 
-## Roadmap
+## Technical Roadmap & Priority Planning
 
-### Q1 2025 (Prototype Phase)
+### Phase 1: Critical Security & Reliability (Immediate)
 
-- [x] Core SQL execution
-- [x] PDF export
-- [x] Performance optimization
-- [x] Authentication (JWT)
-- [x] Multi-tenant support
+- [ ] **SEC-05-15:** Implement AST-based SQL parsing for query validation
+- [ ] **SEC-05-19:** Move JWT storage from localStorage to `httpOnly` cookies
+- [ ] **SEC-05-18:** Enforce strict request payload size limits per endpoint
+- [ ] **SEC-05-16:** Implement CSRF protection
+- [ ] **INFRA-04-19:** Implement proper secrets management
 
-### Q2 2025
+### Phase 2: Performance & Scalability (High Priority)
 
-- [ ] Visual query builder
-- [ ] Advanced filters
-- [ ] Advanced tools
-- [ ] Interactive charts
-- [ ] Saved templates
+- [ ] **SCALE-06-20:** Implement Puppeteer browser pooling
+- [ ] **SCALE-06-16:** Extract in-memory caches to Redis
+- [ ] **SCALE-06-03:** Refactor PDF rendering to background workers
+- [ ] **SCALE-06-06:** Implement pagination for query results
 
-### Q3 2025
+### Phase 3: Testing & Maintainability (Medium Priority)
 
-- [ ] Excel export
-- [ ] Dashboard analytics
-- [ ] API documentation (Swagger)
+- [ ] **DEBT-07-10:** Add unit tests for business logic
+- [ ] **DEBT-07-11:** Add integration tests for API endpoints
+- [ ] **DEBT-07-07:** Standardize API response envelopes
+- [ ] **INFRA-04-15:** Setup CI/CD pipelines (GitHub Actions)
+
+### Phase 4: Production Readiness & Observability (Medium Term)
+
+- [ ] **INFRA-04-11:** Setup Nginx reverse proxy with TLS
+- [ ] **INFRA-04-20:** Automate database backups
+- [ ] **DEBT-07-15:** Implement structured JSON logging
+- [ ] **DEBT-07-17:** Export APM metrics (latency, pool utilization)
 
 ---
 

@@ -1,0 +1,39 @@
+
+> backend@1.0.0 test
+> cross-env NODE_OPTIONS=--experimental-vm-modules jest c:\Users\DoQR\Documents\qreports-tool\backend\src\tests\integration\security.test.ts
+
+(node:5896) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+  console.log
+    [GET] /api/auth/csrf-token
+
+      at requestLogger (src/middlewares/requestLogger.ts:8:11)
+
+FAIL src/tests/integration/security.test.ts
+  Security Middlewares Integration
+    ÔêÜ should return a CSRF token from GET /api/auth/csrf-token (40 ms)
+    ÔêÜ should reject POST request without CSRF token (5 ms)
+    ├ù should reject a JSON payload larger than 1MB (9 ms)
+
+  ÔùÅ Security Middlewares Integration ÔÇ║ should reject a JSON payload larger than 1MB
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 413
+    Received: 403
+
+      36 |
+      37 |         // express.json() payload limits throw a PayloadTooLargeError which usually results in 413
+    > 38 |         expect(res.status).toBe(413);
+         |                            ^
+      39 |     });
+      40 | });
+      41 |
+
+      at Object.<anonymous> (src/tests/integration/security.test.ts:38:28)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 2 passed, 3 total
+Snapshots:   0 total
+Time:        1.182 s, estimated 2 s
+Ran all test suites matching c:\Users\DoQR\Documents\qreports-tool\backend\src\tests\integration\security.test.ts.

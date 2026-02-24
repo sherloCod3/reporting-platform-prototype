@@ -20,6 +20,34 @@ export function errorHandler(
     });
   }
 
+  // Trata erros de middlewares conhecidos do Express
+  // Type patch para propriedades comuns de erro HTTP
+  const httpError = error as any;
+  if (httpError.code === 'EBADCSRFTOKEN') {
+    return res.status(403).json({
+      success: false,
+      message: 'Sessão inválida ou expirada (CSRF Error)',
+      timestamp: new Date().toISOString()
+    });
+  }
+
+  if (httpError.type === 'entity.too.large' || httpError.statusCode === 413) {
+    return res.status(413).json({
+      success: false,
+      message: 'Payload muito grande',
+      timestamp: new Date().toISOString()
+    });
+  }
+
+  // Verifica se o erro possui um status code embutido (ex: middlewares como body-parser)
+  if (httpError.status && typeof httpError.status === 'number') {
+    return res.status(httpError.status).json({
+      success: false,
+      message: httpError.message || 'Erro de processamento',
+      timestamp: new Date().toISOString()
+    });
+  }
+
   if (process.env.NODE_ENV !== 'production') {
     console.error('Erro nao tratado:', error);
   }
