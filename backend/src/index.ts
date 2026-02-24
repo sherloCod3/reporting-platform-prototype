@@ -3,6 +3,7 @@ import { env } from './config/env.config.js';
 import { testConnection } from './config/database.config.js';
 import { initAuthSchema } from './db/init-schema.js';
 import { browserPool } from './config/puppeteer.config.js';
+import { connectRedis, disconnectRedis } from './config/redis.config.js';
 
 // Inicia o servidor
 let serverInstance: any;
@@ -10,6 +11,7 @@ let serverInstance: any;
 async function startServer() {
   try {
     await testConnection();
+    await connectRedis();
     await initAuthSchema();
     serverInstance = app.listen(env.PORT, () => {
       console.log(`Backend rodando na porta ${env.PORT}`);
@@ -32,6 +34,14 @@ const gracefullyShutdown = async () => {
   } catch (err) {
     console.error('Erro ao encerrar pool:', err);
   }
+
+  try {
+    await disconnectRedis();
+    console.log('Conexao Redis encerrada.');
+  } catch (err) {
+    console.error('Erro ao desconectar Redis:', err);
+  }
+
   if (serverInstance) {
     serverInstance.close(() => {
       console.log('Processo finalizado.');

@@ -1,8 +1,15 @@
 import request from 'supertest';
 import express from 'express';
 import app from '../../server.js';
+import { disconnectRedis } from '../../config/redis.config.js';
+import { browserPool } from '../../config/puppeteer.config.js';
 
 describe('Security Middlewares Integration', () => {
+
+    afterAll(async () => {
+        await disconnectRedis();
+        await browserPool.drain().then(() => browserPool.clear());
+    });
 
     it('should return a CSRF token from GET /api/auth/csrf-token', async () => {
         const res = await request(app).get('/api/auth/csrf-token');

@@ -4,18 +4,12 @@ import { AuthService } from '../services/auth.service.js';
 import { AuthRepository } from '../repositories/auth.repository.js';
 import { env } from '../config/env.config.js';
 import { ErrorFactory } from '../types/errors.types.js';
+import { redisClient } from '../config/redis.config.js';
 
-// Cache de pools de conexao por destino e credenciais
+// O pool de conexao precisa viver em memoria (são sockets TCP ativos), 
+// entao este cache local permanece para reaproveitar conexoes do mysql2 
+// dentro de uma mesma instancia do backend
 const poolCache = new Map<string, mysql.Pool>();
-
-// Cache de dados de conexao do cliente (TTL de 60s)
-const clientConnCache = new Map<
-  number,
-  {
-    value: { host: string; port: number; db: string; slug: string };
-    expiresAt: number;
-  }
->();
 
 const CLIENT_CONN_TTL_MS = 60_000;
 
@@ -95,8 +89,8 @@ export async function authenticate(
     const payload = AuthService.verifyToken(token);
     req.user = payload;
 
-    const cached = clientConnCache.get(payload.clientId);
-    const now = Date.now();
+    const cacheKey = `client_conn:${payload.clientId}`;
+    const cachedStr = await redisClient.get(cacheKey).catch(() => null);
 
     let clientConn: {
       host: string;
@@ -105,9 +99,15 @@ export async function authenticate(
       slug: string;
     } | null = null;
 
-    if (cached && cached.expiresAt > now) {
-      clientConn = cached.value;
-    } else {
+    if (cachedStr) {
+      try {
+        clientConn = JSON.parse(cachedStr);
+      } catch (e) {
+        // Ignora erro de parse e força re-fetch
+      }
+    }
+
+    if (!clientConn) {
       const row = await AuthRepository.getClientConnection(payload.clientId);
       if (!row) {
         throw ErrorFactory.unauthorized('Cliente inválido ou inativo'); // 401
@@ -121,10 +121,10 @@ export async function authenticate(
         slug: row.slug
       };
 
-      clientConnCache.set(payload.clientId, {
-        value: clientConn,
-        expiresAt: now + CLIENT_CONN_TTL_MS
-      });
+      // Grava no Redis
+      await redisClient.set(cacheKey, JSON.stringify(clientConn), {
+        PX: CLIENT_CONN_TTL_MS
+      }).catch(err => console.warn('Aviso: Falha ao setar cache Redis:', err));
     }
 
     // Por seguranca, usa credenciais somente-leitura para todos os usuarios
@@ -135,13 +135,14 @@ export async function authenticate(
 
     const requestedDb = req.headers[ 'x-database' ];
     if (requestedDb && typeof requestedDb === 'string') {
-      clientConn = { ...clientConn, db: requestedDb };
+      // clientConn was guaranteed to be assigned above
+      clientConn = { ...clientConn!, db: requestedDb };
     }
 
-    const pool = getOrCreatePool(clientConn, cred);
+    const pool = getOrCreatePool(clientConn!, cred);
 
     req.db = pool;
-    req.clientConn = clientConn;
+    req.clientConn = clientConn!;
     req.dbCredentials = cred;
 
     next();

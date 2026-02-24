@@ -47,5 +47,7 @@ export const env = {
   JWT_SECRET: getEnv('JWT_SECRET'),
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN ?? '4h',
 
-  PUPPETEER_EXECUTABLE_PATH: process.env.PUPPETEER_EXECUTABLE_PATH
+  PUPPETEER_EXECUTABLE_PATH: process.env.PUPPETEER_EXECUTABLE_PATH,
+
+  REDIS_URL: process.env.REDIS_URL || 'redis://redis:6379'
 };

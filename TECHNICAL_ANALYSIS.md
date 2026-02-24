@@ -836,7 +836,7 @@
 - **ROADMAP-08-ITEM-16:** Extract in-memory caches (pool, client) to Redis
   - Impact Level: High
   - Risk Category: Scalability
-  - Status: Open
+  - Status: Done
 
 - **ROADMAP-08-ITEM-17:** Implement clustering or separate worker processes for PDF rendering
   - Impact Level: High
