@@ -6,7 +6,7 @@ import { env } from './env.config.js';
 const factory = {
   create: async function (): Promise<Browser> {
     const options: any = {
-      headless: true,
+      headless: 'new',
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',

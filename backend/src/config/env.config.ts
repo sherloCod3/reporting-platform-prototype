@@ -49,5 +49,5 @@ export const env = {
 
   PUPPETEER_EXECUTABLE_PATH: process.env.PUPPETEER_EXECUTABLE_PATH,
 
-  REDIS_URL: process.env.REDIS_URL || 'redis://redis:6379'
+  REDIS_URL: process.env.REDIS_URL || (process.env.NODE_ENV === 'production' ? 'redis://redis:6379' : 'redis://localhost:6379')
 };
