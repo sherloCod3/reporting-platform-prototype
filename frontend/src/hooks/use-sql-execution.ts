@@ -11,7 +11,7 @@ interface ExecutionState {
 }
 
 export function useSqlExecution() {
-  const [state, setState] = useState<ExecutionState>({
+  const [ state, setState ] = useState<ExecutionState>({
     isExecuting: false,
     result: null,
     error: null
@@ -33,18 +33,15 @@ export function useSqlExecution() {
     });
 
     try {
-      const response = await api.post<{
-        success: boolean;
-        data: QueryResult;
-      }>('/reports/execute', { query });
+      const response = await api.post<QueryResult>('/reports/execute', { query });
 
       setState({
         isExecuting: false,
-        result: response.data.data,
+        result: response.data,
         error: null
       });
 
-      return response.data.data;
+      return response.data;
     } catch (err) {
       const error = err as {
         response?: { data?: { message?: string } };

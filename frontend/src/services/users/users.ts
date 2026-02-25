@@ -12,12 +12,12 @@ export interface User {
 export const UserService = {
   async getAll(): Promise<User[]> {
     const response = await api.get('/auth/users');
-    return response.data.data;
+    return response.data;
   },
 
   async create(data: Partial<User>): Promise<User> {
     const response = await api.post('/auth/users', data);
-    return response.data.data;
+    return response.data;
   },
 
   async update(id: number, data: Partial<User>): Promise<User> {

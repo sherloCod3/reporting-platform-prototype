@@ -3,54 +3,62 @@ import { logger } from '../utils/logger.js';
 
 export abstract class BaseController {
   protected ok<T>(res: Response, dto?: T) {
-    if (dto) {
-      res.status(200).json(dto);
-    } else {
-      res.sendStatus(200);
-    }
+    const response = {
+      success: true,
+      data: dto || null,
+      meta: { timestamp: new Date().toISOString() }
+    };
+    res.status(200).json(response);
   }
 
   protected created<T>(res: Response, dto?: T) {
-    if (dto) {
-      res.status(201).json(dto);
-    } else {
-      res.sendStatus(201);
-    }
+    const response = {
+      success: true,
+      data: dto || null,
+      meta: { timestamp: new Date().toISOString() }
+    };
+    res.status(201).json(response);
   }
 
   protected clientError(res: Response, message?: string) {
     res.status(400).json({
-      error: 'ClientError',
-      message: message || 'Bad Request'
+      success: false,
+      error: { code: 'ClientError', message: message || 'Bad Request' },
+      meta: { timestamp: new Date().toISOString() }
     });
   }
 
   protected unauthorized(res: Response, message?: string) {
     res.status(401).json({
-      error: 'Unauthorized',
-      message: message || 'Unauthorized'
+      success: false,
+      error: { code: 'Unauthorized', message: message || 'Unauthorized' },
+      meta: { timestamp: new Date().toISOString() }
     });
   }
 
   protected forbidden(res: Response, message?: string) {
     res.status(403).json({
-      error: 'Forbidden',
-      message: message || 'Forbidden'
+      success: false,
+      error: { code: 'Forbidden', message: message || 'Forbidden' },
+      meta: { timestamp: new Date().toISOString() }
     });
   }
 
   protected notFound(res: Response, message?: string) {
     res.status(404).json({
-      error: 'NotFound',
-      message: message || 'Not Found'
+      success: false,
+      error: { code: 'NotFound', message: message || 'Not Found' },
+      meta: { timestamp: new Date().toISOString() }
     });
   }
 
   protected fail(res: Response, error: Error | string) {
-    console.error(error);
+    const message = error instanceof Error ? error.message : error.toString();
+    logger.error({ err: error }, 'BaseController fail() invoked');
     res.status(500).json({
-      error: 'InternalServerError',
-      message: error.toString()
+      success: false,
+      error: { code: 'InternalServerError', message },
+      meta: { timestamp: new Date().toISOString() }
     });
   }
 }

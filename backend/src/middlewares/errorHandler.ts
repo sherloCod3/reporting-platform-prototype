@@ -15,9 +15,12 @@ export function errorHandler(
   if (error instanceof AppError) {
     return res.status(error.statusCode).json({
       success: false,
-      message: error.message,
-      hint: error.hint,
-      timestamp: new Date().toISOString()
+      error: {
+        code: error.name || 'AppError',
+        message: error.message,
+        hint: error.hint
+      },
+      meta: { timestamp: new Date().toISOString() }
     });
   }
 
@@ -27,16 +30,22 @@ export function errorHandler(
   if (httpError.code === 'EBADCSRFTOKEN') {
     return res.status(403).json({
       success: false,
-      message: 'Sessão inválida ou expirada (CSRF Error)',
-      timestamp: new Date().toISOString()
+      error: {
+        code: 'EBADCSRFTOKEN',
+        message: 'Sessão inválida ou expirada (CSRF Error)'
+      },
+      meta: { timestamp: new Date().toISOString() }
     });
   }
 
   if (httpError.type === 'entity.too.large' || httpError.statusCode === 413) {
     return res.status(413).json({
       success: false,
-      message: 'Payload muito grande',
-      timestamp: new Date().toISOString()
+      error: {
+        code: 'PayloadTooLarge',
+        message: 'Payload muito grande'
+      },
+      meta: { timestamp: new Date().toISOString() }
     });
   }
 
@@ -44,8 +53,11 @@ export function errorHandler(
   if (httpError.status && typeof httpError.status === 'number') {
     return res.status(httpError.status).json({
       success: false,
-      message: httpError.message || 'Erro de processamento',
-      timestamp: new Date().toISOString()
+      error: {
+        code: 'HttpError',
+        message: httpError.message || 'Erro de processamento'
+      },
+      meta: { timestamp: new Date().toISOString() }
     });
   }
 
@@ -54,7 +66,10 @@ export function errorHandler(
   }
   res.status(500).json({
     success: false,
-    message: 'Erro interno do servidor',
-    timestamp: new Date().toISOString()
+    error: {
+      code: 'InternalServerError',
+      message: 'Erro interno do servidor'
+    },
+    meta: { timestamp: new Date().toISOString() }
   });
 }

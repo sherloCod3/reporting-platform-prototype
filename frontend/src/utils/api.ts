@@ -51,7 +51,12 @@ api.interceptors.request.use(async config => {
 
 /** Redireciona para /login ao receber 401, limpando a sessao. Lida com CSRF invalido em 403. */
 api.interceptors.response.use(
-  response => response,
+  response => {
+    if (response.data && typeof response.data === 'object' && response.data.success === true && 'data' in response.data) {
+      response.data = response.data.data;
+    }
+    return response;
+  },
   error => {
     // Limpa o CSRF token para ser re-buscado em caso de erro 403 (Invalid CSRF)
     if (error.response?.status === 403) {

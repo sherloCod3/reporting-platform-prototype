@@ -1,18 +1,26 @@
-export interface ApiResponse<T = any> {
-  success: boolean;
-  data?: T;
-  message?: string;
+export interface SuccessResponse<T = any> {
+  success: true;
+  data: T;
   meta?: {
     timestamp: string;
-    [key: string]: any;
+    [ key: string ]: any;
   };
 }
 
-export interface ApiError {
-  status: number;
-  message: string;
-  code?: string;
+export interface ErrorResponse {
+  success: false;
+  error: {
+    code: string;
+    message: string;
+    hint?: string;
+  };
+  meta?: {
+    timestamp: string;
+    [ key: string ]: any;
+  };
 }
+
+export type ApiResponse<T = any> = SuccessResponse<T> | ErrorResponse;
 
 export interface User {
   id: number;

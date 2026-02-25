@@ -66,17 +66,17 @@ export default function RunReportPage() {
               <table>
                 <thead>
                   <tr>
-                    ${executionMutation.data?.data?.columns?.map((c: string) => `<th>${c}</th>`).join('') || ''}
+                    ${executionMutation.data?.columns?.map((c: string) => `<th>${c}</th>`).join('') || ''}
                   </tr>
                 </thead>
                 <tbody>
                   ${
-                    executionMutation.data?.data?.rows
+                    executionMutation.data?.rows
                       ?.slice(0, 50)
                       .map(
                         (r: Record<string, unknown>) => `
                     <tr>
-                      ${executionMutation.data?.data?.columns?.map((c: string) => `<td>${String(r[c] || '')}</td>`).join('') || ''}
+                      ${executionMutation.data?.columns?.map((c: string) => `<td>${String(r[c] || '')}</td>`).join('') || ''}
                     </tr>
                   `
                       )
@@ -84,7 +84,7 @@ export default function RunReportPage() {
                   }
                 </tbody>
               </table>
-              ${executionMutation.data?.data?.rows?.length > 50 ? '<p><i>... (truncado para visualização)</i></p>' : ''}
+              ${executionMutation.data?.rows?.length > 50 ? '<p><i>... (truncado para visualização)</i></p>' : ''}
             </body>
           </html>`;
 
@@ -230,13 +230,13 @@ export default function RunReportPage() {
             <div className="text-center text-red-500 p-8">
               Ocorreu um erro ao executar a consulta.
             </div>
-          ) : executionMutation.data?.data?.rows ? (
+          ) : executionMutation.data?.rows ? (
             <ResultsTable
-              data={executionMutation.data.data.rows}
-              page={executionMutation.data.data.page}
-              pageSize={executionMutation.data.data.pageSize}
-              totalRows={executionMutation.data.data.totalRows}
-              totalPages={executionMutation.data.data.totalPages}
+              data={executionMutation.data.rows}
+              page={executionMutation.data.page}
+              pageSize={executionMutation.data.pageSize}
+              totalRows={executionMutation.data.totalRows}
+              totalPages={executionMutation.data.totalPages}
               onPageChange={handlePageChange}
             />
           ) : (

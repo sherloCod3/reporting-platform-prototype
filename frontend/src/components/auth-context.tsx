@@ -63,7 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setIsLoading(true);
       const response = await api.post('/auth/login', { email, password });
-      const { user, client } = response.data.data;
+      const { user, client } = response.data;
 
       localStorage.setItem('@qreports:user', JSON.stringify(user));
       localStorage.setItem('@qreports:client', JSON.stringify(client));

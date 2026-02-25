@@ -16,10 +16,10 @@ interface ReportRow extends RowDataPacket {
 export const ReportDefinitionController = {
   async list(req: Request, res: Response, next: NextFunction) {
     try {
-      const [rows] = await authPool.execute<ReportRow[]>(
+      const [ rows ] = await authPool.execute<ReportRow[]>(
         'SELECT id, name, description, created_at FROM reports ORDER BY created_at DESC'
       );
-      res.json(rows);
+      res.json({ success: true, data: rows });
     } catch (error) {
       next(error);
     }
@@ -29,11 +29,11 @@ export const ReportDefinitionController = {
     try {
       const { id } = req.params;
 
-      const [rows] = await authPool.execute<ReportRow[]>(
+      const [ rows ] = await authPool.execute<ReportRow[]>(
         'SELECT * FROM reports WHERE id = ?',
-        [id]
+        [ id ]
       );
-      const report = rows[0];
+      const report = rows[ 0 ];
 
       if (!report) throw ErrorFactory.notFound('Relatório não encontrado');
 
@@ -42,7 +42,7 @@ export const ReportDefinitionController = {
         report.layout_json = JSON.parse(report.layout_json);
       }
 
-      res.json(report);
+      res.json({ success: true, data: report });
     } catch (error) {
       next(error);
     }
@@ -54,7 +54,7 @@ export const ReportDefinitionController = {
 
       if (!name) throw ErrorFactory.badRequest('Nome é obrigatório');
 
-      const [result] = await authPool.execute<ResultSetHeader>(
+      const [ result ] = await authPool.execute<ResultSetHeader>(
         'INSERT INTO reports (name, description, sql_query, layout_json, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW())',
         [
           name,
@@ -66,7 +66,7 @@ export const ReportDefinitionController = {
 
       res
         .status(201)
-        .json({ id: result.insertId, message: 'Relatório criado com sucesso' });
+        .json({ success: true, data: { id: result.insertId, message: 'Relatório criado com sucesso' } });
     } catch (error) {
       next(error);
     }
@@ -77,15 +77,15 @@ export const ReportDefinitionController = {
       const { id } = req.params;
       const { name, description, sql_query, layout_json } = req.body;
 
-      const [result] = await authPool.execute<ResultSetHeader>(
+      const [ result ] = await authPool.execute<ResultSetHeader>(
         'UPDATE reports SET name = ?, description = ?, sql_query = ?, layout_json = ?, updated_at = NOW() WHERE id = ?',
-        [name, description, sql_query, JSON.stringify(layout_json), id]
+        [ name, description, sql_query, JSON.stringify(layout_json), id ]
       );
 
       if (result.affectedRows === 0)
         throw ErrorFactory.notFound('Relatório não encontrado');
 
-      res.json({ message: 'Relatório atualizado com sucesso' });
+      res.json({ success: true, data: { message: 'Relatório atualizado com sucesso' } });
     } catch (error) {
       next(error);
     }
@@ -95,8 +95,8 @@ export const ReportDefinitionController = {
     try {
       const { id } = req.params;
 
-      await authPool.execute('DELETE FROM reports WHERE id = ?', [id]);
-      res.json({ message: 'Relatório excluído' });
+      await authPool.execute('DELETE FROM reports WHERE id = ?', [ id ]);
+      res.json({ success: true, data: { message: 'Relatório excluído' } });
     } catch (error) {
       next(error);
     }

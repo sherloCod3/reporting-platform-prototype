@@ -243,6 +243,11 @@
   - Risk Category: Maintainability
   - Status: Open
 
+- **FE-03-ITEM-23:** Axios interceptor globally unwraps successful backend responses (`{ success: true, data: T }`), stripping the envelope and returning `T`. Components must expect flat response data to prevent "cannot read properties of undefined" errors on double unboxing.
+  - Impact Level: Medium
+  - Risk Category: Maintainability
+  - Status: Done
+
 ---
 
 ## SECTION-INFRA-04: Infrastructure & DevOps Strategy
@@ -630,10 +635,10 @@
   - Risk Category: Performance
   - Status: Done
 
-- **DEBT-07-ITEM-07:** Standardize API response envelope -- Some endpoints return `{ success, data }`, others return raw arrays
+- **DEBT-07-ITEM-07:** Standardize API response envelope -- Centralized `SuccessResponse<T>` and `ErrorResponse` structured payloads via `BaseController` and `errorHandler`. Frontend interceptors automatically unwrap the success payload.
   - Impact Level: Medium
   - Risk Category: Maintainability
-  - Status: Open
+  - Status: Done
 
 - **DEBT-07-ITEM-08:** Align port conventions -- Frontend Docker config, constants, and API defaults reference different ports
   - Impact Level: Low
@@ -885,24 +890,10 @@
 - **ROADMAP-08-ITEM-25:** Implement structured JSON logging (Pino)
   - Impact Level: Medium
   - Risk Category: Maintainability
-  - Status: In Progress (Pulled to Phase 3)
+  - Status: Done (Pulled to Phase 3)
 
 ---
 
 ## SECTION-REFACTOR-LOGS-09: Refactoring Execution History
 
-This section acts as an auto-incremental briefing file to capture refactoring transitions explicitly, cross-referencing our `.agent` skills for Clean Code and TypeScript Best Practices.
-
-### Format Template
-
-- **a) Previous State**: How the system behaved or was implemented prior.
-- **b) Current State (WIP)**: The active implementation being manipulated.
-- **c) Planned State**: What the idealized pattern should look like.
-- **d) Implementation Steps**: Named and identified code changes.
-- **e) Post-Refactoring Observations**: Final confirmation, test results, or residual reservations.
-
-### Logs
-
-_(Initial Setup)_
-
-- **Log 01**: Setting up Structured Logging (Pino) to improve error-catching for future tests and API wrappers.
+For the detailed, step-by-step history of our Phase 3 (and onwards) refactoring implementations, please refer to the dedicated [REFACTORING_LOG.md](./REFACTORING_LOG.md) file.

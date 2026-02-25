@@ -45,8 +45,10 @@ export async function exportPdf(
 
     res.json({
       success: true,
-      jobId: job.id,
-      message: 'PDF generation job started.'
+      data: {
+        jobId: job.id,
+        message: 'PDF generation job started.'
+      }
     });
   } catch (error) {
     next(error);
@@ -73,22 +75,28 @@ export async function getPdfJobStatus(
       const resultData = job.returnvalue;
       res.json({
         success: true,
-        state,
-        progress,
-        pdfData: resultData?.pdfData
+        data: {
+          state,
+          progress,
+          pdfData: resultData?.pdfData
+        }
       });
     } else if (state === 'failed') {
       res.status(500).json({
         success: false,
-        state,
-        progress,
-        error: job.failedReason
+        error: {
+          code: 'JobFailed',
+          message: job.failedReason || 'Job failed'
+        },
+        meta: { state, progress }
       });
     } else {
       res.json({
         success: true,
-        state,
-        progress
+        data: {
+          state,
+          progress
+        }
       });
     }
   } catch (error) {

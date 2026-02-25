@@ -41,7 +41,7 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
 
     try {
       const response = await api.get('/db/status');
-      setStatus(response.data.data);
+      setStatus(response.data);
     } catch {
       setStatus(null);
     }
@@ -51,7 +51,7 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true);
     try {
       const response = await api.get('/db/databases');
-      setDatabases(response.data.data.databases);
+      setDatabases(response.data.databases);
     } catch (error) {
       console.error('Failed to fetch databases:', error);
       toast.error('Could not load database list');
@@ -87,7 +87,7 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
   const testConnection = useCallback(async () => {
     try {
       const response = await api.post('/db/test');
-      const result = response.data.data;
+      const result = response.data;
       toast.success(`Connection test successful (${result.duration})`);
     } catch (error) {
       console.error('Connection test failed:', error);
