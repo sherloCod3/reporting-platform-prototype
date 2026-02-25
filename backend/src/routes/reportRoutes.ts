@@ -18,6 +18,9 @@ router.post('/execute', queryRateLimiter, legacyController.executeQuery);
 // 50mb override allows large generated tables to export properly
 router.post('/export-pdf', express.json({ limit: '50mb' }), legacyController.exportPdf);
 
+// Polling endpoint for PDF generation status via BullMQ
+router.get('/export-pdf/:jobId/status', legacyController.getPdfJobStatus);
+
 // Composicao de dependencias para esta rota
 const reportRepository = new ReportRepository();
 const reportService = new ReportService(reportRepository);

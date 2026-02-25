@@ -5,6 +5,8 @@ export type { QueryResult };
 export interface ExecuteQueryRequest {
   query: string;
   params?: any[];
+  page?: number;
+  pageSize?: number;
 }
 
 export interface GeneratePdfRequest {

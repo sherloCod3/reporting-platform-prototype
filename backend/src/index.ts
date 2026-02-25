@@ -3,6 +3,8 @@ import { env } from './config/env.config.js';
 import { testConnection } from './config/database.config.js';
 import { initAuthSchema } from './db/init-schema.js';
 import { browserPool } from './config/puppeteer.config.js';
+// Init background workers
+import './workers/pdf.worker.js';
 import { connectRedis, disconnectRedis } from './config/redis.config.js';
 
 // Inicia o servidor

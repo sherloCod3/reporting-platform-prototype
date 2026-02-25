@@ -1,5 +1,5 @@
 export interface RowDataPacket {
-  [column: string]: any;
+  [ column: string ]: any;
 }
 
 export interface QueryResult {
@@ -7,6 +7,10 @@ export interface QueryResult {
   rows: RowDataPacket[] | any[];
   rowCount: number;
   duration: number;
+  page?: number;
+  pageSize?: number;
+  totalRows?: number;
+  totalPages?: number;
 }
 
 export interface ReportExecutionResult {
