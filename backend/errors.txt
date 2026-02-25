@@ -1,1 +1,0 @@
-src/services/query.service.ts(36,25): error TS18048: 'countResult' is possibly 'undefined'.

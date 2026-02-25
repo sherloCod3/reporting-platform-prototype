@@ -23,6 +23,9 @@ export async function executeQuery(
     const result = await queryService.execute(query, req.db, parsedPage, parsedPageSize);
     res.json(result);
   } catch (error: any) {
+    if (error?.isOperational || error?.statusCode) {
+      return next(error);
+    }
     logger.error({ err: error }, 'Execute route internal error');
     next(ErrorFactory.internal(`Execute route error: ${error?.message || 'Unknown error'}`));
   }

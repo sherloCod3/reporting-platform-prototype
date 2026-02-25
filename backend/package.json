@@ -11,7 +11,7 @@
     "test:watch": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --watch",
     "test:coverage": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --coverage",
     "test:unit": "cross-env NODE_OPTIONS=--experimental-vm-modules jest src/tests/unit",
-    "test:integration": "cross-env NODE_OPTIONS=--experimental-vm-modules jest src/tests/integration",
+    "test:integration": "cross-env NODE_OPTIONS=--experimental-vm-modules jest src/tests/integration --forceExit",
     "create-user": "tsx scripts/create-user.ts",
     "test:api": "tsx scripts/test-api.ts"
   },

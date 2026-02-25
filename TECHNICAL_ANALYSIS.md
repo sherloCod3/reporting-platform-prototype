@@ -655,12 +655,12 @@
 - **DEBT-07-ITEM-10:** No unit tests for services, repositories, or validators
   - Impact Level: High
   - Risk Category: Maintainability
-  - Status: Open
+  - Status: Done
 
 - **DEBT-07-ITEM-11:** No integration tests for API endpoints
   - Impact Level: High
   - Risk Category: Maintainability
-  - Status: Open
+  - Status: Done
 
 - **DEBT-07-ITEM-12:** No E2E tests for critical flows (login, query execution, PDF export)
   - Impact Level: High
@@ -753,6 +753,11 @@
   - Risk Category: Maintainability
   - Status: Open
 
+- **DEBT-07-ITEM-29:** `report.controller.ts` execute route masks client errors (400) as internal server errors (500)
+  - Impact Level: Medium
+  - Risk Category: Maintainability
+  - Status: Done
+
 ---
 
 ## SECTION-ROADMAP-08: Suggested Technical Evolution Roadmap
@@ -792,7 +797,7 @@
 - **ROADMAP-08-ITEM-07:** Add unit tests for `validation.service.ts`, `auth.service.ts`, and `query.service.ts`
   - Impact Level: High
   - Risk Category: Maintainability
-  - Status: Open
+  - Status: Done
 
 - **ROADMAP-08-ITEM-08:** Standardize API response envelope across all endpoints
   - Impact Level: Medium
@@ -858,12 +863,12 @@
 - **ROADMAP-08-ITEM-19:** Add unit test coverage for services, repositories, and validators
   - Impact Level: High
   - Risk Category: Maintainability
-  - Status: Open
+  - Status: Done
 
 - **ROADMAP-08-ITEM-20:** Implement integration tests for critical API endpoints
   - Impact Level: High
   - Risk Category: Maintainability
-  - Status: Open
+  - Status: Done
 
 - **ROADMAP-08-ITEM-21:** Standardize API response envelopes
   - Impact Level: Medium
@@ -891,6 +896,11 @@
   - Impact Level: Medium
   - Risk Category: Maintainability
   - Status: Done (Pulled to Phase 3)
+
+- **ROADMAP-08-ITEM-26:** Fix error masking in `report.controller.ts` execute route
+  - Impact Level: Medium
+  - Risk Category: Maintainability
+  - Status: Done
 
 ---
 
