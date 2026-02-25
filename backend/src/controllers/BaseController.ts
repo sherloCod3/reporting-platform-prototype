@@ -1,4 +1,5 @@
 import type { Response } from 'express';
+import { logger } from '../utils/logger.js';
 
 export abstract class BaseController {
   protected ok<T>(res: Response, dto?: T) {

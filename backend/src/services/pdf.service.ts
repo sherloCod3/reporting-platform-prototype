@@ -1,4 +1,5 @@
 import { browserPool } from '../config/puppeteer.config.js';
+import { logger } from '../utils/logger.js';
 
 export async function htmlToPdf(htmlContent: string): Promise<Buffer> {
   // Acquire a warm browser from the pool
@@ -23,13 +24,13 @@ export async function htmlToPdf(htmlContent: string): Promise<Buffer> {
       return Buffer.from(pdf);
     } finally {
       // Always close the tab context to unbind memory, regardless of generation success
-      await page.close().catch(console.error);
+      await page.close().catch(err => logger.error({ err }, 'Error closing page'));
     }
   } catch (error) {
-    console.error('Erro ao converter HTML para PDF:', error);
+    logger.error({ err: error }, 'Erro ao converter HTML para PDF');
     throw new Error('Falha ao renderizar PDF');
   } finally {
     // Release the browser back to the pool
-    await browserPool.release(browser).catch(console.error);
+    await browserPool.release(browser).catch(err => logger.error({ err }, 'Error releasing browser'));
   }
 }

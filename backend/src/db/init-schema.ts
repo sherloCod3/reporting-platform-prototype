@@ -1,8 +1,9 @@
 import { authPool } from '../config/authDb.config.js';
+import { logger } from '../utils/logger.js';
 
 export async function initAuthSchema(): Promise<void> {
   try {
-    console.log('Iniciando verificação de schema do banco de autenticação...');
+    logger.info('Iniciando verificação de schema do banco de autenticação...');
 
     // Tabela de definicoes de relatorios
     await authPool.execute(`
@@ -17,9 +18,9 @@ export async function initAuthSchema(): Promise<void> {
             )
         `);
 
-    console.log('Schema inicializado com sucesso.');
+    logger.info('Schema inicializado com sucesso.');
   } catch (error) {
-    console.error('Erro ao inicializar schema:', error);
+    logger.error({ err: error }, 'Erro ao inicializar schema');
     throw error;
   }
 }

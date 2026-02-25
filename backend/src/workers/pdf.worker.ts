@@ -2,12 +2,13 @@ import { Worker, Job } from 'bullmq';
 import { connection } from '../config/bullmq.config.js';
 import { PDF_QUEUE_NAME } from '../queues/pdf.queue.js';
 import { htmlToPdf } from '../services/pdf.service.js';
+import { logger } from '../utils/logger.js';
 
 // The Worker is responsible for processing jobs from the queue
 export const pdfWorker = new Worker(
     PDF_QUEUE_NAME,
     async (job: Job<{ htmlContent: string; reportId?: string }>) => {
-        console.log(`[PDF Worker] Processing job ${job.id}`);
+        logger.info({ jobId: job.id }, 'Processing job');
 
         // We update progress to give feedback to clients
         await job.updateProgress(10);
@@ -28,7 +29,7 @@ export const pdfWorker = new Worker(
             const base64Pdf = pdfBuffer.toString('base64');
 
             await job.updateProgress(100);
-            console.log(`[PDF Worker] Job ${job.id} completed successfully`);
+            logger.info({ jobId: job.id }, 'Job completed successfully');
 
             return {
                 status: 'success',
@@ -36,7 +37,7 @@ export const pdfWorker = new Worker(
             };
 
         } catch (error: any) {
-            console.error(`[PDF Worker] Job ${job.id} failed:`, error);
+            logger.error({ err: error, jobId: job.id }, 'Job failed');
             throw error;
         }
     },
@@ -47,9 +48,9 @@ export const pdfWorker = new Worker(
 );
 
 pdfWorker.on('completed', (job) => {
-    console.log(`[BullMQ] PDF Job ${job.id} has completed!`);
+    logger.info({ jobId: job.id }, 'PDF Job has completed!');
 });
 
 pdfWorker.on('failed', (job, err) => {
-    console.log(`[BullMQ] PDF Job ${job?.id} has failed with ${err.message}`);
+    logger.error({ err, jobId: job?.id }, 'PDF Job has failed');
 });

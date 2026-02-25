@@ -3,6 +3,7 @@ import * as queryService from '../services/query.service.js';
 import { htmlToPdf } from '../services/pdf.service.js';
 import { ErrorFactory } from '../types/errors.types.js';
 import { pdfQueue } from '../queues/pdf.queue.js';
+import { logger } from '../utils/logger.js';
 
 export async function executeQuery(
   req: Request,
@@ -22,10 +23,8 @@ export async function executeQuery(
     const result = await queryService.execute(query, req.db, parsedPage, parsedPageSize);
     res.json(result);
   } catch (error: any) {
-    if (process.env.NODE_ENV !== 'production' && !(error instanceof ErrorFactory)) {
-      console.error('Execute route internal error:', error?.message || error);
-    }
-    next(error);
+    logger.error({ err: error }, 'Execute route internal error');
+    next(ErrorFactory.internal(`Execute route error: ${error?.message || 'Unknown error'}`));
   }
 }
 

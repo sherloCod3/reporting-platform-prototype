@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { AppError } from '../types/errors.types.js';
+import { logger } from '../utils/logger.js';
 
 export function errorHandler(
   error: Error | AppError,
@@ -49,7 +50,7 @@ export function errorHandler(
   }
 
   if (process.env.NODE_ENV !== 'production') {
-    console.error('Erro nao tratado:', error);
+    logger.error({ err: error }, 'Erro nao tratado');
   }
   res.status(500).json({
     success: false,

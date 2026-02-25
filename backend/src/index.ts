@@ -6,6 +6,7 @@ import { browserPool } from './config/puppeteer.config.js';
 // Init background workers
 import './workers/pdf.worker.js';
 import { connectRedis, disconnectRedis } from './config/redis.config.js';
+import { logger } from './utils/logger.js';
 
 // Inicia o servidor
 let serverInstance: any;
@@ -16,12 +17,19 @@ async function startServer() {
     await connectRedis();
     await initAuthSchema();
     serverInstance = app.listen(env.PORT, () => {
-      console.log(`Backend rodando na porta ${env.PORT}`);
-      console.log(`Ambiente: ${process.env.NODE_ENV || 'development'}`);
+      logger.info(`Backend rodando na porta ${env.PORT}`);
+      logger.info(`Ambiente: ${process.env.NODE_ENV || 'development'}`);
     });
+
+    serverInstance.on('error', (error: any) => {
+      const message = error instanceof Error ? error.message : String(error);
+      logger.error({ err: error }, `Servidor nao iniciado: ${message}`);
+      process.exit(1);
+    });
+
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    console.error('Servidor nao iniciado:', message);
+    logger.error({ err: error }, `Falha na inicializacao: ${message}`);
     process.exit(1);
   }
 }
@@ -29,24 +37,24 @@ async function startServer() {
 startServer();
 
 const gracefullyShutdown = async () => {
-  console.log('Encerrando servidor...');
+  logger.info('Encerrando servidor...');
   try {
     await browserPool.drain().then(() => browserPool.clear());
-    console.log('Pool de browsers encerrado.');
+    logger.info('Pool de browsers encerrado.');
   } catch (err) {
-    console.error('Erro ao encerrar pool:', err);
+    logger.error({ err }, 'Erro ao encerrar pool');
   }
 
   try {
     await disconnectRedis();
-    console.log('Conexao Redis encerrada.');
+    logger.info('Conexao Redis encerrada.');
   } catch (err) {
-    console.error('Erro ao desconectar Redis:', err);
+    logger.error({ err }, 'Erro ao desconectar Redis');
   }
 
   if (serverInstance) {
     serverInstance.close(() => {
-      console.log('Processo finalizado.');
+      logger.info('Processo finalizado.');
       process.exit(0);
     });
   } else {

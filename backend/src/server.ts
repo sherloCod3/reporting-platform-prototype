@@ -2,8 +2,9 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import csurf from 'csurf';
+import { pinoHttp } from 'pino-http';
 import routes from './routes/index.js';
-import { requestLogger } from './middlewares/requestLogger.js';
+import { logger } from './utils/logger.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 
 const app = express();
@@ -29,7 +30,7 @@ app.use(csurf({
 // Limite padrao de 1mb para mitigar ataques de exhaustion de memoria
 app.use(express.json({ limit: '1mb' }));
 
-app.use((req, res, next) => requestLogger(req, res, next));
+app.use(pinoHttp({ logger }));
 app.use('/api', routes);
 app.use(errorHandler);
 

@@ -1,5 +1,6 @@
 import Redis from 'ioredis';
 import { env } from './env.config.js';
+import { logger } from '../utils/logger.js';
 
 // BullMQ recommends a separate Redis connection logic based on ioredis
 const redisOptions = {
@@ -11,8 +12,8 @@ const redisOptions = {
 export const connection = new Redis.default(env.REDIS_URL, redisOptions);
 
 connection.on('error', (err: any) => {
-    console.error('BullMQ Redis connection error:', err);
+    logger.error({ err }, 'BullMQ Redis connection error');
 });
 connection.on('ready', () => {
-    console.log('BullMQ Redis connection ready');
+    logger.info('BullMQ Redis connection ready');
 });

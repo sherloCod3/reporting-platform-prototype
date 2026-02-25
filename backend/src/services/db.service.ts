@@ -1,6 +1,7 @@
 import mysql from 'mysql2/promise';
 import { env } from '../config/env.config.js';
 import { ErrorFactory } from '../types/errors.types.js';
+import { logger } from '../utils/logger.js';
 
 /** Servico de gerenciamento de conexoes com bancos externos. */
 export const DbService = {
@@ -19,7 +20,7 @@ export const DbService = {
         duration
       };
     } catch (error: any) {
-      console.error('testConnection error', error);
+      logger.error({ err: error }, 'testConnection error');
       const duration = `${Date.now() - startTime}ms`;
       throw ErrorFactory.internal(`Database connection test failed: ${error?.message || error}`);
     }
@@ -68,7 +69,7 @@ export const DbService = {
         user: info.user
       };
     } catch (error: any) {
-      console.error('Erro em getConnectionInfo:', error);
+      logger.error({ err: error }, 'Erro em getConnectionInfo');
       throw ErrorFactory.internal(`Failed to get connection info: ${error?.message || error}`);
     }
   },

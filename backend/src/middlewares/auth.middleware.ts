@@ -5,6 +5,7 @@ import { AuthRepository } from '../repositories/auth.repository.js';
 import { env } from '../config/env.config.js';
 import { ErrorFactory } from '../types/errors.types.js';
 import { redisClient } from '../config/redis.config.js';
+import { logger } from '../utils/logger.js';
 
 // O pool de conexao precisa viver em memoria (são sockets TCP ativos), 
 // entao este cache local permanece para reaproveitar conexoes do mysql2 
@@ -124,7 +125,7 @@ export async function authenticate(
       // Grava no Redis
       await redisClient.set(cacheKey, JSON.stringify(clientConn), {
         PX: CLIENT_CONN_TTL_MS
-      }).catch(err => console.warn('Aviso: Falha ao setar cache Redis:', err));
+      }).catch(err => logger.warn({ err }, 'Aviso: Falha ao setar cache Redis'));
     }
 
     // Por seguranca, usa credenciais somente-leitura para todos os usuarios
