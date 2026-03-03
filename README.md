@@ -83,8 +83,8 @@ The main goal of this repository is to explore:
 
 ### Frontend
 
-- **Framework:** React 19
-- **Build Tool:** Vite 5
+- **Framework:** Next.js 16 (App Router)
+- **UI Library:** React 19
 - **Styling:** Tailwind CSS 4
 - **State:** React Hooks
 - **HTTP:** Axios
@@ -205,16 +205,16 @@ reporting-platform-prototype/
 │   ├── package.json
 │   └── tsconfig.json
 │
-├── frontend/                # Frontend UI (React + Vite)
-│   ├── src/
-│   │   ├── components/     # React components (planned)
-│   │   ├── hooks/          # Custom hooks (planned)
-│   │   ├── services/       # API services (planned)
-│   │   ├── App.tsx         # Main component
-│   │   └── main.tsx        # Entry point
+├── frontend/                # Frontend UI (Next.js)
+│   ├── app/                # App Router (pages & layouts)
+│   ├── components/         # React components
+│   ├── features/           # Feature-sliced modules
+│   ├── hooks/              # Custom hooks
+│   ├── services/           # API services
+│   ├── utils/              # Utilities
 │   ├── Dockerfile
 │   ├── package.json
-│   └── vite.config.ts
+│   └── next.config.ts      # Configuration
 │
 ├── .github/                 # GitHub Actions (planned)
 │   └── workflows/
@@ -245,9 +245,9 @@ DB_NAME=relatorios
 PORT=3000
 NODE_ENV=development
 
-# Frontend (prefix with VITE_)
-VITE_API_URL=http://localhost:3000/api
-VITE_API_TIMEOUT=30000
+# Frontend (prefix with NEXT_PUBLIC_)
+NEXT_PUBLIC_API_URL=http://localhost:3000/api
+NEXT_PUBLIC_API_TIMEOUT=30000
 ```
 
 ### Optional Variables
@@ -257,8 +257,8 @@ VITE_API_TIMEOUT=30000
 PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
 # Feature Flags
-VITE_ENABLE_EXPORT_PDF=true
-VITE_ENABLE_SAVE_QUERIES=false
+NEXT_PUBLIC_ENABLE_EXPORT_PDF=true
+NEXT_PUBLIC_ENABLE_SAVE_QUERIES=false
 ```
 
 **Security Note:** Never commit `.env` to version control.
@@ -281,9 +281,9 @@ npm test         # Run tests (planned)
 #### Frontend
 
 ```bash
-npm run dev      # Start Vite dev server
+npm run dev      # Start Next.js dev server
 npm run build    # Build for production
-npm run preview  # Preview production build
+npm start        # Start production server
 npm run lint     # Run ESLint
 ```
 
@@ -469,16 +469,16 @@ chore: maintenance tasks
 
 ### Phase 3: Testing & Maintainability (Medium Priority)
 
-- [ ] **DEBT-07-10:** Add unit tests for business logic
-- [ ] **DEBT-07-11:** Add integration tests for API endpoints
-- [ ] **DEBT-07-07:** Standardize API response envelopes
-- [ ] **INFRA-04-15:** Setup CI/CD pipelines (GitHub Actions)
+- [x] **DEBT-07-10:** Add unit tests for business logic
+- [x] **DEBT-07-11:** Add integration tests for API endpoints
+- [x] **DEBT-07-07:** Standardize API response envelopes
+- [x] **INFRA-04-15:** Setup CI/CD pipelines (GitHub Actions)
 
 ### Phase 4: Production Readiness & Observability (Medium Term)
 
 - [ ] **INFRA-04-11:** Setup Nginx reverse proxy with TLS
 - [ ] **INFRA-04-20:** Automate database backups
-- [ ] **DEBT-07-15:** Implement structured JSON logging
+- [x] **DEBT-07-15:** Implement structured JSON logging (Pino)
 - [ ] **DEBT-07-17:** Export APM metrics (latency, pool utilization)
 
 ---

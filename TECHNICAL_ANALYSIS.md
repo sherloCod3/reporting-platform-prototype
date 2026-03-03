@@ -387,7 +387,7 @@
 - **SEC-05-ITEM-06:** Forbidden keyword check uses simple `includes()` on normalized string -- can be bypassed with comments (`/*DELETE*/`), string literals (`'DELETE'`), or substrings in identifiers (`UPDATED_AT`)
   - Impact Level: High
   - Risk Category: Security
-  - Status: Open
+  - Status: Done
 
 - **SEC-05-ITEM-07:** `unifiedConfig.ts` falls back to `"default_secret_dont_use_in_prod"` for JWT secret if env var is missing -- tokens signed with a known secret
   - Impact Level: High
@@ -397,17 +397,17 @@
 - **SEC-05-ITEM-08:** No CSRF protection on state-changing endpoints
   - Impact Level: Medium
   - Risk Category: Security
-  - Status: Open
+  - Status: Done
 
 - **SEC-05-ITEM-09:** `express.json({ limit: '50mb' })` allows large payloads without content validation -- potential for memory exhaustion
   - Impact Level: Medium
   - Risk Category: Security
-  - Status: Open
+  - Status: Done
 
 - **SEC-05-ITEM-10:** JWT tokens stored in `localStorage` -- vulnerable to XSS
   - Impact Level: Medium
   - Risk Category: Security
-  - Status: Open
+  - Status: Done
 
 - **SEC-05-ITEM-11:** No token refresh mechanism; tokens valid for 4-8 hours with no revocation capability
   - Impact Level: Medium
@@ -417,7 +417,7 @@
 - **SEC-05-ITEM-12:** CORS configured with single origin (`FRONTEND_URL` or `localhost:5173`); no origin validation for production
   - Impact Level: Low
   - Risk Category: Security
-  - Status: Open
+  - Status: Done
 
 - **SEC-05-ITEM-13:** Error handler exposes full error details in non-production environments
   - Impact Level: Low
@@ -434,12 +434,12 @@
 - **SEC-05-ITEM-15:** Implement SQL parsing (AST-based) instead of string matching for effective injection prevention
   - Impact Level: High
   - Risk Category: Security
-  - Status: Open
+  - Status: Done
 
 - **SEC-05-ITEM-16:** Add CSRF tokens or SameSite cookie-based auth
   - Impact Level: Medium
   - Risk Category: Security
-  - Status: Open
+  - Status: Done
 
 - **SEC-05-ITEM-17:** Implement token refresh rotation
   - Impact Level: Medium
@@ -449,12 +449,12 @@
 - **SEC-05-ITEM-18:** Add request payload size limits per endpoint
   - Impact Level: Medium
   - Risk Category: Security
-  - Status: Open
+  - Status: Done
 
 - **SEC-05-ITEM-19:** Move JWT storage to httpOnly cookies
   - Impact Level: Medium
   - Risk Category: Security
-  - Status: Open
+  - Status: Done
 
 - **SEC-05-ITEM-20:** Add IP-based login attempt throttling
   - Impact Level: Medium
@@ -490,7 +490,7 @@
 - **SCALE-06-ITEM-03:** Single-process Node.js -- No clustering or worker threads; CPU-bound PDF rendering blocks the event loop
   - Impact Level: High
   - Risk Category: Performance
-  - Status: Open
+  - Status: Done
 
 - **SCALE-06-ITEM-04:** No connection pool cleanup -- Dynamic tenant pools are created but never destroyed; long-running server accumulates idle connections
   - Impact Level: Medium
@@ -507,7 +507,7 @@
 - **SCALE-06-ITEM-06:** No pagination on query execution endpoint; entire result set loaded into memory
   - Impact Level: High
   - Risk Category: Performance
-  - Status: Open
+  - Status: Done
 
 - **SCALE-06-ITEM-07:** `ensureTableExists()` DDL executed on every list/create request to `report-def.controller.ts`
   - Impact Level: Medium
@@ -677,7 +677,7 @@
 - **DEBT-07-ITEM-14:** `requestLogger` logs method and URL only; no request ID, duration, status code, or user context
   - Impact Level: Medium
   - Risk Category: Maintainability
-  - Status: Open
+  - Status: Done
 
 - **DEBT-07-ITEM-15:** No structured logging (JSON format) for log aggregation
   - Impact Level: Medium
@@ -751,7 +751,7 @@
 - **DEBT-07-ITEM-28:** `README.md` project structure section is outdated (references Vite instead of Next.js)
   - Impact Level: Low
   - Risk Category: Maintainability
-  - Status: Open
+  - Status: Done
 
 - **DEBT-07-ITEM-29:** `report.controller.ts` execute route masks client errors (400) as internal server errors (500)
   - Impact Level: Medium
@@ -802,7 +802,7 @@
 - **ROADMAP-08-ITEM-08:** Standardize API response envelope across all endpoints
   - Impact Level: Medium
   - Risk Category: Maintainability
-  - Status: Open
+  - Status: Done
 
 - **ROADMAP-08-ITEM-09:** Align port configuration across Docker, constants, and API defaults
   - Impact Level: Low
@@ -851,12 +851,12 @@
 - **ROADMAP-08-ITEM-17:** Implement clustering or separate worker processes for PDF rendering
   - Impact Level: High
   - Risk Category: Scalability
-  - Status: Open
+  - Status: Done
 
 - **ROADMAP-08-ITEM-18:** Implement pagination for query execution results
   - Impact Level: High
   - Risk Category: Performance
-  - Status: Open
+  - Status: Done
 
 ### Phase 3: Testing & Maintainability (Medium Priority)
 
@@ -873,12 +873,12 @@
 - **ROADMAP-08-ITEM-21:** Standardize API response envelopes
   - Impact Level: Medium
   - Risk Category: Maintainability
-  - Status: Open
+  - Status: Done
 
 - **ROADMAP-08-ITEM-22:** Setup CI/CD pipelines (GitHub Actions)
   - Impact Level: High
   - Risk Category: Maintainability
-  - Status: Open
+  - Status: Done
 
 ### Phase 4: Production Readiness & Observability (Long Term)
 
