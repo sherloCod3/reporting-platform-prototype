@@ -37,6 +37,12 @@ jobs:
           DB_USER: 'test'
           DB_PASSWORD: 'testpassword'
           DB_NAME: 'testdb'
+          AUTH_DB_PORT: '3306'
+          REPORT_DB_HOST: 'localhost'
+          REPORT_DB_READ_USER: 'test_read'
+          REPORT_DB_READ_PASSWORD: 'testpassword'
+          REPORT_DB_WRITE_USER: 'test_write'
+          REPORT_DB_WRITE_PASSWORD: 'testpassword'
           JWT_SECRET: 'testsecret'
           FRONTEND_URL: 'http://localhost:5173'
         run: npm test --if-present
