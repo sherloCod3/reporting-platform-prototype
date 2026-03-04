@@ -32,6 +32,13 @@ jobs:
 
       - name: Run Backend Tests
         working-directory: ./backend
+        env:
+          DB_HOST: 'localhost'
+          DB_USER: 'test'
+          DB_PASSWORD: 'testpassword'
+          DB_NAME: 'testdb'
+          JWT_SECRET: 'testsecret'
+          FRONTEND_URL: 'http://localhost:5173'
         run: npm test --if-present
 
       - name: Run Backend Build
