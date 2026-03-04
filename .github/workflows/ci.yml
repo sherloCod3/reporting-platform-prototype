@@ -26,6 +26,8 @@ jobs:
 
       - name: Install dependencies (Backend)
         working-directory: ./backend
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: 'true'
         run: npm ci
 
       - name: Run Backend Tests
