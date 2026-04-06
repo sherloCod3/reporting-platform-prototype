@@ -70,6 +70,18 @@ The main goal of this repository is to explore:
 
 ---
 
+## Screenshots
+
+> 📸 *Screenshots demonstrating the UI, query editor, and reports will be added here.*
+
+<!-- 
+Add your screenshots below using Markdown format:
+![Dashboard View](./docs/assets/dashboard-preview.png)
+![Query Editor](./docs/assets/query-editor-preview.png)
+-->
+
+---
+
 ## Tech Stack
 
 ### Backend

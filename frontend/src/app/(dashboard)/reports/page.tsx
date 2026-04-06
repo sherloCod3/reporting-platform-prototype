@@ -58,10 +58,10 @@ export default function ReportsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
             Meus Relatórios
           </h1>
-          <p className="text-gray-500">
+          <p className="text-muted-foreground">
             Gerencie todos os seus relatórios e dashboards.
           </p>
         </div>
@@ -78,10 +78,10 @@ export default function ReportsPage() {
           <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mb-4">
             <FileText className="h-6 w-6 text-primary" />
           </div>
-          <h3 className="text-lg font-medium text-gray-900">
+          <h3 className="text-lg font-medium text-foreground">
             Nenhum relatório encontrado
           </h3>
-          <p className="text-gray-500 mt-1 mb-4 text-center max-w-sm">
+          <p className="text-muted-foreground mt-1 mb-4 text-center max-w-sm">
             Você ainda não criou nenhum relatório. Comece criando um novo agora
             mesmo.
           </p>
@@ -142,7 +142,7 @@ function ReportCard({ report }: { report: Report }) {
         </DropdownMenu>
       </CardHeader>
       <CardContent>
-        <div className="flex items-center text-sm text-gray-500 mt-2">
+        <div className="flex items-center text-sm text-muted-foreground mt-2">
           <Calendar className="mr-2 h-4 w-4" />
           {format(new Date(report.created_at), "d 'de' MMMM, yyyy", {
             locale: ptBR
